@@ -1,3 +1,4 @@
+# lib file for connection mysql server
 import mysql.connector
 
 conn_params = {
@@ -8,4 +9,5 @@ conn_params = {
 }
 
 def connect():
+    ''' return database connection '''
     return mysql.connector.connect(**conn_params)
