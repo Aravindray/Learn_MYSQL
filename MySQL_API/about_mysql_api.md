@@ -2,7 +2,7 @@
 
 In windows search find - **Edit the system environment variables** and click *Environment Variables* under *System variables* click *new* if `PYTHONPATH` not exists, Then enter the variable name as `PYTHONPATH` and variable values *the actual file location*. if more than one location user **;** (semicolon) as delimiter.
 
-
+![Setup PYTHONPATH](https://github.com/Aravindray/Learn_MYSQL/blob/main/assets/setting%20PYTHONPATH%20environment%20variables.png)
 
 Alternatively, We can inform the program to search the library file to explicit define them in the script with
 
