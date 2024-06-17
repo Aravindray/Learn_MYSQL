@@ -1,4 +1,4 @@
-# lib file for connection mysql server
+'''lib file for connection mysql server'''
 import mysql.connector
 
 conn_params = {
