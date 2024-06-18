@@ -10,3 +10,25 @@ Alternatively, We can inform the program to search the library file to explicit 
 import sys
 sys.path.append('D:\\desire\\folder\\location') # Don't forget to user escape char \\
 ```
+
+## Handling Special Characters in identifier
+
+In a sql statement the identifier may have special character for example,
+
+```sql
+CREATE TABLE some table (i INT);
+```
+
+above statement through an error to handle it user **`** (backtick) as quotation to identifier.
+
+```sql
+CREATE TABLE `some table` (i INT);
+
+-- Another example., If quoting character appears in identifier just double it abc`def -> `abc``def `
+```
+
+cookbook, profile is identifier, but in the below statement it is used as data value. So quote it as data value.
+
+```sql
+SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'cookbook' AND TABLE_NAME = 'profile';
+```
