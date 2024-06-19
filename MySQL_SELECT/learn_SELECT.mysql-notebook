@@ -1,0 +1,1068 @@
+{
+    "type": "MySQLNotebook",
+    "version": "1.0",
+    "caption": "DB Notebook",
+    "content": "SELECT user();\nUSE cookbook\n-- Want to display specific columns and rows from a table.\nSELECT t, srcuser, srchost, dstuser, dsthost, size FROM mail;\nSELECT srcuser, srchost, t, size FROM mail;\nSELECT t, srcuser, srchost FROM mail WHERE srchost = 'venus';\nSELECT t, srcuser, srchost FROM mail WHERE srchost LIKE 's%';\nSELECT t, srcuser, srchost, dstuser, dsthost, size FROM mail WHERE srcuser = 'barb' AND dstuser = 'tricia';\nSELECT t, CONCAT(srcuser, '@', srchost), size FROM mail;\n-- You can use TABLE instead of SELECT but TABLE supports only ORDER BY and LIMIT clauses only\nTABLE mail ORDER BY size DESC LIMIT 3;\n",
+    "options": {
+        "tabSize": 4,
+        "indentSize": 4,
+        "insertSpaces": true,
+        "defaultEOL": "LF",
+        "trimAutoWhitespace": true
+    },
+    "viewState": {
+        "cursorState": [
+            {
+                "inSelectionMode": false,
+                "selectionStart": {
+                    "lineNumber": 12,
+                    "column": 1
+                },
+                "position": {
+                    "lineNumber": 12,
+                    "column": 1
+                }
+            }
+        ],
+        "viewState": {
+            "scrollLeft": 0,
+            "firstPosition": {
+                "lineNumber": 10,
+                "column": 1
+            },
+            "firstPositionDeltaTop": 349
+        },
+        "contributionsState": {
+            "editor.contrib.folding": {},
+            "editor.contrib.wordHighlighter": false
+        }
+    },
+    "contexts": [
+        {
+            "state": {
+                "start": 1,
+                "end": 1,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "ced1e5ce-41eb-440d-e2cd-256050fc86ad"
+                    ]
+                },
+                "currentHeight": 36,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 14
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "085d0272-6e0b-40cc-c454-1938ae6bbae0",
+                    "resultId": "ced1e5ce-41eb-440d-e2cd-256050fc86ad",
+                    "rows": [
+                        {
+                            "0": "cbuser@localhost"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "user()",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17
+                            }
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 0s"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT user()"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 2,
+                "end": 2,
+                "language": "mysql",
+                "result": {
+                    "type": "text",
+                    "text": [
+                        {
+                            "type": 4,
+                            "index": 0,
+                            "resultId": "9607f898-e74c-4225-be8d-8aa7d7f153ff",
+                            "content": "OK, 0 records retrieved in 0s"
+                        }
+                    ]
+                },
+                "currentHeight": 28,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 12
+                        },
+                        "contentStart": 0,
+                        "state": 3
+                    }
+                ]
+            },
+            "data": []
+        },
+        {
+            "state": {
+                "start": 3,
+                "end": 4,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "5da754e5-9a9a-48b4-ddca-f09955da0085"
+                    ]
+                },
+                "currentHeight": 36,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 120
+                        },
+                        "contentStart": 59,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "085d0272-6e0b-40cc-c454-1938ae6bbae0",
+                    "resultId": "5da754e5-9a9a-48b4-ddca-f09955da0085",
+                    "rows": [
+                        {
+                            "0": "2014-05-11 10:15:08",
+                            "1": "barb",
+                            "2": "saturn",
+                            "3": "tricia",
+                            "4": "mars",
+                            "5": 58274
+                        },
+                        {
+                            "0": "2014-05-12 12:48:13",
+                            "1": "tricia",
+                            "2": "mars",
+                            "3": "gene",
+                            "4": "venus",
+                            "5": 194925
+                        },
+                        {
+                            "0": "2014-05-12 15:02:49",
+                            "1": "phil",
+                            "2": "mars",
+                            "3": "phil",
+                            "4": "saturn",
+                            "5": 1048
+                        },
+                        {
+                            "0": "2014-05-12 18:59:18",
+                            "1": "barb",
+                            "2": "saturn",
+                            "3": "tricia",
+                            "4": "venus",
+                            "5": 271
+                        },
+                        {
+                            "0": "2014-05-14 09:31:37",
+                            "1": "gene",
+                            "2": "venus",
+                            "3": "barb",
+                            "4": "mars",
+                            "5": 2291
+                        },
+                        {
+                            "0": "2014-05-14 11:52:17",
+                            "1": "phil",
+                            "2": "mars",
+                            "3": "tricia",
+                            "4": "saturn",
+                            "5": 5781
+                        },
+                        {
+                            "0": "2014-05-14 14:42:21",
+                            "1": "barb",
+                            "2": "venus",
+                            "3": "barb",
+                            "4": "venus",
+                            "5": 98151
+                        },
+                        {
+                            "0": "2014-05-14 17:03:01",
+                            "1": "tricia",
+                            "2": "saturn",
+                            "3": "phil",
+                            "4": "venus",
+                            "5": 2394482
+                        },
+                        {
+                            "0": "2014-05-15 07:17:48",
+                            "1": "gene",
+                            "2": "mars",
+                            "3": "gene",
+                            "4": "saturn",
+                            "5": 3824
+                        },
+                        {
+                            "0": "2014-05-15 08:50:57",
+                            "1": "phil",
+                            "2": "venus",
+                            "3": "phil",
+                            "4": "venus",
+                            "5": 978
+                        },
+                        {
+                            "0": "2014-05-15 10:25:52",
+                            "1": "gene",
+                            "2": "mars",
+                            "3": "tricia",
+                            "4": "saturn",
+                            "5": 998532
+                        },
+                        {
+                            "0": "2014-05-15 17:35:31",
+                            "1": "gene",
+                            "2": "saturn",
+                            "3": "gene",
+                            "4": "mars",
+                            "5": 3856
+                        },
+                        {
+                            "0": "2014-05-16 09:00:28",
+                            "1": "gene",
+                            "2": "venus",
+                            "3": "barb",
+                            "4": "mars",
+                            "5": 613
+                        },
+                        {
+                            "0": "2014-05-16 23:04:19",
+                            "1": "phil",
+                            "2": "venus",
+                            "3": "barb",
+                            "4": "venus",
+                            "5": 10294
+                        },
+                        {
+                            "0": "2014-05-19 12:49:23",
+                            "1": "phil",
+                            "2": "mars",
+                            "3": "tricia",
+                            "4": "saturn",
+                            "5": 873
+                        },
+                        {
+                            "0": "2014-05-19 22:21:51",
+                            "1": "gene",
+                            "2": "saturn",
+                            "3": "gene",
+                            "4": "venus",
+                            "5": 23992
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "t",
+                            "field": "0",
+                            "dataType": {
+                                "type": 26
+                            }
+                        },
+                        {
+                            "title": "srcuser",
+                            "field": "1",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "srchost",
+                            "field": "2",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "dstuser",
+                            "field": "3",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "dsthost",
+                            "field": "4",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "size",
+                            "field": "5",
+                            "dataType": {
+                                "type": 5
+                            }
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 16 records retrieved in 0s"
+                    },
+                    "totalRowCount": 16,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "-- Want to display specific columns and rows from a table.\nSELECT t, srcuser, srchost, dstuser, dsthost, size FROM mail"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 5,
+                "end": 5,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "e61259d9-c753-4f5e-a029-c06457b4eae4"
+                    ]
+                },
+                "currentHeight": 36,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 43
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "085d0272-6e0b-40cc-c454-1938ae6bbae0",
+                    "resultId": "e61259d9-c753-4f5e-a029-c06457b4eae4",
+                    "rows": [
+                        {
+                            "0": "barb",
+                            "1": "saturn",
+                            "2": "2014-05-11 10:15:08",
+                            "3": 58274
+                        },
+                        {
+                            "0": "tricia",
+                            "1": "mars",
+                            "2": "2014-05-12 12:48:13",
+                            "3": 194925
+                        },
+                        {
+                            "0": "phil",
+                            "1": "mars",
+                            "2": "2014-05-12 15:02:49",
+                            "3": 1048
+                        },
+                        {
+                            "0": "barb",
+                            "1": "saturn",
+                            "2": "2014-05-12 18:59:18",
+                            "3": 271
+                        },
+                        {
+                            "0": "gene",
+                            "1": "venus",
+                            "2": "2014-05-14 09:31:37",
+                            "3": 2291
+                        },
+                        {
+                            "0": "phil",
+                            "1": "mars",
+                            "2": "2014-05-14 11:52:17",
+                            "3": 5781
+                        },
+                        {
+                            "0": "barb",
+                            "1": "venus",
+                            "2": "2014-05-14 14:42:21",
+                            "3": 98151
+                        },
+                        {
+                            "0": "tricia",
+                            "1": "saturn",
+                            "2": "2014-05-14 17:03:01",
+                            "3": 2394482
+                        },
+                        {
+                            "0": "gene",
+                            "1": "mars",
+                            "2": "2014-05-15 07:17:48",
+                            "3": 3824
+                        },
+                        {
+                            "0": "phil",
+                            "1": "venus",
+                            "2": "2014-05-15 08:50:57",
+                            "3": 978
+                        },
+                        {
+                            "0": "gene",
+                            "1": "mars",
+                            "2": "2014-05-15 10:25:52",
+                            "3": 998532
+                        },
+                        {
+                            "0": "gene",
+                            "1": "saturn",
+                            "2": "2014-05-15 17:35:31",
+                            "3": 3856
+                        },
+                        {
+                            "0": "gene",
+                            "1": "venus",
+                            "2": "2014-05-16 09:00:28",
+                            "3": 613
+                        },
+                        {
+                            "0": "phil",
+                            "1": "venus",
+                            "2": "2014-05-16 23:04:19",
+                            "3": 10294
+                        },
+                        {
+                            "0": "phil",
+                            "1": "mars",
+                            "2": "2014-05-19 12:49:23",
+                            "3": 873
+                        },
+                        {
+                            "0": "gene",
+                            "1": "saturn",
+                            "2": "2014-05-19 22:21:51",
+                            "3": 23992
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "srcuser",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "srchost",
+                            "field": "1",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "t",
+                            "field": "2",
+                            "dataType": {
+                                "type": 26
+                            }
+                        },
+                        {
+                            "title": "size",
+                            "field": "3",
+                            "dataType": {
+                                "type": 5
+                            }
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 16 records retrieved in 0s"
+                    },
+                    "totalRowCount": 16,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT srcuser, srchost, t, size FROM mail"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 6,
+                "end": 6,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "756dff25-eea3-4a20-a39a-d7e5c94e91cd"
+                    ]
+                },
+                "currentHeight": 36,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 61
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "085d0272-6e0b-40cc-c454-1938ae6bbae0",
+                    "resultId": "756dff25-eea3-4a20-a39a-d7e5c94e91cd",
+                    "rows": [
+                        {
+                            "0": "2014-05-14 09:31:37",
+                            "1": "gene",
+                            "2": "venus"
+                        },
+                        {
+                            "0": "2014-05-14 14:42:21",
+                            "1": "barb",
+                            "2": "venus"
+                        },
+                        {
+                            "0": "2014-05-15 08:50:57",
+                            "1": "phil",
+                            "2": "venus"
+                        },
+                        {
+                            "0": "2014-05-16 09:00:28",
+                            "1": "gene",
+                            "2": "venus"
+                        },
+                        {
+                            "0": "2014-05-16 23:04:19",
+                            "1": "phil",
+                            "2": "venus"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "t",
+                            "field": "0",
+                            "dataType": {
+                                "type": 26
+                            }
+                        },
+                        {
+                            "title": "srcuser",
+                            "field": "1",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "srchost",
+                            "field": "2",
+                            "dataType": {
+                                "type": 17
+                            }
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 5 records retrieved in 0s"
+                    },
+                    "totalRowCount": 5,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT t, srcuser, srchost FROM mail WHERE srchost = 'venus'"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 7,
+                "end": 7,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "37da666e-0098-4a83-8e8f-188a9723bf3e"
+                    ]
+                },
+                "currentHeight": 36,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 61
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "085d0272-6e0b-40cc-c454-1938ae6bbae0",
+                    "resultId": "37da666e-0098-4a83-8e8f-188a9723bf3e",
+                    "rows": [
+                        {
+                            "0": "2014-05-11 10:15:08",
+                            "1": "barb",
+                            "2": "saturn"
+                        },
+                        {
+                            "0": "2014-05-12 18:59:18",
+                            "1": "barb",
+                            "2": "saturn"
+                        },
+                        {
+                            "0": "2014-05-14 17:03:01",
+                            "1": "tricia",
+                            "2": "saturn"
+                        },
+                        {
+                            "0": "2014-05-15 17:35:31",
+                            "1": "gene",
+                            "2": "saturn"
+                        },
+                        {
+                            "0": "2014-05-19 22:21:51",
+                            "1": "gene",
+                            "2": "saturn"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "t",
+                            "field": "0",
+                            "dataType": {
+                                "type": 26
+                            }
+                        },
+                        {
+                            "title": "srcuser",
+                            "field": "1",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "srchost",
+                            "field": "2",
+                            "dataType": {
+                                "type": 17
+                            }
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 5 records retrieved in 0s"
+                    },
+                    "totalRowCount": 5,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT t, srcuser, srchost FROM mail WHERE srchost LIKE 's%'"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 8,
+                "end": 8,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "83d55b81-0298-489e-edad-74483daf39f2"
+                    ]
+                },
+                "currentHeight": 36,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 107
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "085d0272-6e0b-40cc-c454-1938ae6bbae0",
+                    "resultId": "83d55b81-0298-489e-edad-74483daf39f2",
+                    "rows": [
+                        {
+                            "0": "2014-05-11 10:15:08",
+                            "1": "barb",
+                            "2": "saturn",
+                            "3": "tricia",
+                            "4": "mars",
+                            "5": 58274
+                        },
+                        {
+                            "0": "2014-05-12 18:59:18",
+                            "1": "barb",
+                            "2": "saturn",
+                            "3": "tricia",
+                            "4": "venus",
+                            "5": 271
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "t",
+                            "field": "0",
+                            "dataType": {
+                                "type": 26
+                            }
+                        },
+                        {
+                            "title": "srcuser",
+                            "field": "1",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "srchost",
+                            "field": "2",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "dstuser",
+                            "field": "3",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "dsthost",
+                            "field": "4",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "size",
+                            "field": "5",
+                            "dataType": {
+                                "type": 5
+                            }
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 2 records retrieved in 8ms"
+                    },
+                    "totalRowCount": 2,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT t, srcuser, srchost, dstuser, dsthost, size FROM mail WHERE srcuser = 'barb' AND dstuser = 'tricia'"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 9,
+                "end": 9,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "94307834-f1e7-48b8-ab09-0e3a08b637f0"
+                    ]
+                },
+                "currentHeight": 352,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 56
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "085d0272-6e0b-40cc-c454-1938ae6bbae0",
+                    "resultId": "94307834-f1e7-48b8-ab09-0e3a08b637f0",
+                    "rows": [
+                        {
+                            "0": "2014-05-11 10:15:08",
+                            "1": "barb@saturn",
+                            "2": 58274
+                        },
+                        {
+                            "0": "2014-05-12 12:48:13",
+                            "1": "tricia@mars",
+                            "2": 194925
+                        },
+                        {
+                            "0": "2014-05-12 15:02:49",
+                            "1": "phil@mars",
+                            "2": 1048
+                        },
+                        {
+                            "0": "2014-05-12 18:59:18",
+                            "1": "barb@saturn",
+                            "2": 271
+                        },
+                        {
+                            "0": "2014-05-14 09:31:37",
+                            "1": "gene@venus",
+                            "2": 2291
+                        },
+                        {
+                            "0": "2014-05-14 11:52:17",
+                            "1": "phil@mars",
+                            "2": 5781
+                        },
+                        {
+                            "0": "2014-05-14 14:42:21",
+                            "1": "barb@venus",
+                            "2": 98151
+                        },
+                        {
+                            "0": "2014-05-14 17:03:01",
+                            "1": "tricia@saturn",
+                            "2": 2394482
+                        },
+                        {
+                            "0": "2014-05-15 07:17:48",
+                            "1": "gene@mars",
+                            "2": 3824
+                        },
+                        {
+                            "0": "2014-05-15 08:50:57",
+                            "1": "phil@venus",
+                            "2": 978
+                        },
+                        {
+                            "0": "2014-05-15 10:25:52",
+                            "1": "gene@mars",
+                            "2": 998532
+                        },
+                        {
+                            "0": "2014-05-15 17:35:31",
+                            "1": "gene@saturn",
+                            "2": 3856
+                        },
+                        {
+                            "0": "2014-05-16 09:00:28",
+                            "1": "gene@venus",
+                            "2": 613
+                        },
+                        {
+                            "0": "2014-05-16 23:04:19",
+                            "1": "phil@venus",
+                            "2": 10294
+                        },
+                        {
+                            "0": "2014-05-19 12:49:23",
+                            "1": "phil@mars",
+                            "2": 873
+                        },
+                        {
+                            "0": "2014-05-19 22:21:51",
+                            "1": "gene@saturn",
+                            "2": 23992
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "t",
+                            "field": "0",
+                            "dataType": {
+                                "type": 26
+                            }
+                        },
+                        {
+                            "title": "CONCAT(srcuser, '@', srchost)",
+                            "field": "1",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "size",
+                            "field": "2",
+                            "dataType": {
+                                "type": 5
+                            }
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 16 records retrieved in 0s"
+                    },
+                    "totalRowCount": 16,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT t, CONCAT(srcuser, '@', srchost), size FROM mail"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 10,
+                "end": 11,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "a69e647c-195d-40d0-b0aa-b69741a7b2b6"
+                    ]
+                },
+                "currentHeight": 171.921875,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 133
+                        },
+                        "contentStart": 95,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "085d0272-6e0b-40cc-c454-1938ae6bbae0",
+                    "resultId": "a69e647c-195d-40d0-b0aa-b69741a7b2b6",
+                    "rows": [
+                        {
+                            "0": 8,
+                            "1": "2014-05-14 17:03:01",
+                            "2": "tricia",
+                            "3": "saturn",
+                            "4": "phil",
+                            "5": "venus",
+                            "6": 2394482
+                        },
+                        {
+                            "0": 11,
+                            "1": "2014-05-15 10:25:52",
+                            "2": "gene",
+                            "3": "mars",
+                            "4": "tricia",
+                            "5": "saturn",
+                            "6": 998532
+                        },
+                        {
+                            "0": 2,
+                            "1": "2014-05-12 12:48:13",
+                            "2": "tricia",
+                            "3": "mars",
+                            "4": "gene",
+                            "5": "venus",
+                            "6": 194925
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "id",
+                            "field": "0",
+                            "dataType": {
+                                "type": 4
+                            }
+                        },
+                        {
+                            "title": "t",
+                            "field": "1",
+                            "dataType": {
+                                "type": 26
+                            }
+                        },
+                        {
+                            "title": "srcuser",
+                            "field": "2",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "srchost",
+                            "field": "3",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "dstuser",
+                            "field": "4",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "dsthost",
+                            "field": "5",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "size",
+                            "field": "6",
+                            "dataType": {
+                                "type": 5
+                            }
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 3 records retrieved in 0s"
+                    },
+                    "totalRowCount": 3,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "-- You can use TABLE instead of SELECT but TABLE supports only ORDER BY and LIMIT clauses only\nTABLE mail ORDER BY size DESC LIMIT 3"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 12,
+                "end": 12,
+                "language": "mysql",
+                "currentHeight": 180,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 0
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": []
+        }
+    ]
+}
