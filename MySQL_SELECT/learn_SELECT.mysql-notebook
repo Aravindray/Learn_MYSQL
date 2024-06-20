@@ -2,7 +2,7 @@
     "type": "MySQLNotebook",
     "version": "1.0",
     "caption": "DB Notebook",
-    "content": "SELECT user();\nUSE cookbook\n-- Want to display specific columns and rows from a table.\nSELECT t, srcuser, srchost, dstuser, dsthost, size FROM mail;\nSELECT srcuser, srchost, t, size FROM mail;\nSELECT t, srcuser, srchost FROM mail WHERE srchost = 'venus';\nSELECT t, srcuser, srchost FROM mail WHERE srchost LIKE 's%';\nSELECT t, srcuser, srchost, dstuser, dsthost, size FROM mail WHERE srcuser = 'barb' AND dstuser = 'tricia';\nSELECT t, CONCAT(srcuser, '@', srchost), size FROM mail;\n-- You can use TABLE instead of SELECT but TABLE supports only ORDER BY and LIMIT clauses only\nTABLE mail ORDER BY size DESC LIMIT 4;\n-- Naming Query Result Columns with aliases\nSELECT DATE_FORMAT(t, '%M %e, %Y'), CONCAT(srcuser,'@',srchost), size FROM mail;\nSELECT\nDATE_FORMAT(t, '%M %e, %Y') AS date_sent,\nCONCAT(srcuser,'@',srchost) AS sender,\nsize FROM mail;\nSELECT\nDATE_FORMAT(t, '%M %e, %Y') AS 'Date of message',\nCONCAT(srcuser,'@',srchost) AS 'Message sender',\nsize AS 'Number of byts' FROM mail;\nSELECT 1 AS 'INTEGER';\nSELECT t, srcuser, dstuser, size/1024 AS Kilobytes\nFROM mail;\nSELECT t, srcuser, dstuser, size/1024 AS Kilobytes FROM mail\nWHERE size/1024 > 500;\n-- Sorting Query Result\nSELECT t, srcuser, srchost, dstuser, dsthost, size FROM mail WHERE dstuser = 'tricia'\nORDER BY srchost, srcuser;\nSELECT t, srcuser, srchost,dstuser, dsthost, size FROM mail\nWHERE size > 50000 ORDER BY size DESC;\n-- Removing Duplicate Rows\nSELECT srcuser from mail;\n-- Using DISTINCT to remove duplicate\nSELECT DISTINCT srcuser from mail;\n-- Using COUNT to find no of result\nSELECT COUNT(srcuser) FROM mail;\nSELECT COUNT(DISTINCT srcuser) FROM mail;\nSELECT DISTINCT YEAR(t), MONTH(t), DAYOFMONTH(t) FROM mail;\n-- Working with NULL VALUES\n-- Failing Statement\nSELECT * FROM expt WHERE score = NULL;\nSELECT * FROM expt WHERE score <> NULL;\n-- MySQL NULL operator IS NULL, IS NOT NULL, <=>\nSELECT * FROM expt WHERE score IS NULL;\nSELECT * FROM expt WHERE score IS NOT NULL;\nSELECT * FROM expt WHERE score <=> NULL;\nSELECT NULL = NULL, NULL <=> NULL;\n-- Using IF() to replace NULL value into different value\n-- IF SYNTAX: IF(condition, true, false)\nSELECT subject, test, if (score IS NULL, 'Unknown', score) AS 'score' FROM expt;\n-- Using IFNULL(IF NOT NULL[false], IF NULL[true])\nSELECT subject, test, IFNULL(score, 'Unknown') AS 'score' FROM expt;\n-- The above is equal to IF (score IS NOT NULL, score, 'Unknown')\n-- Using COALESCE\nSELECT subject, test, COALESCE(score, 'Unknown') AS 'score' FROM expt;\n",
+    "content": "SELECT user();\nUSE cookbook;\n-- Want to display specific columns and rows from a table.\nSELECT t, srcuser, srchost, dstuser, dsthost, size FROM mail;\nSELECT srcuser, srchost, t, size FROM mail;\nSELECT t, srcuser, srchost FROM mail WHERE srchost = 'venus';\nSELECT t, srcuser, srchost FROM mail WHERE srchost LIKE 's%';\nSELECT t, srcuser, srchost, dstuser, dsthost, size FROM mail WHERE srcuser = 'barb' AND dstuser = 'tricia';\nSELECT t, CONCAT(srcuser, '@', srchost), size FROM mail;\n-- You can use TABLE instead of SELECT but TABLE supports only ORDER BY and LIMIT clauses only\nTABLE mail ORDER BY size DESC LIMIT 4;\n-- Naming Query Result Columns with aliases\nSELECT DATE_FORMAT(t, '%M %e, %Y'), CONCAT(srcuser,'@',srchost), size FROM mail;\nSELECT\nDATE_FORMAT(t, '%M %e, %Y') AS date_sent,\nCONCAT(srcuser,'@',srchost) AS sender,\nsize FROM mail;\nSELECT\nDATE_FORMAT(t, '%M %e, %Y') AS 'Date of message',\nCONCAT(srcuser,'@',srchost) AS 'Message sender',\nsize AS 'Number of byts' FROM mail;\nSELECT 1 AS 'INTEGER';\nSELECT t, srcuser, dstuser, size/1024 AS Kilobytes\nFROM mail;\nSELECT t, srcuser, dstuser, size/1024 AS Kilobytes FROM mail\nWHERE size/1024 > 500;\n-- Sorting Query Result\nSELECT t, srcuser, srchost, dstuser, dsthost, size FROM mail WHERE dstuser = 'tricia'\nORDER BY srchost, srcuser;\nSELECT t, srcuser, srchost,dstuser, dsthost, size FROM mail\nWHERE size > 50000 ORDER BY size DESC;\n-- Removing Duplicate Rows\nSELECT srcuser from mail;\n-- Using DISTINCT to remove duplicate\nSELECT DISTINCT srcuser from mail;\n-- Using COUNT to find no of result\nSELECT COUNT(srcuser) FROM mail;\nSELECT COUNT(DISTINCT srcuser) FROM mail;\nSELECT DISTINCT YEAR(t), MONTH(t), DAYOFMONTH(t) FROM mail;\n-- Working with NULL VALUES\n-- Failing Statement\nSELECT * FROM expt WHERE score = NULL;\nSELECT * FROM expt WHERE score <> NULL;\n-- MySQL NULL operator IS NULL, IS NOT NULL, <=>\nSELECT * FROM expt WHERE score IS NULL;\nSELECT * FROM expt WHERE score IS NOT NULL;\nSELECT * FROM expt WHERE score <=> NULL;\nSELECT NULL = NULL, NULL <=> NULL;\n-- Using IF() to replace NULL value into different value\n-- IF SYNTAX: IF(condition, true, false)\nSELECT subject, test, if (score IS NULL, 'Unknown', score) AS 'score' FROM expt;\n-- Using IFNULL(IF NOT NULL[false], IF NULL[true])\nSELECT subject, test, IFNULL(score, 'Unknown') AS 'score' FROM expt;\n-- The above is equal to IF (score IS NOT NULL, score, 'Unknown')\n-- Using COALESCE\nSELECT subject, test, COALESCE(score, 'Unknown') AS 'score' FROM expt;\n-- Using VIEWS to simplify table access\nSELECT\nDATE_FORMAT(t, '%M %e, %Y') AS 'date_sent',\nCONCAT(srcuser,'@',srchost) AS 'sender',\nCONCAT(dstuser,'@',dsthost) AS 'recipient',\nsize FROM mail;\nCREATE VIEW mail_view AS\nSELECT\nDATE_FORMAT(t, '%M %e, %Y') AS 'date_sent',\nCONCAT(srcuser,'@',srchost) AS 'sender',\nCONCAT(dstuser,'@',dsthost) AS 'recipient',\nsize FROM mail;\nSELECT date_sent, sender, size FROM mail_view\nWHERE size > 100000 ORDER BY size;\n-- Using JOIN to query the result from Two or More tables\nSELECT profile.id, name, service, contact_name FROM profile_contact INNER JOIN profile ON profile.id = profile_id;\n",
     "options": {
         "tabSize": 4,
         "indentSize": 4,
@@ -15,11 +15,11 @@
             {
                 "inSelectionMode": false,
                 "selectionStart": {
-                    "lineNumber": 57,
+                    "lineNumber": 73,
                     "column": 1
                 },
                 "position": {
-                    "lineNumber": 57,
+                    "lineNumber": 73,
                     "column": 1
                 }
             }
@@ -27,10 +27,10 @@
         "viewState": {
             "scrollLeft": 0,
             "firstPosition": {
-                "lineNumber": 54,
+                "lineNumber": 70,
                 "column": 1
             },
-            "firstPositionDeltaTop": 185
+            "firstPositionDeltaTop": -18
         },
         "contributionsState": {
             "editor.contrib.folding": {},
@@ -46,7 +46,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "ea232310-e34e-4ef9-a3ac-44d55e0b48e5"
+                        "c30f5537-67ad-434b-8120-8804563f0366"
                     ]
                 },
                 "currentHeight": 36,
@@ -64,8 +64,8 @@
             },
             "data": [
                 {
-                    "tabId": "1667a34f-4c15-4053-a228-838ec30c7a77",
-                    "resultId": "ea232310-e34e-4ef9-a3ac-44d55e0b48e5",
+                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
+                    "resultId": "c30f5537-67ad-434b-8120-8804563f0366",
                     "rows": [
                         {
                             "0": "cbuser@localhost"
@@ -102,8 +102,8 @@
                         {
                             "type": 4,
                             "index": 0,
-                            "resultId": "8f7500e8-7aaf-4b58-d431-8f0209f008ec",
-                            "content": "OK, 0 records retrieved in 8.501ms"
+                            "resultId": "2cd19135-530b-4b0d-e740-fd70dc3d0c2e",
+                            "content": "OK, 0 records retrieved in 0s"
                         }
                     ]
                 },
@@ -113,10 +113,10 @@
                         "delimiter": ";",
                         "span": {
                             "start": 0,
-                            "length": 12
+                            "length": 13
                         },
                         "contentStart": 0,
-                        "state": 3
+                        "state": 0
                     }
                 ]
             },
@@ -130,7 +130,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "a1910d32-72fd-40b0-a434-922817f82111"
+                        "1b2bd6dc-5ab7-4b80-a3de-492128b4bc40"
                     ]
                 },
                 "currentHeight": 36,
@@ -148,8 +148,8 @@
             },
             "data": [
                 {
-                    "tabId": "1667a34f-4c15-4053-a228-838ec30c7a77",
-                    "resultId": "a1910d32-72fd-40b0-a434-922817f82111",
+                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
+                    "resultId": "1b2bd6dc-5ab7-4b80-a3de-492128b4bc40",
                     "rows": [
                         {
                             "0": "2014-05-11 10:15:08",
@@ -343,7 +343,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "b609425a-d2ec-4998-92a7-2f58c058eb74"
+                        "36263565-2017-4d6c-c189-ee4c4728f4aa"
                     ]
                 },
                 "currentHeight": 36,
@@ -361,8 +361,8 @@
             },
             "data": [
                 {
-                    "tabId": "1667a34f-4c15-4053-a228-838ec30c7a77",
-                    "resultId": "b609425a-d2ec-4998-92a7-2f58c058eb74",
+                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
+                    "resultId": "36263565-2017-4d6c-c189-ee4c4728f4aa",
                     "rows": [
                         {
                             "0": "barb",
@@ -510,7 +510,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "71c75f12-6cf3-4d62-9501-4893e5fae253"
+                        "f0d9315f-ae84-4222-acad-7ac50ddf3482"
                     ]
                 },
                 "currentHeight": 36,
@@ -528,8 +528,8 @@
             },
             "data": [
                 {
-                    "tabId": "1667a34f-4c15-4053-a228-838ec30c7a77",
-                    "resultId": "71c75f12-6cf3-4d62-9501-4893e5fae253",
+                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
+                    "resultId": "f0d9315f-ae84-4222-acad-7ac50ddf3482",
                     "rows": [
                         {
                             "0": "2014-05-14 09:31:37",
@@ -599,7 +599,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "99db29c1-989c-4206-de16-aafe3449662a"
+                        "26db5b4f-0409-4389-b652-017e2bc37a5c"
                     ]
                 },
                 "currentHeight": 36,
@@ -617,8 +617,8 @@
             },
             "data": [
                 {
-                    "tabId": "1667a34f-4c15-4053-a228-838ec30c7a77",
-                    "resultId": "99db29c1-989c-4206-de16-aafe3449662a",
+                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
+                    "resultId": "26db5b4f-0409-4389-b652-017e2bc37a5c",
                     "rows": [
                         {
                             "0": "2014-05-11 10:15:08",
@@ -688,7 +688,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "91b64ee3-139a-437f-d21a-1e7c3a9ac11a"
+                        "c1d5719a-0881-43dc-d3c9-1b5091d424d2"
                     ]
                 },
                 "currentHeight": 36,
@@ -706,8 +706,8 @@
             },
             "data": [
                 {
-                    "tabId": "1667a34f-4c15-4053-a228-838ec30c7a77",
-                    "resultId": "91b64ee3-139a-437f-d21a-1e7c3a9ac11a",
+                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
+                    "resultId": "c1d5719a-0881-43dc-d3c9-1b5091d424d2",
                     "rows": [
                         {
                             "0": "2014-05-11 10:15:08",
@@ -789,7 +789,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "eef16b54-aa48-4bbb-8706-63bd4cadb71a"
+                        "de93c1e6-eab5-4980-96c3-4842391a326e"
                     ]
                 },
                 "currentHeight": 352,
@@ -807,8 +807,8 @@
             },
             "data": [
                 {
-                    "tabId": "1667a34f-4c15-4053-a228-838ec30c7a77",
-                    "resultId": "eef16b54-aa48-4bbb-8706-63bd4cadb71a",
+                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
+                    "resultId": "de93c1e6-eab5-4980-96c3-4842391a326e",
                     "rows": [
                         {
                             "0": "2014-05-11 10:15:08",
@@ -933,7 +933,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "6c17c309-9c4f-4a74-9294-f57919cf8652"
+                        "dda26fd4-cc4d-4b6a-dbd6-040e5a4faded"
                     ]
                 },
                 "currentHeight": 36,
@@ -951,8 +951,8 @@
             },
             "data": [
                 {
-                    "tabId": "1667a34f-4c15-4053-a228-838ec30c7a77",
-                    "resultId": "6c17c309-9c4f-4a74-9294-f57919cf8652",
+                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
+                    "resultId": "dda26fd4-cc4d-4b6a-dbd6-040e5a4faded",
                     "rows": [
                         {
                             "0": 8,
@@ -1061,7 +1061,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "1119405f-9848-41db-d664-317b98570b30"
+                        "cfa2878d-797a-4b76-e4db-f3f1ec96f0d6"
                     ]
                 },
                 "currentHeight": 36,
@@ -1079,8 +1079,8 @@
             },
             "data": [
                 {
-                    "tabId": "1667a34f-4c15-4053-a228-838ec30c7a77",
-                    "resultId": "1119405f-9848-41db-d664-317b98570b30",
+                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
+                    "resultId": "cfa2878d-797a-4b76-e4db-f3f1ec96f0d6",
                     "rows": [
                         {
                             "0": "May 11, 2014",
@@ -1205,7 +1205,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "404c22fe-5773-4f3b-c301-1b1592088793"
+                        "b0fd8eba-16ba-4aa6-e1d7-80dde218fe86"
                     ]
                 },
                 "currentHeight": 36,
@@ -1223,8 +1223,8 @@
             },
             "data": [
                 {
-                    "tabId": "1667a34f-4c15-4053-a228-838ec30c7a77",
-                    "resultId": "404c22fe-5773-4f3b-c301-1b1592088793",
+                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
+                    "resultId": "b0fd8eba-16ba-4aa6-e1d7-80dde218fe86",
                     "rows": [
                         {
                             "0": "May 11, 2014",
@@ -1349,7 +1349,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "86934395-6c09-476c-b835-182e1987cd24"
+                        "0d232b2e-ca5f-48bc-a831-dad8f48f666c"
                     ]
                 },
                 "currentHeight": 36,
@@ -1367,8 +1367,8 @@
             },
             "data": [
                 {
-                    "tabId": "1667a34f-4c15-4053-a228-838ec30c7a77",
-                    "resultId": "86934395-6c09-476c-b835-182e1987cd24",
+                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
+                    "resultId": "0d232b2e-ca5f-48bc-a831-dad8f48f666c",
                     "rows": [
                         {
                             "0": "May 11, 2014",
@@ -1493,7 +1493,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "7a792e21-49a4-420d-edfd-26049241c4d2"
+                        "b4961416-645f-4227-85bf-861f1b2f3624"
                     ]
                 },
                 "currentHeight": 106.640625,
@@ -1511,8 +1511,8 @@
             },
             "data": [
                 {
-                    "tabId": "1667a34f-4c15-4053-a228-838ec30c7a77",
-                    "resultId": "7a792e21-49a4-420d-edfd-26049241c4d2",
+                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
+                    "resultId": "b4961416-645f-4227-85bf-861f1b2f3624",
                     "rows": [
                         {
                             "0": 1
@@ -1546,7 +1546,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "1844de63-4184-4705-d025-95a43c43e13f"
+                        "4091d3e3-d079-4013-9e42-6c2d6509f632"
                     ]
                 },
                 "currentHeight": 36,
@@ -1564,8 +1564,8 @@
             },
             "data": [
                 {
-                    "tabId": "1667a34f-4c15-4053-a228-838ec30c7a77",
-                    "resultId": "1844de63-4184-4705-d025-95a43c43e13f",
+                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
+                    "resultId": "4091d3e3-d079-4013-9e42-6c2d6509f632",
                     "rows": [
                         {
                             "0": "2014-05-11 10:15:08",
@@ -1713,7 +1713,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "bbc08970-917e-4b6d-b81e-7d34779025b6"
+                        "a5e7ef10-6ede-4d9b-b5cb-22b3e0539abc"
                     ]
                 },
                 "currentHeight": 36,
@@ -1731,8 +1731,8 @@
             },
             "data": [
                 {
-                    "tabId": "1667a34f-4c15-4053-a228-838ec30c7a77",
-                    "resultId": "bbc08970-917e-4b6d-b81e-7d34779025b6",
+                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
+                    "resultId": "a5e7ef10-6ede-4d9b-b5cb-22b3e0539abc",
                     "rows": [
                         {
                             "0": "2014-05-14 17:03:01",
@@ -1796,7 +1796,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "f92d8182-8783-4ed3-b10c-fcdb6dabdfbe"
+                        "e3ff2d46-f5ba-4e7f-fe35-cbf0bb3ea694"
                     ]
                 },
                 "currentHeight": 36,
@@ -1823,8 +1823,8 @@
             },
             "data": [
                 {
-                    "tabId": "1667a34f-4c15-4053-a228-838ec30c7a77",
-                    "resultId": "f92d8182-8783-4ed3-b10c-fcdb6dabdfbe",
+                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
+                    "resultId": "e3ff2d46-f5ba-4e7f-fe35-cbf0bb3ea694",
                     "rows": [
                         {
                             "0": "2014-05-15 10:25:52",
@@ -1930,7 +1930,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "4fd4cb63-527b-4ba3-f98b-7c94ed7d371d"
+                        "41fc8245-d5dd-4f00-aa9b-078332a95571"
                     ]
                 },
                 "currentHeight": 36,
@@ -1957,8 +1957,8 @@
             },
             "data": [
                 {
-                    "tabId": "1667a34f-4c15-4053-a228-838ec30c7a77",
-                    "resultId": "4fd4cb63-527b-4ba3-f98b-7c94ed7d371d",
+                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
+                    "resultId": "41fc8245-d5dd-4f00-aa9b-078332a95571",
                     "rows": [
                         {
                             "0": "2014-05-14 17:03:01",
@@ -2064,7 +2064,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "f0a8825f-9b2b-4d75-ccdf-ebfd695eaade"
+                        "fef24504-b072-4b01-8a32-a8b8fb2a3e5f"
                     ]
                 },
                 "currentHeight": 352,
@@ -2091,8 +2091,8 @@
             },
             "data": [
                 {
-                    "tabId": "1667a34f-4c15-4053-a228-838ec30c7a77",
-                    "resultId": "f0a8825f-9b2b-4d75-ccdf-ebfd695eaade",
+                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
+                    "resultId": "fef24504-b072-4b01-8a32-a8b8fb2a3e5f",
                     "rows": [
                         {
                             "0": "barb"
@@ -2171,7 +2171,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "881bb9c1-fe35-4468-bc8f-a01cdd01f3db"
+                        "600ed189-65e5-483e-8714-97667d2dbe98"
                     ]
                 },
                 "currentHeight": 36,
@@ -2198,8 +2198,8 @@
             },
             "data": [
                 {
-                    "tabId": "1667a34f-4c15-4053-a228-838ec30c7a77",
-                    "resultId": "881bb9c1-fe35-4468-bc8f-a01cdd01f3db",
+                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
+                    "resultId": "600ed189-65e5-483e-8714-97667d2dbe98",
                     "rows": [
                         {
                             "0": "barb"
@@ -2242,7 +2242,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "bb68363a-e86c-45ef-ba6f-3e78199cec09"
+                        "45413152-7c27-4369-b642-4598a1a80658"
                     ]
                 },
                 "currentHeight": 36,
@@ -2269,8 +2269,8 @@
             },
             "data": [
                 {
-                    "tabId": "1667a34f-4c15-4053-a228-838ec30c7a77",
-                    "resultId": "bb68363a-e86c-45ef-ba6f-3e78199cec09",
+                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
+                    "resultId": "45413152-7c27-4369-b642-4598a1a80658",
                     "rows": [
                         {
                             "0": 16
@@ -2304,7 +2304,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "6e492ae1-f824-42b5-e8c0-390a4d47255a"
+                        "e62ca98a-b562-4f5e-f99c-a3304c0964ff"
                     ]
                 },
                 "currentHeight": 36,
@@ -2322,8 +2322,8 @@
             },
             "data": [
                 {
-                    "tabId": "1667a34f-4c15-4053-a228-838ec30c7a77",
-                    "resultId": "6e492ae1-f824-42b5-e8c0-390a4d47255a",
+                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
+                    "resultId": "e62ca98a-b562-4f5e-f99c-a3304c0964ff",
                     "rows": [
                         {
                             "0": 4
@@ -2357,7 +2357,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "ae0b19b2-2150-4176-b057-79e2deb1a9db"
+                        "43232e97-f931-4d8a-fb6c-85c420f5caa8"
                     ]
                 },
                 "currentHeight": 36,
@@ -2375,8 +2375,8 @@
             },
             "data": [
                 {
-                    "tabId": "1667a34f-4c15-4053-a228-838ec30c7a77",
-                    "resultId": "ae0b19b2-2150-4176-b057-79e2deb1a9db",
+                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
+                    "resultId": "43232e97-f931-4d8a-fb6c-85c420f5caa8",
                     "rows": [
                         {
                             "0": 2014,
@@ -2522,7 +2522,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "75763973-63da-458e-d844-b08bf6238672"
+                        "7c2ef4d9-572d-45fc-9f8b-0fb16f92adef"
                     ]
                 },
                 "currentHeight": 36,
@@ -2540,8 +2540,8 @@
             },
             "data": [
                 {
-                    "tabId": "1667a34f-4c15-4053-a228-838ec30c7a77",
-                    "resultId": "75763973-63da-458e-d844-b08bf6238672",
+                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
+                    "resultId": "7c2ef4d9-572d-45fc-9f8b-0fb16f92adef",
                     "rows": [
                         {
                             "0": "Jane",
@@ -2601,7 +2601,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "3b772332-c333-4f9f-9639-70657e40173a"
+                        "0085808d-208f-4a39-ccd4-beb0e491a801"
                     ]
                 },
                 "currentHeight": 36,
@@ -2619,8 +2619,8 @@
             },
             "data": [
                 {
-                    "tabId": "1667a34f-4c15-4053-a228-838ec30c7a77",
-                    "resultId": "3b772332-c333-4f9f-9639-70657e40173a",
+                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
+                    "resultId": "0085808d-208f-4a39-ccd4-beb0e491a801",
                     "rows": [
                         {
                             "0": "Jane",
@@ -2690,7 +2690,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "801fdaa8-266b-4348-a50d-252c6f7cccb6"
+                        "61b3ebed-0b03-4b69-a00f-758ada7180a5"
                     ]
                 },
                 "currentHeight": 36,
@@ -2708,8 +2708,8 @@
             },
             "data": [
                 {
-                    "tabId": "1667a34f-4c15-4053-a228-838ec30c7a77",
-                    "resultId": "801fdaa8-266b-4348-a50d-252c6f7cccb6",
+                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
+                    "resultId": "61b3ebed-0b03-4b69-a00f-758ada7180a5",
                     "rows": [
                         {
                             "0": "Jane",
@@ -2769,7 +2769,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "dcaa87d6-ece9-4418-b7cb-04234e342c4b"
+                        "b82c2571-1fe5-49b8-c36f-b067f352eba8"
                     ]
                 },
                 "currentHeight": 36,
@@ -2787,8 +2787,8 @@
             },
             "data": [
                 {
-                    "tabId": "1667a34f-4c15-4053-a228-838ec30c7a77",
-                    "resultId": "dcaa87d6-ece9-4418-b7cb-04234e342c4b",
+                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
+                    "resultId": "b82c2571-1fe5-49b8-c36f-b067f352eba8",
                     "rows": [
                         {
                             "0": null,
@@ -2830,7 +2830,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "6a6f7e7b-1618-4163-eda5-808055a4a925"
+                        "dce7f343-c674-4c4c-9c09-70f759b296ca"
                     ]
                 },
                 "currentHeight": 36,
@@ -2848,8 +2848,8 @@
             },
             "data": [
                 {
-                    "tabId": "1667a34f-4c15-4053-a228-838ec30c7a77",
-                    "resultId": "6a6f7e7b-1618-4163-eda5-808055a4a925",
+                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
+                    "resultId": "dce7f343-c674-4c4c-9c09-70f759b296ca",
                     "rows": [
                         {
                             "0": "Jane",
@@ -2934,7 +2934,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "c69481bb-9dc6-4b25-d197-c902dfa4dde6"
+                        "3e922811-c795-4707-c31e-35320fb18fef"
                     ]
                 },
                 "currentHeight": 335.125,
@@ -2952,8 +2952,8 @@
             },
             "data": [
                 {
-                    "tabId": "1667a34f-4c15-4053-a228-838ec30c7a77",
-                    "resultId": "c69481bb-9dc6-4b25-d197-c902dfa4dde6",
+                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
+                    "resultId": "3e922811-c795-4707-c31e-35320fb18fef",
                     "rows": [
                         {
                             "0": "Jane",
@@ -3038,7 +3038,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "ad5fdd5b-e59f-4493-a2b5-2168eafb57dc"
+                        "5a093caf-cd5d-4ce2-fe4a-399f4a6049b5"
                     ]
                 },
                 "currentHeight": 335.125,
@@ -3056,8 +3056,8 @@
             },
             "data": [
                 {
-                    "tabId": "1667a34f-4c15-4053-a228-838ec30c7a77",
-                    "resultId": "ad5fdd5b-e59f-4493-a2b5-2168eafb57dc",
+                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
+                    "resultId": "5a093caf-cd5d-4ce2-fe4a-399f4a6049b5",
                     "rows": [
                         {
                             "0": "Jane",
@@ -3137,7 +3137,391 @@
         {
             "state": {
                 "start": 57,
-                "end": 57,
+                "end": 62,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "12ca7d85-671b-4d4f-e492-5e541c093b5b"
+                    ]
+                },
+                "currentHeight": 352,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 191
+                        },
+                        "contentStart": 40,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
+                    "resultId": "12ca7d85-671b-4d4f-e492-5e541c093b5b",
+                    "rows": [
+                        {
+                            "0": "May 11, 2014",
+                            "1": "barb@saturn",
+                            "2": "tricia@mars",
+                            "3": 58274
+                        },
+                        {
+                            "0": "May 12, 2014",
+                            "1": "tricia@mars",
+                            "2": "gene@venus",
+                            "3": 194925
+                        },
+                        {
+                            "0": "May 12, 2014",
+                            "1": "phil@mars",
+                            "2": "phil@saturn",
+                            "3": 1048
+                        },
+                        {
+                            "0": "May 12, 2014",
+                            "1": "barb@saturn",
+                            "2": "tricia@venus",
+                            "3": 271
+                        },
+                        {
+                            "0": "May 14, 2014",
+                            "1": "gene@venus",
+                            "2": "barb@mars",
+                            "3": 2291
+                        },
+                        {
+                            "0": "May 14, 2014",
+                            "1": "phil@mars",
+                            "2": "tricia@saturn",
+                            "3": 5781
+                        },
+                        {
+                            "0": "May 14, 2014",
+                            "1": "barb@venus",
+                            "2": "barb@venus",
+                            "3": 98151
+                        },
+                        {
+                            "0": "May 14, 2014",
+                            "1": "tricia@saturn",
+                            "2": "phil@venus",
+                            "3": 2394482
+                        },
+                        {
+                            "0": "May 15, 2014",
+                            "1": "gene@mars",
+                            "2": "gene@saturn",
+                            "3": 3824
+                        },
+                        {
+                            "0": "May 15, 2014",
+                            "1": "phil@venus",
+                            "2": "phil@venus",
+                            "3": 978
+                        },
+                        {
+                            "0": "May 15, 2014",
+                            "1": "gene@mars",
+                            "2": "tricia@saturn",
+                            "3": 998532
+                        },
+                        {
+                            "0": "May 15, 2014",
+                            "1": "gene@saturn",
+                            "2": "gene@mars",
+                            "3": 3856
+                        },
+                        {
+                            "0": "May 16, 2014",
+                            "1": "gene@venus",
+                            "2": "barb@mars",
+                            "3": 613
+                        },
+                        {
+                            "0": "May 16, 2014",
+                            "1": "phil@venus",
+                            "2": "barb@venus",
+                            "3": 10294
+                        },
+                        {
+                            "0": "May 19, 2014",
+                            "1": "phil@mars",
+                            "2": "tricia@saturn",
+                            "3": 873
+                        },
+                        {
+                            "0": "May 19, 2014",
+                            "1": "gene@saturn",
+                            "2": "gene@venus",
+                            "3": 23992
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "date_sent",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "sender",
+                            "field": "1",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "recipient",
+                            "field": "2",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "size",
+                            "field": "3",
+                            "dataType": {
+                                "type": 5
+                            }
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 16 records retrieved in 0s"
+                    },
+                    "totalRowCount": 16,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "-- Using VIEWS to simplify table access\nSELECT\nDATE_FORMAT(t, '%M %e, %Y') AS 'date_sent',\nCONCAT(srcuser,'@',srchost) AS 'sender',\nCONCAT(dstuser,'@',dsthost) AS 'recipient',\nsize FROM mail"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 63,
+                "end": 68,
+                "language": "mysql",
+                "result": {
+                    "type": "text",
+                    "text": [
+                        {
+                            "type": 4,
+                            "index": 0,
+                            "resultId": "ed8e755e-683e-4003-937d-4134648c4db2",
+                            "content": "OK, 0 records retrieved in 58.699ms"
+                        }
+                    ]
+                },
+                "currentHeight": 34,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 176
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": []
+        },
+        {
+            "state": {
+                "start": 69,
+                "end": 70,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "74e0b8ff-73bd-423d-957a-ae5d51183972"
+                    ]
+                },
+                "currentHeight": 245,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 80
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
+                    "resultId": "74e0b8ff-73bd-423d-957a-ae5d51183972",
+                    "rows": [
+                        {
+                            "0": "May 12, 2014",
+                            "1": "tricia@mars",
+                            "2": 194925
+                        },
+                        {
+                            "0": "May 15, 2014",
+                            "1": "gene@mars",
+                            "2": 998532
+                        },
+                        {
+                            "0": "May 14, 2014",
+                            "1": "tricia@saturn",
+                            "2": 2394482
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "date_sent",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "sender",
+                            "field": "1",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "size",
+                            "field": "2",
+                            "dataType": {
+                                "type": 5
+                            }
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 3 records retrieved in 9.787ms"
+                    },
+                    "totalRowCount": 3,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT date_sent, sender, size FROM mail_view\nWHERE size > 100000 ORDER BY size"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 71,
+                "end": 72,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "057a7093-6802-4367-b342-7dc752223943"
+                    ]
+                },
+                "currentHeight": 269.84375,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 172
+                        },
+                        "contentStart": 58,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
+                    "resultId": "057a7093-6802-4367-b342-7dc752223943",
+                    "rows": [
+                        {
+                            "0": 1,
+                            "1": "Sybil",
+                            "2": "Twitter",
+                            "3": "user1-twtrid"
+                        },
+                        {
+                            "0": 1,
+                            "1": "Sybil",
+                            "2": "Facebook",
+                            "3": "user1-fbid"
+                        },
+                        {
+                            "0": 2,
+                            "1": "Nancy",
+                            "2": "Twitter",
+                            "3": "user2-fbrid"
+                        },
+                        {
+                            "0": 2,
+                            "1": "Nancy",
+                            "2": "Facebook",
+                            "3": "user2-msnid"
+                        },
+                        {
+                            "0": 2,
+                            "1": "Nancy",
+                            "2": "LinkedIn",
+                            "3": "user2-lnkdid"
+                        },
+                        {
+                            "0": 4,
+                            "1": "Lothair",
+                            "2": "LinkedIn",
+                            "3": "user4-lnkdid"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "id",
+                            "field": "0",
+                            "dataType": {
+                                "type": 4
+                            }
+                        },
+                        {
+                            "title": "name",
+                            "field": "1",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "service",
+                            "field": "2",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "contact_name",
+                            "field": "3",
+                            "dataType": {
+                                "type": 17
+                            }
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 6 records retrieved in 7.592ms"
+                    },
+                    "totalRowCount": 6,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "-- Using JOIN to query the result from Two or More tables\nSELECT profile.id, name, service, contact_name FROM profile_contact INNER JOIN profile ON profile.id = profile_id"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 73,
+                "end": 73,
                 "language": "mysql",
                 "currentHeight": 180,
                 "statements": [
