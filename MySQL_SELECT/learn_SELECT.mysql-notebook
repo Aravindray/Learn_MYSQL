@@ -2,7 +2,7 @@
     "type": "MySQLNotebook",
     "version": "1.0",
     "caption": "DB Notebook",
-    "content": "SELECT user();\nUSE cookbook;\n-- Want to display specific columns and rows from a table.\nSELECT t, srcuser, srchost, dstuser, dsthost, size FROM mail;\nSELECT srcuser, srchost, t, size FROM mail;\nSELECT t, srcuser, srchost FROM mail WHERE srchost = 'venus';\nSELECT t, srcuser, srchost FROM mail WHERE srchost LIKE 's%';\nSELECT t, srcuser, srchost, dstuser, dsthost, size FROM mail WHERE srcuser = 'barb' AND dstuser = 'tricia';\nSELECT t, CONCAT(srcuser, '@', srchost), size FROM mail;\n-- You can use TABLE instead of SELECT but TABLE supports only ORDER BY and LIMIT clauses only\nTABLE mail ORDER BY size DESC LIMIT 4;\n-- Naming Query Result Columns with aliases\nSELECT DATE_FORMAT(t, '%M %e, %Y'), CONCAT(srcuser,'@',srchost), size FROM mail;\nSELECT\nDATE_FORMAT(t, '%M %e, %Y') AS date_sent,\nCONCAT(srcuser,'@',srchost) AS sender,\nsize FROM mail;\nSELECT\nDATE_FORMAT(t, '%M %e, %Y') AS 'Date of message',\nCONCAT(srcuser,'@',srchost) AS 'Message sender',\nsize AS 'Number of byts' FROM mail;\nSELECT 1 AS 'INTEGER';\nSELECT t, srcuser, dstuser, size/1024 AS Kilobytes\nFROM mail;\nSELECT t, srcuser, dstuser, size/1024 AS Kilobytes FROM mail\nWHERE size/1024 > 500;\n-- Sorting Query Result\nSELECT t, srcuser, srchost, dstuser, dsthost, size FROM mail WHERE dstuser = 'tricia'\nORDER BY srchost, srcuser;\nSELECT t, srcuser, srchost,dstuser, dsthost, size FROM mail\nWHERE size > 50000 ORDER BY size DESC;\n-- Removing Duplicate Rows\nSELECT srcuser from mail;\n-- Using DISTINCT to remove duplicate\nSELECT DISTINCT srcuser from mail;\n-- Using COUNT to find no of result\nSELECT COUNT(srcuser) FROM mail;\nSELECT COUNT(DISTINCT srcuser) FROM mail;\nSELECT DISTINCT YEAR(t), MONTH(t), DAYOFMONTH(t) FROM mail;\n-- Working with NULL VALUES\n-- Failing Statement\nSELECT * FROM expt WHERE score = NULL;\nSELECT * FROM expt WHERE score <> NULL;\n-- MySQL NULL operator IS NULL, IS NOT NULL, <=>\nSELECT * FROM expt WHERE score IS NULL;\nSELECT * FROM expt WHERE score IS NOT NULL;\nSELECT * FROM expt WHERE score <=> NULL;\nSELECT NULL = NULL, NULL <=> NULL;\n-- Using IF() to replace NULL value into different value\n-- IF SYNTAX: IF(condition, true, false)\nSELECT subject, test, if (score IS NULL, 'Unknown', score) AS 'score' FROM expt;\n-- Using IFNULL(IF NOT NULL[false], IF NULL[true])\nSELECT subject, test, IFNULL(score, 'Unknown') AS 'score' FROM expt;\n-- The above is equal to IF (score IS NOT NULL, score, 'Unknown')\n-- Using COALESCE\nSELECT subject, test, COALESCE(score, 'Unknown') AS 'score' FROM expt;\n-- Using VIEWS to simplify table access\nSELECT\nDATE_FORMAT(t, '%M %e, %Y') AS 'date_sent',\nCONCAT(srcuser,'@',srchost) AS 'sender',\nCONCAT(dstuser,'@',dsthost) AS 'recipient',\nsize FROM mail;\nCREATE VIEW mail_view AS\nSELECT\nDATE_FORMAT(t, '%M %e, %Y') AS 'date_sent',\nCONCAT(srcuser,'@',srchost) AS 'sender',\nCONCAT(dstuser,'@',dsthost) AS 'recipient',\nsize FROM mail;\nSELECT date_sent, sender, size FROM mail_view\nWHERE size > 100000 ORDER BY size;\n-- Using JOIN to query the result from Two or More tables\nSELECT profile.id, name, service, contact_name FROM profile_contact INNER JOIN profile ON profile.id = profile_id;\n",
+    "content": "SELECT user();\nUSE cookbook;\n-- Want to display specific columns and rows from a table.\nSELECT t, srcuser, srchost, dstuser, dsthost, size FROM mail;\nSELECT srcuser, srchost, t, size FROM mail;\nSELECT t, srcuser, srchost FROM mail WHERE srchost = 'venus';\nSELECT t, srcuser, srchost FROM mail WHERE srchost LIKE 's%';\nSELECT t, srcuser, srchost, dstuser, dsthost, size FROM mail WHERE srcuser = 'barb' AND dstuser = 'tricia';\nSELECT t, CONCAT(srcuser, '@', srchost), size FROM mail;\n-- You can use TABLE instead of SELECT but TABLE supports only ORDER BY and LIMIT clauses only\nTABLE mail ORDER BY size DESC LIMIT 4;\n-- Naming Query Result Columns with aliases\nSELECT DATE_FORMAT(t, '%M %e, %Y'), CONCAT(srcuser,'@',srchost), size FROM mail;\nSELECT\nDATE_FORMAT(t, '%M %e, %Y') AS date_sent,\nCONCAT(srcuser,'@',srchost) AS sender,\nsize FROM mail;\nSELECT\nDATE_FORMAT(t, '%M %e, %Y') AS 'Date of message',\nCONCAT(srcuser,'@',srchost) AS 'Message sender',\nsize AS 'Number of byts' FROM mail;\nSELECT 1 AS 'INTEGER';\nSELECT t, srcuser, dstuser, size/1024 AS Kilobytes\nFROM mail;\nSELECT t, srcuser, dstuser, size/1024 AS Kilobytes FROM mail\nWHERE size/1024 > 500;\n-- Sorting Query Result\nSELECT t, srcuser, srchost, dstuser, dsthost, size FROM mail WHERE dstuser = 'tricia'\nORDER BY srchost, srcuser;\nSELECT t, srcuser, srchost,dstuser, dsthost, size FROM mail\nWHERE size > 50000 ORDER BY size DESC;\n-- Removing Duplicate Rows\nSELECT srcuser from mail;\n-- Using DISTINCT to remove duplicate\nSELECT DISTINCT srcuser from mail;\n-- Using COUNT to find no of result\nSELECT COUNT(srcuser) FROM mail;\nSELECT COUNT(DISTINCT srcuser) FROM mail;\nSELECT DISTINCT YEAR(t), MONTH(t), DAYOFMONTH(t) FROM mail;\n-- Working with NULL VALUES\n-- Failing Statement\nSELECT * FROM expt WHERE score = NULL;\nSELECT * FROM expt WHERE score <> NULL;\n-- MySQL NULL operator IS NULL, IS NOT NULL, <=>\nSELECT * FROM expt WHERE score IS NULL;\nSELECT * FROM expt WHERE score IS NOT NULL;\nSELECT * FROM expt WHERE score <=> NULL;\nSELECT NULL = NULL, NULL <=> NULL;\n-- Using IF() to replace NULL value into different value\n-- IF SYNTAX: IF(condition, true, false)\nSELECT subject, test, if (score IS NULL, 'Unknown', score) AS 'score' FROM expt;\n-- Using IFNULL(IF NOT NULL[false], IF NULL[true])\nSELECT subject, test, IFNULL(score, 'Unknown') AS 'score' FROM expt;\n-- The above is equal to IF (score IS NOT NULL, score, 'Unknown')\n-- Using COALESCE\nSELECT subject, test, COALESCE(score, 'Unknown') AS 'score' FROM expt;\n-- Using VIEWS to simplify table access\nSELECT\nDATE_FORMAT(t, '%M %e, %Y') AS 'date_sent',\nCONCAT(srcuser,'@',srchost) AS 'sender',\nCONCAT(dstuser,'@',dsthost) AS 'recipient',\nsize FROM mail;\nCREATE VIEW mail_view AS\nSELECT\nDATE_FORMAT(t, '%M %e, %Y') AS 'date_sent',\nCONCAT(srcuser,'@',srchost) AS 'sender',\nCONCAT(dstuser,'@',dsthost) AS 'recipient',\nsize FROM mail;\nSELECT date_sent, sender, size FROM mail_view\nWHERE size > 100000 ORDER BY size;\n-- Using JOIN to query the result from two or More tables\nSELECT profile.id, name, service, contact_name \nFROM profile_contact INNER JOIN profile ON profile.id = profile_id;\n-- Using Subqueries to join two or more tables\nSELECT profile_id, service, contact_name FROM profile_contact\nWHERE profile_id = (SELECT id from profile WHERE name = 'Nancy');\n-- Using LIMIT with SELECT\nSELECT * FROM profile LIMIT 1;\nSELECT * FROM profile LIMIT 3;\nSELECT * FROM profile ORDER BY birth;\nSELECT * FROM profile ORDER BY birth LIMIT 1;\nSELECT * FROM profile ORDER BY birth DESC LIMIT 1;\nSELECT name, DATE_FORMAT(birth, '%m-%d') AS 'birthday' FROM profile ORDER BY birthday LIMIT 1;\nSELECT * FROM profile ORDER BY birth LIMIT 2,1;\nSELECT * FROM profile ORDER BY birth DESC LIMIT 2,1;\n-- Using COUNT to find out no of record in a table\nSELECT COUNT(*) FROM profile;\n-- Find the 4 people who born recently in ascending order\nSELECT * from (SELECT name, birth FROM profile ORDER BY birth DESC LIMIT 4) AS t ORDER BY birth;\n",
     "options": {
         "tabSize": 4,
         "indentSize": 4,
@@ -15,11 +15,11 @@
             {
                 "inSelectionMode": false,
                 "selectionStart": {
-                    "lineNumber": 73,
+                    "lineNumber": 90,
                     "column": 1
                 },
                 "position": {
-                    "lineNumber": 73,
+                    "lineNumber": 90,
                     "column": 1
                 }
             }
@@ -27,10 +27,10 @@
         "viewState": {
             "scrollLeft": 0,
             "firstPosition": {
-                "lineNumber": 70,
+                "lineNumber": 85,
                 "column": 1
             },
-            "firstPositionDeltaTop": -18
+            "firstPositionDeltaTop": 56
         },
         "contributionsState": {
             "editor.contrib.folding": {},
@@ -46,7 +46,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "c30f5537-67ad-434b-8120-8804563f0366"
+                        "eedb8f36-d5f0-4445-d801-5d475caaf159"
                     ]
                 },
                 "currentHeight": 36,
@@ -64,8 +64,8 @@
             },
             "data": [
                 {
-                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
-                    "resultId": "c30f5537-67ad-434b-8120-8804563f0366",
+                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
+                    "resultId": "eedb8f36-d5f0-4445-d801-5d475caaf159",
                     "rows": [
                         {
                             "0": "cbuser@localhost"
@@ -102,7 +102,7 @@
                         {
                             "type": 4,
                             "index": 0,
-                            "resultId": "2cd19135-530b-4b0d-e740-fd70dc3d0c2e",
+                            "resultId": "06bb1fc3-cdcc-4e18-d5f1-50d96b0787ba",
                             "content": "OK, 0 records retrieved in 0s"
                         }
                     ]
@@ -130,7 +130,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "1b2bd6dc-5ab7-4b80-a3de-492128b4bc40"
+                        "27fcf8ab-49af-466e-bd48-89a534e9d761"
                     ]
                 },
                 "currentHeight": 36,
@@ -148,8 +148,8 @@
             },
             "data": [
                 {
-                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
-                    "resultId": "1b2bd6dc-5ab7-4b80-a3de-492128b4bc40",
+                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
+                    "resultId": "27fcf8ab-49af-466e-bd48-89a534e9d761",
                     "rows": [
                         {
                             "0": "2014-05-11 10:15:08",
@@ -343,7 +343,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "36263565-2017-4d6c-c189-ee4c4728f4aa"
+                        "2f08f4e3-cdc5-4934-825f-9874668a7a5b"
                     ]
                 },
                 "currentHeight": 36,
@@ -361,8 +361,8 @@
             },
             "data": [
                 {
-                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
-                    "resultId": "36263565-2017-4d6c-c189-ee4c4728f4aa",
+                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
+                    "resultId": "2f08f4e3-cdc5-4934-825f-9874668a7a5b",
                     "rows": [
                         {
                             "0": "barb",
@@ -510,7 +510,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "f0d9315f-ae84-4222-acad-7ac50ddf3482"
+                        "6e83793e-ca16-4804-87c6-30f6fc8222e2"
                     ]
                 },
                 "currentHeight": 36,
@@ -528,8 +528,8 @@
             },
             "data": [
                 {
-                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
-                    "resultId": "f0d9315f-ae84-4222-acad-7ac50ddf3482",
+                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
+                    "resultId": "6e83793e-ca16-4804-87c6-30f6fc8222e2",
                     "rows": [
                         {
                             "0": "2014-05-14 09:31:37",
@@ -599,7 +599,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "26db5b4f-0409-4389-b652-017e2bc37a5c"
+                        "d9be6221-9e10-4376-8604-4de39f30f2c9"
                     ]
                 },
                 "currentHeight": 36,
@@ -617,8 +617,8 @@
             },
             "data": [
                 {
-                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
-                    "resultId": "26db5b4f-0409-4389-b652-017e2bc37a5c",
+                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
+                    "resultId": "d9be6221-9e10-4376-8604-4de39f30f2c9",
                     "rows": [
                         {
                             "0": "2014-05-11 10:15:08",
@@ -688,7 +688,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "c1d5719a-0881-43dc-d3c9-1b5091d424d2"
+                        "964b87bf-0077-4a3d-8fd3-56619a908620"
                     ]
                 },
                 "currentHeight": 36,
@@ -706,8 +706,8 @@
             },
             "data": [
                 {
-                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
-                    "resultId": "c1d5719a-0881-43dc-d3c9-1b5091d424d2",
+                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
+                    "resultId": "964b87bf-0077-4a3d-8fd3-56619a908620",
                     "rows": [
                         {
                             "0": "2014-05-11 10:15:08",
@@ -789,7 +789,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "de93c1e6-eab5-4980-96c3-4842391a326e"
+                        "a4c9efd0-8428-4244-b1f2-f2d487a7c2e9"
                     ]
                 },
                 "currentHeight": 352,
@@ -807,8 +807,8 @@
             },
             "data": [
                 {
-                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
-                    "resultId": "de93c1e6-eab5-4980-96c3-4842391a326e",
+                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
+                    "resultId": "a4c9efd0-8428-4244-b1f2-f2d487a7c2e9",
                     "rows": [
                         {
                             "0": "2014-05-11 10:15:08",
@@ -933,7 +933,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "dda26fd4-cc4d-4b6a-dbd6-040e5a4faded"
+                        "456b7ac2-dc4d-4ff9-eb26-5989647de2b8"
                     ]
                 },
                 "currentHeight": 36,
@@ -951,8 +951,8 @@
             },
             "data": [
                 {
-                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
-                    "resultId": "dda26fd4-cc4d-4b6a-dbd6-040e5a4faded",
+                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
+                    "resultId": "456b7ac2-dc4d-4ff9-eb26-5989647de2b8",
                     "rows": [
                         {
                             "0": 8,
@@ -1061,7 +1061,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "cfa2878d-797a-4b76-e4db-f3f1ec96f0d6"
+                        "dbf79e37-6ff3-496b-ac31-07a96cbec59f"
                     ]
                 },
                 "currentHeight": 36,
@@ -1079,8 +1079,8 @@
             },
             "data": [
                 {
-                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
-                    "resultId": "cfa2878d-797a-4b76-e4db-f3f1ec96f0d6",
+                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
+                    "resultId": "dbf79e37-6ff3-496b-ac31-07a96cbec59f",
                     "rows": [
                         {
                             "0": "May 11, 2014",
@@ -1205,7 +1205,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "b0fd8eba-16ba-4aa6-e1d7-80dde218fe86"
+                        "a6b7c092-5b93-4ee7-c93b-eb7297dec970"
                     ]
                 },
                 "currentHeight": 36,
@@ -1223,8 +1223,8 @@
             },
             "data": [
                 {
-                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
-                    "resultId": "b0fd8eba-16ba-4aa6-e1d7-80dde218fe86",
+                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
+                    "resultId": "a6b7c092-5b93-4ee7-c93b-eb7297dec970",
                     "rows": [
                         {
                             "0": "May 11, 2014",
@@ -1349,7 +1349,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "0d232b2e-ca5f-48bc-a831-dad8f48f666c"
+                        "85465026-2b83-4ece-b91a-c625ef838346"
                     ]
                 },
                 "currentHeight": 36,
@@ -1367,8 +1367,8 @@
             },
             "data": [
                 {
-                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
-                    "resultId": "0d232b2e-ca5f-48bc-a831-dad8f48f666c",
+                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
+                    "resultId": "85465026-2b83-4ece-b91a-c625ef838346",
                     "rows": [
                         {
                             "0": "May 11, 2014",
@@ -1493,7 +1493,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "b4961416-645f-4227-85bf-861f1b2f3624"
+                        "f2451eb1-80d0-4256-8526-bd4ab456583d"
                     ]
                 },
                 "currentHeight": 106.640625,
@@ -1511,8 +1511,8 @@
             },
             "data": [
                 {
-                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
-                    "resultId": "b4961416-645f-4227-85bf-861f1b2f3624",
+                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
+                    "resultId": "f2451eb1-80d0-4256-8526-bd4ab456583d",
                     "rows": [
                         {
                             "0": 1
@@ -1546,7 +1546,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "4091d3e3-d079-4013-9e42-6c2d6509f632"
+                        "43e18096-07b8-4aff-d11b-fc214598b099"
                     ]
                 },
                 "currentHeight": 36,
@@ -1564,8 +1564,8 @@
             },
             "data": [
                 {
-                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
-                    "resultId": "4091d3e3-d079-4013-9e42-6c2d6509f632",
+                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
+                    "resultId": "43e18096-07b8-4aff-d11b-fc214598b099",
                     "rows": [
                         {
                             "0": "2014-05-11 10:15:08",
@@ -1713,7 +1713,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "a5e7ef10-6ede-4d9b-b5cb-22b3e0539abc"
+                        "11ccfbe3-e551-46e6-d69b-4f804ceeda41"
                     ]
                 },
                 "currentHeight": 36,
@@ -1731,8 +1731,8 @@
             },
             "data": [
                 {
-                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
-                    "resultId": "a5e7ef10-6ede-4d9b-b5cb-22b3e0539abc",
+                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
+                    "resultId": "11ccfbe3-e551-46e6-d69b-4f804ceeda41",
                     "rows": [
                         {
                             "0": "2014-05-14 17:03:01",
@@ -1796,7 +1796,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "e3ff2d46-f5ba-4e7f-fe35-cbf0bb3ea694"
+                        "8a75e09c-ff0c-46ef-e121-82f7643c0b92"
                     ]
                 },
                 "currentHeight": 36,
@@ -1823,8 +1823,8 @@
             },
             "data": [
                 {
-                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
-                    "resultId": "e3ff2d46-f5ba-4e7f-fe35-cbf0bb3ea694",
+                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
+                    "resultId": "8a75e09c-ff0c-46ef-e121-82f7643c0b92",
                     "rows": [
                         {
                             "0": "2014-05-15 10:25:52",
@@ -1930,7 +1930,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "41fc8245-d5dd-4f00-aa9b-078332a95571"
+                        "0f676dcb-9f9a-482d-c258-8c7e266c89d9"
                     ]
                 },
                 "currentHeight": 36,
@@ -1957,8 +1957,8 @@
             },
             "data": [
                 {
-                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
-                    "resultId": "41fc8245-d5dd-4f00-aa9b-078332a95571",
+                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
+                    "resultId": "0f676dcb-9f9a-482d-c258-8c7e266c89d9",
                     "rows": [
                         {
                             "0": "2014-05-14 17:03:01",
@@ -2064,7 +2064,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "fef24504-b072-4b01-8a32-a8b8fb2a3e5f"
+                        "df692d56-ffd3-4497-adba-dca5949548e2"
                     ]
                 },
                 "currentHeight": 352,
@@ -2091,8 +2091,8 @@
             },
             "data": [
                 {
-                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
-                    "resultId": "fef24504-b072-4b01-8a32-a8b8fb2a3e5f",
+                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
+                    "resultId": "df692d56-ffd3-4497-adba-dca5949548e2",
                     "rows": [
                         {
                             "0": "barb"
@@ -2171,7 +2171,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "600ed189-65e5-483e-8714-97667d2dbe98"
+                        "e8841472-4271-4b68-9b26-f3563dfb767e"
                     ]
                 },
                 "currentHeight": 36,
@@ -2198,8 +2198,8 @@
             },
             "data": [
                 {
-                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
-                    "resultId": "600ed189-65e5-483e-8714-97667d2dbe98",
+                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
+                    "resultId": "e8841472-4271-4b68-9b26-f3563dfb767e",
                     "rows": [
                         {
                             "0": "barb"
@@ -2242,7 +2242,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "45413152-7c27-4369-b642-4598a1a80658"
+                        "1c4c384a-33c0-4264-f4c5-a3dcebcabb69"
                     ]
                 },
                 "currentHeight": 36,
@@ -2269,8 +2269,8 @@
             },
             "data": [
                 {
-                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
-                    "resultId": "45413152-7c27-4369-b642-4598a1a80658",
+                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
+                    "resultId": "1c4c384a-33c0-4264-f4c5-a3dcebcabb69",
                     "rows": [
                         {
                             "0": 16
@@ -2304,7 +2304,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "e62ca98a-b562-4f5e-f99c-a3304c0964ff"
+                        "0cd6eb1e-2619-4666-bf87-5c5e2643afca"
                     ]
                 },
                 "currentHeight": 36,
@@ -2322,8 +2322,8 @@
             },
             "data": [
                 {
-                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
-                    "resultId": "e62ca98a-b562-4f5e-f99c-a3304c0964ff",
+                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
+                    "resultId": "0cd6eb1e-2619-4666-bf87-5c5e2643afca",
                     "rows": [
                         {
                             "0": 4
@@ -2357,7 +2357,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "43232e97-f931-4d8a-fb6c-85c420f5caa8"
+                        "3d792a56-daa3-4bb8-a15d-dc449e179641"
                     ]
                 },
                 "currentHeight": 36,
@@ -2375,8 +2375,8 @@
             },
             "data": [
                 {
-                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
-                    "resultId": "43232e97-f931-4d8a-fb6c-85c420f5caa8",
+                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
+                    "resultId": "3d792a56-daa3-4bb8-a15d-dc449e179641",
                     "rows": [
                         {
                             "0": 2014,
@@ -2522,7 +2522,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "7c2ef4d9-572d-45fc-9f8b-0fb16f92adef"
+                        "382e3d04-9728-4233-b909-33c5f76dd55b"
                     ]
                 },
                 "currentHeight": 36,
@@ -2540,8 +2540,8 @@
             },
             "data": [
                 {
-                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
-                    "resultId": "7c2ef4d9-572d-45fc-9f8b-0fb16f92adef",
+                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
+                    "resultId": "382e3d04-9728-4233-b909-33c5f76dd55b",
                     "rows": [
                         {
                             "0": "Jane",
@@ -2601,7 +2601,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "0085808d-208f-4a39-ccd4-beb0e491a801"
+                        "8f9f423e-31b2-4f71-8692-ccb347a3b1b2"
                     ]
                 },
                 "currentHeight": 36,
@@ -2619,8 +2619,8 @@
             },
             "data": [
                 {
-                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
-                    "resultId": "0085808d-208f-4a39-ccd4-beb0e491a801",
+                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
+                    "resultId": "8f9f423e-31b2-4f71-8692-ccb347a3b1b2",
                     "rows": [
                         {
                             "0": "Jane",
@@ -2690,7 +2690,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "61b3ebed-0b03-4b69-a00f-758ada7180a5"
+                        "45cc9ac0-e182-4697-fc37-56aad5d8e5f4"
                     ]
                 },
                 "currentHeight": 36,
@@ -2708,8 +2708,8 @@
             },
             "data": [
                 {
-                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
-                    "resultId": "61b3ebed-0b03-4b69-a00f-758ada7180a5",
+                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
+                    "resultId": "45cc9ac0-e182-4697-fc37-56aad5d8e5f4",
                     "rows": [
                         {
                             "0": "Jane",
@@ -2769,7 +2769,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "b82c2571-1fe5-49b8-c36f-b067f352eba8"
+                        "65af9668-2a4c-4494-b4d8-9b3773b565cc"
                     ]
                 },
                 "currentHeight": 36,
@@ -2787,8 +2787,8 @@
             },
             "data": [
                 {
-                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
-                    "resultId": "b82c2571-1fe5-49b8-c36f-b067f352eba8",
+                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
+                    "resultId": "65af9668-2a4c-4494-b4d8-9b3773b565cc",
                     "rows": [
                         {
                             "0": null,
@@ -2830,7 +2830,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "dce7f343-c674-4c4c-9c09-70f759b296ca"
+                        "2c153bb0-abc6-4147-fd29-1157ac41e2b0"
                     ]
                 },
                 "currentHeight": 36,
@@ -2848,8 +2848,8 @@
             },
             "data": [
                 {
-                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
-                    "resultId": "dce7f343-c674-4c4c-9c09-70f759b296ca",
+                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
+                    "resultId": "2c153bb0-abc6-4147-fd29-1157ac41e2b0",
                     "rows": [
                         {
                             "0": "Jane",
@@ -2934,7 +2934,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "3e922811-c795-4707-c31e-35320fb18fef"
+                        "be42c5b7-6bc6-470b-c8c5-99446a0eec28"
                     ]
                 },
                 "currentHeight": 335.125,
@@ -2952,8 +2952,8 @@
             },
             "data": [
                 {
-                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
-                    "resultId": "3e922811-c795-4707-c31e-35320fb18fef",
+                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
+                    "resultId": "be42c5b7-6bc6-470b-c8c5-99446a0eec28",
                     "rows": [
                         {
                             "0": "Jane",
@@ -3038,7 +3038,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "5a093caf-cd5d-4ce2-fe4a-399f4a6049b5"
+                        "b51dd5d2-af9e-472e-e8b5-7fcf02e0b174"
                     ]
                 },
                 "currentHeight": 335.125,
@@ -3056,8 +3056,8 @@
             },
             "data": [
                 {
-                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
-                    "resultId": "5a093caf-cd5d-4ce2-fe4a-399f4a6049b5",
+                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
+                    "resultId": "b51dd5d2-af9e-472e-e8b5-7fcf02e0b174",
                     "rows": [
                         {
                             "0": "Jane",
@@ -3142,7 +3142,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "12ca7d85-671b-4d4f-e492-5e541c093b5b"
+                        "3c45ebbc-989f-4e25-f999-34fdb6e48402"
                     ]
                 },
                 "currentHeight": 352,
@@ -3160,8 +3160,8 @@
             },
             "data": [
                 {
-                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
-                    "resultId": "12ca7d85-671b-4d4f-e492-5e541c093b5b",
+                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
+                    "resultId": "3c45ebbc-989f-4e25-f999-34fdb6e48402",
                     "rows": [
                         {
                             "0": "May 11, 2014",
@@ -3340,7 +3340,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "74e0b8ff-73bd-423d-957a-ae5d51183972"
+                        "b2c37f15-8fbd-45fa-f1a1-be68fcc38644"
                     ]
                 },
                 "currentHeight": 245,
@@ -3358,8 +3358,8 @@
             },
             "data": [
                 {
-                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
-                    "resultId": "74e0b8ff-73bd-423d-957a-ae5d51183972",
+                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
+                    "resultId": "b2c37f15-8fbd-45fa-f1a1-be68fcc38644",
                     "rows": [
                         {
                             "0": "May 12, 2014",
@@ -3414,12 +3414,12 @@
         {
             "state": {
                 "start": 71,
-                "end": 72,
+                "end": 73,
                 "language": "mysql",
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "057a7093-6802-4367-b342-7dc752223943"
+                        "e18d7414-e0f4-4b86-c32d-4f8a0c9a611d"
                     ]
                 },
                 "currentHeight": 269.84375,
@@ -3428,7 +3428,7 @@
                         "delimiter": ";",
                         "span": {
                             "start": 0,
-                            "length": 172
+                            "length": 173
                         },
                         "contentStart": 58,
                         "state": 0
@@ -3437,8 +3437,8 @@
             },
             "data": [
                 {
-                    "tabId": "d3aabd44-0db3-40bd-e671-7c59bfe7053c",
-                    "resultId": "057a7093-6802-4367-b342-7dc752223943",
+                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
+                    "resultId": "e18d7414-e0f4-4b86-c32d-4f8a0c9a611d",
                     "rows": [
                         {
                             "0": 1,
@@ -3520,8 +3520,997 @@
         },
         {
             "state": {
-                "start": 73,
-                "end": 73,
+                "start": 74,
+                "end": 76,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "f32cecde-fa66-48bf-9552-cd5f45edcca0"
+                    ]
+                },
+                "currentHeight": 36,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 174
+                        },
+                        "contentStart": 47,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
+                    "resultId": "f32cecde-fa66-48bf-9552-cd5f45edcca0",
+                    "rows": [
+                        {
+                            "0": 2,
+                            "1": "Twitter",
+                            "2": "user2-fbrid"
+                        },
+                        {
+                            "0": 2,
+                            "1": "Facebook",
+                            "2": "user2-msnid"
+                        },
+                        {
+                            "0": 2,
+                            "1": "LinkedIn",
+                            "2": "user2-lnkdid"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "profile_id",
+                            "field": "0",
+                            "dataType": {
+                                "type": 4
+                            }
+                        },
+                        {
+                            "title": "service",
+                            "field": "1",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "contact_name",
+                            "field": "2",
+                            "dataType": {
+                                "type": 17
+                            }
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 3 records retrieved in 0s"
+                    },
+                    "totalRowCount": 3,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "-- Using Subqueries to join two or more tables\nSELECT profile_id, service, contact_name FROM profile_contact\nWHERE profile_id = (SELECT id from profile WHERE name = 'Nancy')"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 77,
+                "end": 78,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "677b77d3-4bd1-47cd-af4c-638ff2536a65"
+                    ]
+                },
+                "currentHeight": 36,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 57
+                        },
+                        "contentStart": 27,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
+                    "resultId": "677b77d3-4bd1-47cd-af4c-638ff2536a65",
+                    "rows": [
+                        {
+                            "0": 1,
+                            "1": "Sybil",
+                            "2": "1970-04-13",
+                            "3": "black",
+                            "4": "lutefisk,fadge,pizza",
+                            "5": 0
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "id",
+                            "field": "0",
+                            "dataType": {
+                                "type": 4
+                            }
+                        },
+                        {
+                            "title": "name",
+                            "field": "1",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "birth",
+                            "field": "2",
+                            "dataType": {
+                                "type": 28
+                            }
+                        },
+                        {
+                            "title": "color",
+                            "field": "3",
+                            "dataType": {
+                                "type": 46
+                            }
+                        },
+                        {
+                            "title": "foods",
+                            "field": "4",
+                            "dataType": {
+                                "type": 47
+                            }
+                        },
+                        {
+                            "title": "cats",
+                            "field": "5",
+                            "dataType": {
+                                "type": 4
+                            }
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 0s"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "-- Using LIMIT with SELECT\nSELECT * from profile LIMIT 1"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 79,
+                "end": 79,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "697cfc3d-f57b-4181-92dd-f4beff1e182d"
+                    ]
+                },
+                "currentHeight": 36,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 30
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
+                    "resultId": "697cfc3d-f57b-4181-92dd-f4beff1e182d",
+                    "rows": [
+                        {
+                            "0": 1,
+                            "1": "Sybil",
+                            "2": "1970-04-13",
+                            "3": "black",
+                            "4": "lutefisk,fadge,pizza",
+                            "5": 0
+                        },
+                        {
+                            "0": 2,
+                            "1": "Nancy",
+                            "2": "1969-09-30",
+                            "3": "white",
+                            "4": "burrito,curry,eggroll",
+                            "5": 3
+                        },
+                        {
+                            "0": 3,
+                            "1": "Ralph",
+                            "2": "1973-11-02",
+                            "3": "red",
+                            "4": "eggroll,pizza",
+                            "5": 4
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "id",
+                            "field": "0",
+                            "dataType": {
+                                "type": 4
+                            }
+                        },
+                        {
+                            "title": "name",
+                            "field": "1",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "birth",
+                            "field": "2",
+                            "dataType": {
+                                "type": 28
+                            }
+                        },
+                        {
+                            "title": "color",
+                            "field": "3",
+                            "dataType": {
+                                "type": 46
+                            }
+                        },
+                        {
+                            "title": "foods",
+                            "field": "4",
+                            "dataType": {
+                                "type": 47
+                            }
+                        },
+                        {
+                            "title": "cats",
+                            "field": "5",
+                            "dataType": {
+                                "type": 4
+                            }
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 3 records retrieved in 0s"
+                    },
+                    "totalRowCount": 3,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT * FROM profile LIMIT 3"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 80,
+                "end": 80,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "a30239e5-0018-4def-9e49-c326538ade7e"
+                    ]
+                },
+                "currentHeight": 36,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 37
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
+                    "resultId": "a30239e5-0018-4def-9e49-c326538ade7e",
+                    "rows": [
+                        {
+                            "0": 7,
+                            "1": "Joanna",
+                            "2": "1952-08-20",
+                            "3": "green",
+                            "4": "lutefisk,fadge",
+                            "5": 0
+                        },
+                        {
+                            "0": 8,
+                            "1": "Stephen",
+                            "2": "1960-05-01",
+                            "3": "white",
+                            "4": "burrito,pizza",
+                            "5": 0
+                        },
+                        {
+                            "0": 4,
+                            "1": "Lothair",
+                            "2": "1963-07-04",
+                            "3": "blue",
+                            "4": "burrito,curry",
+                            "5": 5
+                        },
+                        {
+                            "0": 5,
+                            "1": "Henry",
+                            "2": "1965-02-14",
+                            "3": "red",
+                            "4": "curry,fadge",
+                            "5": 1
+                        },
+                        {
+                            "0": 6,
+                            "1": "Aaron",
+                            "2": "1968-09-17",
+                            "3": "green",
+                            "4": "lutefisk,fadge",
+                            "5": 1
+                        },
+                        {
+                            "0": 2,
+                            "1": "Nancy",
+                            "2": "1969-09-30",
+                            "3": "white",
+                            "4": "burrito,curry,eggroll",
+                            "5": 3
+                        },
+                        {
+                            "0": 1,
+                            "1": "Sybil",
+                            "2": "1970-04-13",
+                            "3": "black",
+                            "4": "lutefisk,fadge,pizza",
+                            "5": 0
+                        },
+                        {
+                            "0": 3,
+                            "1": "Ralph",
+                            "2": "1973-11-02",
+                            "3": "red",
+                            "4": "eggroll,pizza",
+                            "5": 4
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "id",
+                            "field": "0",
+                            "dataType": {
+                                "type": 4
+                            }
+                        },
+                        {
+                            "title": "name",
+                            "field": "1",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "birth",
+                            "field": "2",
+                            "dataType": {
+                                "type": 28
+                            }
+                        },
+                        {
+                            "title": "color",
+                            "field": "3",
+                            "dataType": {
+                                "type": 46
+                            }
+                        },
+                        {
+                            "title": "foods",
+                            "field": "4",
+                            "dataType": {
+                                "type": 47
+                            }
+                        },
+                        {
+                            "title": "cats",
+                            "field": "5",
+                            "dataType": {
+                                "type": 4
+                            }
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 8 records retrieved in 0s"
+                    },
+                    "totalRowCount": 8,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT * FROM profile ORDER BY birth"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 81,
+                "end": 81,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "6250f550-61e2-482d-8843-dae69144bf9b"
+                    ]
+                },
+                "currentHeight": 36,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 45
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
+                    "resultId": "6250f550-61e2-482d-8843-dae69144bf9b",
+                    "rows": [
+                        {
+                            "0": 7,
+                            "1": "Joanna",
+                            "2": "1952-08-20",
+                            "3": "green",
+                            "4": "lutefisk,fadge",
+                            "5": 0
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "id",
+                            "field": "0",
+                            "dataType": {
+                                "type": 4
+                            }
+                        },
+                        {
+                            "title": "name",
+                            "field": "1",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "birth",
+                            "field": "2",
+                            "dataType": {
+                                "type": 28
+                            }
+                        },
+                        {
+                            "title": "color",
+                            "field": "3",
+                            "dataType": {
+                                "type": 46
+                            }
+                        },
+                        {
+                            "title": "foods",
+                            "field": "4",
+                            "dataType": {
+                                "type": 47
+                            }
+                        },
+                        {
+                            "title": "cats",
+                            "field": "5",
+                            "dataType": {
+                                "type": 4
+                            }
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 0s"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT * FROM profile ORDER BY birth LIMIT 1"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 82,
+                "end": 82,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "b8d59ad4-6313-4dc2-884b-c63d571da8da"
+                    ]
+                },
+                "currentHeight": 36,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 50
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
+                    "resultId": "b8d59ad4-6313-4dc2-884b-c63d571da8da",
+                    "rows": [
+                        {
+                            "0": 3,
+                            "1": "Ralph",
+                            "2": "1973-11-02",
+                            "3": "red",
+                            "4": "eggroll,pizza",
+                            "5": 4
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "id",
+                            "field": "0",
+                            "dataType": {
+                                "type": 4
+                            }
+                        },
+                        {
+                            "title": "name",
+                            "field": "1",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "birth",
+                            "field": "2",
+                            "dataType": {
+                                "type": 28
+                            }
+                        },
+                        {
+                            "title": "color",
+                            "field": "3",
+                            "dataType": {
+                                "type": 46
+                            }
+                        },
+                        {
+                            "title": "foods",
+                            "field": "4",
+                            "dataType": {
+                                "type": 47
+                            }
+                        },
+                        {
+                            "title": "cats",
+                            "field": "5",
+                            "dataType": {
+                                "type": 4
+                            }
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 0s"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT * FROM profile ORDER BY birth DESC LIMIT 1"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 83,
+                "end": 83,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "a9b516c3-1070-4c10-9fc4-9d04b3666805"
+                    ]
+                },
+                "currentHeight": 36,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 94
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
+                    "resultId": "a9b516c3-1070-4c10-9fc4-9d04b3666805",
+                    "rows": [
+                        {
+                            "0": "Henry",
+                            "1": "02-14"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "name",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "birthday",
+                            "field": "1",
+                            "dataType": {
+                                "type": 17
+                            }
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 0s"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT name, DATE_FORMAT(birth, '%m-%d') AS 'birthday' FROM profile ORDER BY birthday LIMIT 1"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 84,
+                "end": 84,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "2ebf6d0d-6914-4d02-b2b6-39e08f3035df"
+                    ]
+                },
+                "currentHeight": 106.640625,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 47
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
+                    "resultId": "2ebf6d0d-6914-4d02-b2b6-39e08f3035df",
+                    "rows": [
+                        {
+                            "0": 4,
+                            "1": "Lothair",
+                            "2": "1963-07-04",
+                            "3": "blue",
+                            "4": "burrito,curry",
+                            "5": 5
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "id",
+                            "field": "0",
+                            "dataType": {
+                                "type": 4
+                            }
+                        },
+                        {
+                            "title": "name",
+                            "field": "1",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "birth",
+                            "field": "2",
+                            "dataType": {
+                                "type": 28
+                            }
+                        },
+                        {
+                            "title": "color",
+                            "field": "3",
+                            "dataType": {
+                                "type": 46
+                            }
+                        },
+                        {
+                            "title": "foods",
+                            "field": "4",
+                            "dataType": {
+                                "type": 47
+                            }
+                        },
+                        {
+                            "title": "cats",
+                            "field": "5",
+                            "dataType": {
+                                "type": 4
+                            }
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 0s"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT * FROM profile ORDER BY birth LIMIT 2,1"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 85,
+                "end": 85,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "6619919d-3289-439c-e35d-60bb8813111e"
+                    ]
+                },
+                "currentHeight": 106.640625,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 52
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
+                    "resultId": "6619919d-3289-439c-e35d-60bb8813111e",
+                    "rows": [
+                        {
+                            "0": 2,
+                            "1": "Nancy",
+                            "2": "1969-09-30",
+                            "3": "white",
+                            "4": "burrito,curry,eggroll",
+                            "5": 3
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "id",
+                            "field": "0",
+                            "dataType": {
+                                "type": 4
+                            }
+                        },
+                        {
+                            "title": "name",
+                            "field": "1",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "birth",
+                            "field": "2",
+                            "dataType": {
+                                "type": 28
+                            }
+                        },
+                        {
+                            "title": "color",
+                            "field": "3",
+                            "dataType": {
+                                "type": 46
+                            }
+                        },
+                        {
+                            "title": "foods",
+                            "field": "4",
+                            "dataType": {
+                                "type": 47
+                            }
+                        },
+                        {
+                            "title": "cats",
+                            "field": "5",
+                            "dataType": {
+                                "type": 4
+                            }
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 0s"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT * FROM profile ORDER BY birth DESC LIMIT 2,1"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 86,
+                "end": 87,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "2aa7c56d-91d9-457c-ebb5-493bde7d90eb"
+                    ]
+                },
+                "currentHeight": 106.640625,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 80
+                        },
+                        "contentStart": 51,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
+                    "resultId": "2aa7c56d-91d9-457c-ebb5-493bde7d90eb",
+                    "rows": [
+                        {
+                            "0": 8
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "COUNT(*)",
+                            "field": "0",
+                            "dataType": {
+                                "type": 4
+                            }
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 0s"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "-- Using COUNT to find out no of record in a table\nSELECT COUNT(*) FROM profile"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 88,
+                "end": 89,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "e7605025-472c-429f-a19f-d3b835795526"
+                    ]
+                },
+                "currentHeight": 204.5625,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 154
+                        },
+                        "contentStart": 58,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
+                    "resultId": "e7605025-472c-429f-a19f-d3b835795526",
+                    "rows": [
+                        {
+                            "0": "Aaron",
+                            "1": "1968-09-17"
+                        },
+                        {
+                            "0": "Nancy",
+                            "1": "1969-09-30"
+                        },
+                        {
+                            "0": "Sybil",
+                            "1": "1970-04-13"
+                        },
+                        {
+                            "0": "Ralph",
+                            "1": "1973-11-02"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "name",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "birth",
+                            "field": "1",
+                            "dataType": {
+                                "type": 28
+                            }
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 4 records retrieved in 0s"
+                    },
+                    "totalRowCount": 4,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "-- Find the 4 people who born recently in ascending order\nSELECT * from (SELECT name, birth FROM profile ORDER BY birth DESC LIMIT 4) AS t ORDER BY birth"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 90,
+                "end": 90,
                 "language": "mysql",
                 "currentHeight": 180,
                 "statements": [
