@@ -2,7 +2,7 @@
     "type": "MySQLNotebook",
     "version": "1.0",
     "caption": "DB Notebook",
-    "content": "SELECT user();\nUSE cookbook;\n-- Want to display specific columns and rows from a table.\nSELECT t, srcuser, srchost, dstuser, dsthost, size FROM mail;\nSELECT srcuser, srchost, t, size FROM mail;\nSELECT t, srcuser, srchost FROM mail WHERE srchost = 'venus';\nSELECT t, srcuser, srchost FROM mail WHERE srchost LIKE 's%';\nSELECT t, srcuser, srchost, dstuser, dsthost, size FROM mail WHERE srcuser = 'barb' AND dstuser = 'tricia';\nSELECT t, CONCAT(srcuser, '@', srchost), size FROM mail;\n-- You can use TABLE instead of SELECT but TABLE supports only ORDER BY and LIMIT clauses only\nTABLE mail ORDER BY size DESC LIMIT 4;\n-- Naming Query Result Columns with aliases\nSELECT DATE_FORMAT(t, '%M %e, %Y'), CONCAT(srcuser,'@',srchost), size FROM mail;\nSELECT\nDATE_FORMAT(t, '%M %e, %Y') AS date_sent,\nCONCAT(srcuser,'@',srchost) AS sender,\nsize FROM mail;\nSELECT\nDATE_FORMAT(t, '%M %e, %Y') AS 'Date of message',\nCONCAT(srcuser,'@',srchost) AS 'Message sender',\nsize AS 'Number of byts' FROM mail;\nSELECT 1 AS 'INTEGER';\nSELECT t, srcuser, dstuser, size/1024 AS Kilobytes\nFROM mail;\nSELECT t, srcuser, dstuser, size/1024 AS Kilobytes FROM mail\nWHERE size/1024 > 500;\n-- Sorting Query Result\nSELECT t, srcuser, srchost, dstuser, dsthost, size FROM mail WHERE dstuser = 'tricia'\nORDER BY srchost, srcuser;\nSELECT t, srcuser, srchost,dstuser, dsthost, size FROM mail\nWHERE size > 50000 ORDER BY size DESC;\n-- Removing Duplicate Rows\nSELECT srcuser from mail;\n-- Using DISTINCT to remove duplicate\nSELECT DISTINCT srcuser from mail;\n-- Using COUNT to find no of result\nSELECT COUNT(srcuser) FROM mail;\nSELECT COUNT(DISTINCT srcuser) FROM mail;\nSELECT DISTINCT YEAR(t), MONTH(t), DAYOFMONTH(t) FROM mail;\n-- Working with NULL VALUES\n-- Failing Statement\nSELECT * FROM expt WHERE score = NULL;\nSELECT * FROM expt WHERE score <> NULL;\n-- MySQL NULL operator IS NULL, IS NOT NULL, <=>\nSELECT * FROM expt WHERE score IS NULL;\nSELECT * FROM expt WHERE score IS NOT NULL;\nSELECT * FROM expt WHERE score <=> NULL;\nSELECT NULL = NULL, NULL <=> NULL;\n-- Using IF() to replace NULL value into different value\n-- IF SYNTAX: IF(condition, true, false)\nSELECT subject, test, if (score IS NULL, 'Unknown', score) AS 'score' FROM expt;\n-- Using IFNULL(IF NOT NULL[false], IF NULL[true])\nSELECT subject, test, IFNULL(score, 'Unknown') AS 'score' FROM expt;\n-- The above is equal to IF (score IS NOT NULL, score, 'Unknown')\n-- Using COALESCE\nSELECT subject, test, COALESCE(score, 'Unknown') AS 'score' FROM expt;\n-- Using VIEWS to simplify table access\nSELECT\nDATE_FORMAT(t, '%M %e, %Y') AS 'date_sent',\nCONCAT(srcuser,'@',srchost) AS 'sender',\nCONCAT(dstuser,'@',dsthost) AS 'recipient',\nsize FROM mail;\nCREATE VIEW mail_view AS\nSELECT\nDATE_FORMAT(t, '%M %e, %Y') AS 'date_sent',\nCONCAT(srcuser,'@',srchost) AS 'sender',\nCONCAT(dstuser,'@',dsthost) AS 'recipient',\nsize FROM mail;\nSELECT date_sent, sender, size FROM mail_view\nWHERE size > 100000 ORDER BY size;\n-- Using JOIN to query the result from two or More tables\nSELECT profile.id, name, service, contact_name \nFROM profile_contact INNER JOIN profile ON profile.id = profile_id;\n-- Using Subqueries to join two or more tables\nSELECT profile_id, service, contact_name FROM profile_contact\nWHERE profile_id = (SELECT id from profile WHERE name = 'Nancy');\n-- Using LIMIT with SELECT\nSELECT * FROM profile LIMIT 1;\nSELECT * FROM profile LIMIT 3;\nSELECT * FROM profile ORDER BY birth;\nSELECT * FROM profile ORDER BY birth LIMIT 1;\nSELECT * FROM profile ORDER BY birth DESC LIMIT 1;\nSELECT name, DATE_FORMAT(birth, '%m-%d') AS 'birthday' FROM profile ORDER BY birthday LIMIT 1;\nSELECT * FROM profile ORDER BY birth LIMIT 2,1;\nSELECT * FROM profile ORDER BY birth DESC LIMIT 2,1;\n-- Using COUNT to find out no of record in a table\nSELECT COUNT(*) FROM profile;\n-- Find the 4 people who born recently in ascending order\nSELECT * from (SELECT name, birth FROM profile ORDER BY birth DESC LIMIT 4) AS t ORDER BY birth;\n",
+    "content": "SELECT user();\nUSE cookbook;\n-- Want to display specific columns and rows from a table.\nSELECT t, srcuser, srchost, dstuser, dsthost, size FROM mail;\nSELECT srcuser, srchost, t, size FROM mail;\nSELECT t, srcuser, srchost FROM mail WHERE srchost = 'venus';\nSELECT t, srcuser, srchost FROM mail WHERE srchost LIKE 's%';\nSELECT t, srcuser, srchost, dstuser, dsthost, size FROM mail WHERE srcuser = 'barb' AND dstuser = 'tricia';\nSELECT t, CONCAT(srcuser, '@', srchost), size FROM mail;\n-- You can use TABLE instead of SELECT but TABLE supports only ORDER BY and LIMIT clauses only\nTABLE mail ORDER BY size DESC LIMIT 4;\n-- Naming Query Result Columns with aliases\nSELECT DATE_FORMAT(t, '%M %e, %Y'), CONCAT(srcuser,'@',srchost), size FROM mail;\nSELECT\nDATE_FORMAT(t, '%M %e, %Y') AS date_sent,\nCONCAT(srcuser,'@',srchost) AS sender,\nsize FROM mail;\nSELECT\nDATE_FORMAT(t, '%M %e, %Y') AS 'Date of message',\nCONCAT(srcuser,'@',srchost) AS 'Message sender',\nsize AS 'Number of byts' FROM mail;\nSELECT 1 AS 'INTEGER';\nSELECT t, srcuser, dstuser, size/1024 AS Kilobytes\nFROM mail;\nSELECT t, srcuser, dstuser, size/1024 AS Kilobytes FROM mail\nWHERE size/1024 > 500;\n-- Sorting Query Result\nSELECT t, srcuser, srchost, dstuser, dsthost, size FROM mail WHERE dstuser = 'tricia'\nORDER BY srchost, srcuser;\nSELECT t, srcuser, srchost,dstuser, dsthost, size FROM mail\nWHERE size > 50000 ORDER BY size DESC;\n-- Removing Duplicate Rows\nSELECT srcuser from mail;\n-- Using DISTINCT to remove duplicate\nSELECT DISTINCT srcuser from mail;\n-- Using COUNT to find no of result\nSELECT COUNT(srcuser) FROM mail;\nSELECT COUNT(DISTINCT srcuser) FROM mail;\nSELECT DISTINCT YEAR(t), MONTH(t), DAYOFMONTH(t) FROM mail;\n-- Working with NULL VALUES\n-- Failing Statement\nSELECT * FROM expt WHERE score = NULL;\nSELECT * FROM expt WHERE score <> NULL;\n-- MySQL NULL operator IS NULL, IS NOT NULL, <=>\nSELECT * FROM expt WHERE score IS NULL;\nSELECT * FROM expt WHERE score IS NOT NULL;\nSELECT * FROM expt WHERE score <=> NULL;\nSELECT NULL = NULL, NULL <=> NULL;\n-- Using IF() to replace NULL value into different value\n-- IF SYNTAX: IF(condition, true, false)\nSELECT subject, test, if (score IS NULL, 'Unknown', score) AS 'score' FROM expt;\n-- Using IFNULL(IF NOT NULL[false], IF NULL[true])\nSELECT subject, test, IFNULL(score, 'Unknown') AS 'score' FROM expt;\n-- The above is equal to IF (score IS NOT NULL, score, 'Unknown')\n-- Using COALESCE\nSELECT subject, test, COALESCE(score, 'Unknown') AS 'score' FROM expt;\n-- Using VIEWS to simplify table access\nSELECT\nDATE_FORMAT(t, '%M %e, %Y') AS 'date_sent',\nCONCAT(srcuser,'@',srchost) AS 'sender',\nCONCAT(dstuser,'@',dsthost) AS 'recipient',\nsize FROM mail;\nCREATE VIEW mail_view AS\nSELECT\nDATE_FORMAT(t, '%M %e, %Y') AS 'date_sent',\nCONCAT(srcuser,'@',srchost) AS 'sender',\nCONCAT(dstuser,'@',dsthost) AS 'recipient',\nsize FROM mail;\nSELECT date_sent, sender, size FROM mail_view\nWHERE size > 100000 ORDER BY size;\n-- Using JOIN to query the result from two or More tables\nSELECT profile.id, name, service, contact_name \nFROM profile_contact INNER JOIN profile ON profile.id = profile_id;\n-- Using Subqueries to join two or more tables\nSELECT profile_id, service, contact_name FROM profile_contact\nWHERE profile_id = (SELECT id from profile WHERE name = 'Nancy');\n-- Using LIMIT with SELECT\nSELECT * FROM profile LIMIT 1;\nSELECT * FROM profile LIMIT 3;\nSELECT * FROM profile ORDER BY birth;\nSELECT * FROM profile ORDER BY birth LIMIT 1;\nSELECT * FROM profile ORDER BY birth DESC LIMIT 1;\nSELECT name, DATE_FORMAT(birth, '%m-%d') AS 'birthday' FROM profile ORDER BY birthday LIMIT 1;\nSELECT * FROM profile ORDER BY birth LIMIT 2,1;\nSELECT * FROM profile ORDER BY birth DESC LIMIT 2,1;\n-- Using COUNT to find out no of record in a table\nSELECT COUNT(*) FROM profile;\n-- Find the 4 people who born recently in ascending order\nSELECT * from (SELECT name, birth FROM profile ORDER BY birth DESC LIMIT 4) AS t ORDER BY birth;\n-- Combining two are more SELECT result by using UNION and UNION ALL\n-- One condition is no of columns must be same\nSELECT DISTINCT srcuser as user, srchost as host from mail\nUNION\nSELECT DISTINCT dstuser as user, dsthost as host from mail;\n-- Let's find 4 users who send highest no of emails, and 4 users who received highest no of emails\n(SELECT CONCAT(srcuser,'@',srchost) AS user, COUNT(*) AS emails FROM mail GROUP BY srcuser, srchost ORDER BY emails DESC LIMIT 4)\nUNION ALL\n(SELECT CONCAT(dstuser,'@',dsthost) AS user, COUNT(*) AS emails FROM mail GROUP BY dstuser, dsthost ORDER BY emails DESC LIMIT 4)\norder by user;\nSELECT CONCAT(srcuser,'@',srchost) AS user, COUNT(*) AS emails FROM mail GROUP BY srcuser, srchost ORDER BY emails DESC LIMIT 4;\nSELECT CONCAT(dstuser,'@',dsthost) AS user, COUNT(*) AS emails FROM mail GROUP BY dstuser, dsthost ORDER BY emails DESC LIMIT 4;\n(SELECT CONCAT(srcuser,'@',srchost) AS user, COUNT(*) AS emails FROM mail GROUP BY srcuser, srchost ORDER BY emails DESC LIMIT 4)\nUNION\n(SELECT CONCAT(dstuser,'@',dsthost) AS user, COUNT(*) AS emails FROM mail GROUP BY dstuser, dsthost ORDER BY emails DESC LIMIT 4)\norder by user;\n-- UNION by default remove the duplicate the same result!\n-- find user send and receive mail count from mail TABLE\nSELECT CONCAT(srcuser,'@',srchost) AS user, \nCOUNT(*) AS send, \n(SELECT COUNT(*) FROM mail d WHERE d.dstuser = m.srcuser AND d.dsthost = m.srchost) AS received \nFROM mail m \nGROUP BY srcuser, srchost\nORDER BY send DESC;\n ",
     "options": {
         "tabSize": 4,
         "indentSize": 4,
@@ -15,22 +15,22 @@
             {
                 "inSelectionMode": false,
                 "selectionStart": {
-                    "lineNumber": 90,
-                    "column": 1
+                    "lineNumber": 114,
+                    "column": 2
                 },
                 "position": {
-                    "lineNumber": 90,
-                    "column": 1
+                    "lineNumber": 114,
+                    "column": 2
                 }
             }
         ],
         "viewState": {
             "scrollLeft": 0,
             "firstPosition": {
-                "lineNumber": 85,
+                "lineNumber": 105,
                 "column": 1
             },
-            "firstPositionDeltaTop": 56
+            "firstPositionDeltaTop": -12
         },
         "contributionsState": {
             "editor.contrib.folding": {},
@@ -46,7 +46,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "eedb8f36-d5f0-4445-d801-5d475caaf159"
+                        "194dcf6f-7778-4bff-ea2b-32f3085fbfeb"
                     ]
                 },
                 "currentHeight": 36,
@@ -64,8 +64,8 @@
             },
             "data": [
                 {
-                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
-                    "resultId": "eedb8f36-d5f0-4445-d801-5d475caaf159",
+                    "tabId": "64b43039-9efa-4853-edd7-e1f1dc5f9240",
+                    "resultId": "194dcf6f-7778-4bff-ea2b-32f3085fbfeb",
                     "rows": [
                         {
                             "0": "cbuser@localhost"
@@ -102,7 +102,7 @@
                         {
                             "type": 4,
                             "index": 0,
-                            "resultId": "06bb1fc3-cdcc-4e18-d5f1-50d96b0787ba",
+                            "resultId": "85ba1148-319f-4b21-da8c-7a0584b6b0ed",
                             "content": "OK, 0 records retrieved in 0s"
                         }
                     ]
@@ -130,7 +130,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "27fcf8ab-49af-466e-bd48-89a534e9d761"
+                        "53e4d970-ae92-4693-b143-4889ac2f8381"
                     ]
                 },
                 "currentHeight": 36,
@@ -148,8 +148,8 @@
             },
             "data": [
                 {
-                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
-                    "resultId": "27fcf8ab-49af-466e-bd48-89a534e9d761",
+                    "tabId": "64b43039-9efa-4853-edd7-e1f1dc5f9240",
+                    "resultId": "53e4d970-ae92-4693-b143-4889ac2f8381",
                     "rows": [
                         {
                             "0": "2014-05-11 10:15:08",
@@ -343,7 +343,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "2f08f4e3-cdc5-4934-825f-9874668a7a5b"
+                        "75ce53f9-58c4-4383-bb51-70faa3b6dadc"
                     ]
                 },
                 "currentHeight": 36,
@@ -361,8 +361,8 @@
             },
             "data": [
                 {
-                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
-                    "resultId": "2f08f4e3-cdc5-4934-825f-9874668a7a5b",
+                    "tabId": "64b43039-9efa-4853-edd7-e1f1dc5f9240",
+                    "resultId": "75ce53f9-58c4-4383-bb51-70faa3b6dadc",
                     "rows": [
                         {
                             "0": "barb",
@@ -510,7 +510,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "6e83793e-ca16-4804-87c6-30f6fc8222e2"
+                        "89d77ebf-92f9-409b-dcdf-45f118f70e33"
                     ]
                 },
                 "currentHeight": 36,
@@ -528,8 +528,8 @@
             },
             "data": [
                 {
-                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
-                    "resultId": "6e83793e-ca16-4804-87c6-30f6fc8222e2",
+                    "tabId": "64b43039-9efa-4853-edd7-e1f1dc5f9240",
+                    "resultId": "89d77ebf-92f9-409b-dcdf-45f118f70e33",
                     "rows": [
                         {
                             "0": "2014-05-14 09:31:37",
@@ -599,7 +599,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "d9be6221-9e10-4376-8604-4de39f30f2c9"
+                        "bcd72def-c24f-4974-d12b-adb380d86f3b"
                     ]
                 },
                 "currentHeight": 36,
@@ -617,8 +617,8 @@
             },
             "data": [
                 {
-                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
-                    "resultId": "d9be6221-9e10-4376-8604-4de39f30f2c9",
+                    "tabId": "64b43039-9efa-4853-edd7-e1f1dc5f9240",
+                    "resultId": "bcd72def-c24f-4974-d12b-adb380d86f3b",
                     "rows": [
                         {
                             "0": "2014-05-11 10:15:08",
@@ -688,7 +688,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "964b87bf-0077-4a3d-8fd3-56619a908620"
+                        "873d33eb-5c1b-444c-f08e-884d341bdaa6"
                     ]
                 },
                 "currentHeight": 36,
@@ -706,8 +706,8 @@
             },
             "data": [
                 {
-                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
-                    "resultId": "964b87bf-0077-4a3d-8fd3-56619a908620",
+                    "tabId": "64b43039-9efa-4853-edd7-e1f1dc5f9240",
+                    "resultId": "873d33eb-5c1b-444c-f08e-884d341bdaa6",
                     "rows": [
                         {
                             "0": "2014-05-11 10:15:08",
@@ -789,7 +789,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "a4c9efd0-8428-4244-b1f2-f2d487a7c2e9"
+                        "0b999e3a-62ad-44ef-d8f6-013f84e9963c"
                     ]
                 },
                 "currentHeight": 352,
@@ -807,8 +807,8 @@
             },
             "data": [
                 {
-                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
-                    "resultId": "a4c9efd0-8428-4244-b1f2-f2d487a7c2e9",
+                    "tabId": "64b43039-9efa-4853-edd7-e1f1dc5f9240",
+                    "resultId": "0b999e3a-62ad-44ef-d8f6-013f84e9963c",
                     "rows": [
                         {
                             "0": "2014-05-11 10:15:08",
@@ -933,7 +933,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "456b7ac2-dc4d-4ff9-eb26-5989647de2b8"
+                        "9b959136-4796-43b2-c185-d6963320f137"
                     ]
                 },
                 "currentHeight": 36,
@@ -951,8 +951,8 @@
             },
             "data": [
                 {
-                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
-                    "resultId": "456b7ac2-dc4d-4ff9-eb26-5989647de2b8",
+                    "tabId": "64b43039-9efa-4853-edd7-e1f1dc5f9240",
+                    "resultId": "9b959136-4796-43b2-c185-d6963320f137",
                     "rows": [
                         {
                             "0": 8,
@@ -1061,7 +1061,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "dbf79e37-6ff3-496b-ac31-07a96cbec59f"
+                        "9131702f-d78c-4ffa-c861-977429640966"
                     ]
                 },
                 "currentHeight": 36,
@@ -1079,8 +1079,8 @@
             },
             "data": [
                 {
-                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
-                    "resultId": "dbf79e37-6ff3-496b-ac31-07a96cbec59f",
+                    "tabId": "64b43039-9efa-4853-edd7-e1f1dc5f9240",
+                    "resultId": "9131702f-d78c-4ffa-c861-977429640966",
                     "rows": [
                         {
                             "0": "May 11, 2014",
@@ -1205,7 +1205,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "a6b7c092-5b93-4ee7-c93b-eb7297dec970"
+                        "45002e81-e69c-41b1-943a-7075ffebb207"
                     ]
                 },
                 "currentHeight": 36,
@@ -1223,8 +1223,8 @@
             },
             "data": [
                 {
-                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
-                    "resultId": "a6b7c092-5b93-4ee7-c93b-eb7297dec970",
+                    "tabId": "64b43039-9efa-4853-edd7-e1f1dc5f9240",
+                    "resultId": "45002e81-e69c-41b1-943a-7075ffebb207",
                     "rows": [
                         {
                             "0": "May 11, 2014",
@@ -1349,7 +1349,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "85465026-2b83-4ece-b91a-c625ef838346"
+                        "196d83f0-8b02-43ed-bbd6-57c5165c07e0"
                     ]
                 },
                 "currentHeight": 36,
@@ -1367,8 +1367,8 @@
             },
             "data": [
                 {
-                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
-                    "resultId": "85465026-2b83-4ece-b91a-c625ef838346",
+                    "tabId": "64b43039-9efa-4853-edd7-e1f1dc5f9240",
+                    "resultId": "196d83f0-8b02-43ed-bbd6-57c5165c07e0",
                     "rows": [
                         {
                             "0": "May 11, 2014",
@@ -1493,7 +1493,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "f2451eb1-80d0-4256-8526-bd4ab456583d"
+                        "ba1f6bf3-8e3a-4c0b-dadd-8515bdcce402"
                     ]
                 },
                 "currentHeight": 106.640625,
@@ -1511,8 +1511,8 @@
             },
             "data": [
                 {
-                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
-                    "resultId": "f2451eb1-80d0-4256-8526-bd4ab456583d",
+                    "tabId": "64b43039-9efa-4853-edd7-e1f1dc5f9240",
+                    "resultId": "ba1f6bf3-8e3a-4c0b-dadd-8515bdcce402",
                     "rows": [
                         {
                             "0": 1
@@ -1546,7 +1546,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "43e18096-07b8-4aff-d11b-fc214598b099"
+                        "7d148e18-41c1-4468-c847-81b5c335236d"
                     ]
                 },
                 "currentHeight": 36,
@@ -1564,8 +1564,8 @@
             },
             "data": [
                 {
-                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
-                    "resultId": "43e18096-07b8-4aff-d11b-fc214598b099",
+                    "tabId": "64b43039-9efa-4853-edd7-e1f1dc5f9240",
+                    "resultId": "7d148e18-41c1-4468-c847-81b5c335236d",
                     "rows": [
                         {
                             "0": "2014-05-11 10:15:08",
@@ -1713,7 +1713,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "11ccfbe3-e551-46e6-d69b-4f804ceeda41"
+                        "e6772952-17aa-414e-bc82-a8fbffa8dfde"
                     ]
                 },
                 "currentHeight": 36,
@@ -1731,8 +1731,8 @@
             },
             "data": [
                 {
-                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
-                    "resultId": "11ccfbe3-e551-46e6-d69b-4f804ceeda41",
+                    "tabId": "64b43039-9efa-4853-edd7-e1f1dc5f9240",
+                    "resultId": "e6772952-17aa-414e-bc82-a8fbffa8dfde",
                     "rows": [
                         {
                             "0": "2014-05-14 17:03:01",
@@ -1796,7 +1796,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "8a75e09c-ff0c-46ef-e121-82f7643c0b92"
+                        "73bf83b9-1f1f-4898-8db1-d91c98ae4b8e"
                     ]
                 },
                 "currentHeight": 36,
@@ -1823,8 +1823,8 @@
             },
             "data": [
                 {
-                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
-                    "resultId": "8a75e09c-ff0c-46ef-e121-82f7643c0b92",
+                    "tabId": "64b43039-9efa-4853-edd7-e1f1dc5f9240",
+                    "resultId": "73bf83b9-1f1f-4898-8db1-d91c98ae4b8e",
                     "rows": [
                         {
                             "0": "2014-05-15 10:25:52",
@@ -1930,7 +1930,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "0f676dcb-9f9a-482d-c258-8c7e266c89d9"
+                        "53e3088e-ea70-4979-a55a-28d18ec28ab4"
                     ]
                 },
                 "currentHeight": 36,
@@ -1957,8 +1957,8 @@
             },
             "data": [
                 {
-                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
-                    "resultId": "0f676dcb-9f9a-482d-c258-8c7e266c89d9",
+                    "tabId": "64b43039-9efa-4853-edd7-e1f1dc5f9240",
+                    "resultId": "53e3088e-ea70-4979-a55a-28d18ec28ab4",
                     "rows": [
                         {
                             "0": "2014-05-14 17:03:01",
@@ -2064,7 +2064,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "df692d56-ffd3-4497-adba-dca5949548e2"
+                        "e8354c17-7c55-40a9-f7e0-7fcf253e8221"
                     ]
                 },
                 "currentHeight": 352,
@@ -2091,8 +2091,8 @@
             },
             "data": [
                 {
-                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
-                    "resultId": "df692d56-ffd3-4497-adba-dca5949548e2",
+                    "tabId": "64b43039-9efa-4853-edd7-e1f1dc5f9240",
+                    "resultId": "e8354c17-7c55-40a9-f7e0-7fcf253e8221",
                     "rows": [
                         {
                             "0": "barb"
@@ -2171,7 +2171,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "e8841472-4271-4b68-9b26-f3563dfb767e"
+                        "15c98e2c-2eb9-4791-a301-98e8e1ec3bcb"
                     ]
                 },
                 "currentHeight": 36,
@@ -2198,8 +2198,8 @@
             },
             "data": [
                 {
-                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
-                    "resultId": "e8841472-4271-4b68-9b26-f3563dfb767e",
+                    "tabId": "64b43039-9efa-4853-edd7-e1f1dc5f9240",
+                    "resultId": "15c98e2c-2eb9-4791-a301-98e8e1ec3bcb",
                     "rows": [
                         {
                             "0": "barb"
@@ -2242,7 +2242,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "1c4c384a-33c0-4264-f4c5-a3dcebcabb69"
+                        "63d42642-75ba-4102-952d-3905d7269d0a"
                     ]
                 },
                 "currentHeight": 36,
@@ -2269,8 +2269,8 @@
             },
             "data": [
                 {
-                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
-                    "resultId": "1c4c384a-33c0-4264-f4c5-a3dcebcabb69",
+                    "tabId": "64b43039-9efa-4853-edd7-e1f1dc5f9240",
+                    "resultId": "63d42642-75ba-4102-952d-3905d7269d0a",
                     "rows": [
                         {
                             "0": 16
@@ -2304,7 +2304,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "0cd6eb1e-2619-4666-bf87-5c5e2643afca"
+                        "88c46a81-3644-4c10-e648-9194db2e482e"
                     ]
                 },
                 "currentHeight": 36,
@@ -2322,8 +2322,8 @@
             },
             "data": [
                 {
-                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
-                    "resultId": "0cd6eb1e-2619-4666-bf87-5c5e2643afca",
+                    "tabId": "64b43039-9efa-4853-edd7-e1f1dc5f9240",
+                    "resultId": "88c46a81-3644-4c10-e648-9194db2e482e",
                     "rows": [
                         {
                             "0": 4
@@ -2357,7 +2357,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "3d792a56-daa3-4bb8-a15d-dc449e179641"
+                        "f3d1a806-8bfa-470b-f949-b2f683877609"
                     ]
                 },
                 "currentHeight": 36,
@@ -2375,8 +2375,8 @@
             },
             "data": [
                 {
-                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
-                    "resultId": "3d792a56-daa3-4bb8-a15d-dc449e179641",
+                    "tabId": "64b43039-9efa-4853-edd7-e1f1dc5f9240",
+                    "resultId": "f3d1a806-8bfa-470b-f949-b2f683877609",
                     "rows": [
                         {
                             "0": 2014,
@@ -2522,7 +2522,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "382e3d04-9728-4233-b909-33c5f76dd55b"
+                        "66d9d231-1612-4ad4-fff2-b4a555575cea"
                     ]
                 },
                 "currentHeight": 36,
@@ -2540,8 +2540,8 @@
             },
             "data": [
                 {
-                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
-                    "resultId": "382e3d04-9728-4233-b909-33c5f76dd55b",
+                    "tabId": "64b43039-9efa-4853-edd7-e1f1dc5f9240",
+                    "resultId": "66d9d231-1612-4ad4-fff2-b4a555575cea",
                     "rows": [
                         {
                             "0": "Jane",
@@ -2601,7 +2601,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "8f9f423e-31b2-4f71-8692-ccb347a3b1b2"
+                        "da051205-1d8a-4e11-8041-b86cbba978b9"
                     ]
                 },
                 "currentHeight": 36,
@@ -2619,8 +2619,8 @@
             },
             "data": [
                 {
-                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
-                    "resultId": "8f9f423e-31b2-4f71-8692-ccb347a3b1b2",
+                    "tabId": "64b43039-9efa-4853-edd7-e1f1dc5f9240",
+                    "resultId": "da051205-1d8a-4e11-8041-b86cbba978b9",
                     "rows": [
                         {
                             "0": "Jane",
@@ -2690,7 +2690,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "45cc9ac0-e182-4697-fc37-56aad5d8e5f4"
+                        "31ef4711-cc87-4975-b7f1-8fef390f37f6"
                     ]
                 },
                 "currentHeight": 36,
@@ -2708,8 +2708,8 @@
             },
             "data": [
                 {
-                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
-                    "resultId": "45cc9ac0-e182-4697-fc37-56aad5d8e5f4",
+                    "tabId": "64b43039-9efa-4853-edd7-e1f1dc5f9240",
+                    "resultId": "31ef4711-cc87-4975-b7f1-8fef390f37f6",
                     "rows": [
                         {
                             "0": "Jane",
@@ -2769,7 +2769,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "65af9668-2a4c-4494-b4d8-9b3773b565cc"
+                        "852d7206-46f0-4a0c-d0a3-c80a1d0b1fdc"
                     ]
                 },
                 "currentHeight": 36,
@@ -2787,8 +2787,8 @@
             },
             "data": [
                 {
-                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
-                    "resultId": "65af9668-2a4c-4494-b4d8-9b3773b565cc",
+                    "tabId": "64b43039-9efa-4853-edd7-e1f1dc5f9240",
+                    "resultId": "852d7206-46f0-4a0c-d0a3-c80a1d0b1fdc",
                     "rows": [
                         {
                             "0": null,
@@ -2830,7 +2830,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "2c153bb0-abc6-4147-fd29-1157ac41e2b0"
+                        "06fc98d0-f0f8-478c-81d5-5f64016625d3"
                     ]
                 },
                 "currentHeight": 36,
@@ -2848,8 +2848,8 @@
             },
             "data": [
                 {
-                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
-                    "resultId": "2c153bb0-abc6-4147-fd29-1157ac41e2b0",
+                    "tabId": "64b43039-9efa-4853-edd7-e1f1dc5f9240",
+                    "resultId": "06fc98d0-f0f8-478c-81d5-5f64016625d3",
                     "rows": [
                         {
                             "0": "Jane",
@@ -2934,7 +2934,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "be42c5b7-6bc6-470b-c8c5-99446a0eec28"
+                        "3df01a16-d0d6-471b-9674-1e3e8cdb4938"
                     ]
                 },
                 "currentHeight": 335.125,
@@ -2952,8 +2952,8 @@
             },
             "data": [
                 {
-                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
-                    "resultId": "be42c5b7-6bc6-470b-c8c5-99446a0eec28",
+                    "tabId": "64b43039-9efa-4853-edd7-e1f1dc5f9240",
+                    "resultId": "3df01a16-d0d6-471b-9674-1e3e8cdb4938",
                     "rows": [
                         {
                             "0": "Jane",
@@ -3038,7 +3038,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "b51dd5d2-af9e-472e-e8b5-7fcf02e0b174"
+                        "b2aa348b-1afa-4b25-bbb8-c263003815d4"
                     ]
                 },
                 "currentHeight": 335.125,
@@ -3056,8 +3056,8 @@
             },
             "data": [
                 {
-                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
-                    "resultId": "b51dd5d2-af9e-472e-e8b5-7fcf02e0b174",
+                    "tabId": "64b43039-9efa-4853-edd7-e1f1dc5f9240",
+                    "resultId": "b2aa348b-1afa-4b25-bbb8-c263003815d4",
                     "rows": [
                         {
                             "0": "Jane",
@@ -3142,7 +3142,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "3c45ebbc-989f-4e25-f999-34fdb6e48402"
+                        "ea7fd7dd-bff4-4cca-bfed-f5bf536af1ff"
                     ]
                 },
                 "currentHeight": 352,
@@ -3160,8 +3160,8 @@
             },
             "data": [
                 {
-                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
-                    "resultId": "3c45ebbc-989f-4e25-f999-34fdb6e48402",
+                    "tabId": "64b43039-9efa-4853-edd7-e1f1dc5f9240",
+                    "resultId": "ea7fd7dd-bff4-4cca-bfed-f5bf536af1ff",
                     "rows": [
                         {
                             "0": "May 11, 2014",
@@ -3340,7 +3340,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "b2c37f15-8fbd-45fa-f1a1-be68fcc38644"
+                        "2049ad4b-1a10-4961-ed40-ab02436866b0"
                     ]
                 },
                 "currentHeight": 245,
@@ -3358,8 +3358,8 @@
             },
             "data": [
                 {
-                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
-                    "resultId": "b2c37f15-8fbd-45fa-f1a1-be68fcc38644",
+                    "tabId": "64b43039-9efa-4853-edd7-e1f1dc5f9240",
+                    "resultId": "2049ad4b-1a10-4961-ed40-ab02436866b0",
                     "rows": [
                         {
                             "0": "May 12, 2014",
@@ -3419,7 +3419,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "e18d7414-e0f4-4b86-c32d-4f8a0c9a611d"
+                        "357acf28-72cf-4b71-edb9-bb5fb732e72a"
                     ]
                 },
                 "currentHeight": 269.84375,
@@ -3437,8 +3437,8 @@
             },
             "data": [
                 {
-                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
-                    "resultId": "e18d7414-e0f4-4b86-c32d-4f8a0c9a611d",
+                    "tabId": "64b43039-9efa-4853-edd7-e1f1dc5f9240",
+                    "resultId": "357acf28-72cf-4b71-edb9-bb5fb732e72a",
                     "rows": [
                         {
                             "0": 1,
@@ -3526,7 +3526,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "f32cecde-fa66-48bf-9552-cd5f45edcca0"
+                        "5b5e7203-765a-48d1-957e-7bb6fdcc0edf"
                     ]
                 },
                 "currentHeight": 36,
@@ -3544,8 +3544,8 @@
             },
             "data": [
                 {
-                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
-                    "resultId": "f32cecde-fa66-48bf-9552-cd5f45edcca0",
+                    "tabId": "64b43039-9efa-4853-edd7-e1f1dc5f9240",
+                    "resultId": "5b5e7203-765a-48d1-957e-7bb6fdcc0edf",
                     "rows": [
                         {
                             "0": 2,
@@ -3605,7 +3605,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "677b77d3-4bd1-47cd-af4c-638ff2536a65"
+                        "efe74011-a099-4b5a-dc4c-6401527f72a9"
                     ]
                 },
                 "currentHeight": 36,
@@ -3623,8 +3623,8 @@
             },
             "data": [
                 {
-                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
-                    "resultId": "677b77d3-4bd1-47cd-af4c-638ff2536a65",
+                    "tabId": "64b43039-9efa-4853-edd7-e1f1dc5f9240",
+                    "resultId": "efe74011-a099-4b5a-dc4c-6401527f72a9",
                     "rows": [
                         {
                             "0": 1,
@@ -3698,7 +3698,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "697cfc3d-f57b-4181-92dd-f4beff1e182d"
+                        "a3074402-67a8-48b1-d77c-fa205e40b194"
                     ]
                 },
                 "currentHeight": 36,
@@ -3716,8 +3716,8 @@
             },
             "data": [
                 {
-                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
-                    "resultId": "697cfc3d-f57b-4181-92dd-f4beff1e182d",
+                    "tabId": "64b43039-9efa-4853-edd7-e1f1dc5f9240",
+                    "resultId": "a3074402-67a8-48b1-d77c-fa205e40b194",
                     "rows": [
                         {
                             "0": 1,
@@ -3807,7 +3807,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "a30239e5-0018-4def-9e49-c326538ade7e"
+                        "8873f33b-0027-4892-ca0b-7b5bba07d737"
                     ]
                 },
                 "currentHeight": 36,
@@ -3825,8 +3825,8 @@
             },
             "data": [
                 {
-                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
-                    "resultId": "a30239e5-0018-4def-9e49-c326538ade7e",
+                    "tabId": "64b43039-9efa-4853-edd7-e1f1dc5f9240",
+                    "resultId": "8873f33b-0027-4892-ca0b-7b5bba07d737",
                     "rows": [
                         {
                             "0": 7,
@@ -3956,7 +3956,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "6250f550-61e2-482d-8843-dae69144bf9b"
+                        "a6567230-8e2d-481e-c12f-a3d25e1ade63"
                     ]
                 },
                 "currentHeight": 36,
@@ -3974,8 +3974,8 @@
             },
             "data": [
                 {
-                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
-                    "resultId": "6250f550-61e2-482d-8843-dae69144bf9b",
+                    "tabId": "64b43039-9efa-4853-edd7-e1f1dc5f9240",
+                    "resultId": "a6567230-8e2d-481e-c12f-a3d25e1ade63",
                     "rows": [
                         {
                             "0": 7,
@@ -4049,7 +4049,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "b8d59ad4-6313-4dc2-884b-c63d571da8da"
+                        "a3c43ae8-086a-4010-c62d-5db09eb9c74b"
                     ]
                 },
                 "currentHeight": 36,
@@ -4067,8 +4067,8 @@
             },
             "data": [
                 {
-                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
-                    "resultId": "b8d59ad4-6313-4dc2-884b-c63d571da8da",
+                    "tabId": "64b43039-9efa-4853-edd7-e1f1dc5f9240",
+                    "resultId": "a3c43ae8-086a-4010-c62d-5db09eb9c74b",
                     "rows": [
                         {
                             "0": 3,
@@ -4142,7 +4142,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "a9b516c3-1070-4c10-9fc4-9d04b3666805"
+                        "c151bd03-baca-40b7-f199-e9475aaeb608"
                     ]
                 },
                 "currentHeight": 36,
@@ -4160,8 +4160,8 @@
             },
             "data": [
                 {
-                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
-                    "resultId": "a9b516c3-1070-4c10-9fc4-9d04b3666805",
+                    "tabId": "64b43039-9efa-4853-edd7-e1f1dc5f9240",
+                    "resultId": "c151bd03-baca-40b7-f199-e9475aaeb608",
                     "rows": [
                         {
                             "0": "Henry",
@@ -4203,7 +4203,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "2ebf6d0d-6914-4d02-b2b6-39e08f3035df"
+                        "3247935a-e3d9-4f95-a056-58627ff1f15a"
                     ]
                 },
                 "currentHeight": 106.640625,
@@ -4221,8 +4221,8 @@
             },
             "data": [
                 {
-                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
-                    "resultId": "2ebf6d0d-6914-4d02-b2b6-39e08f3035df",
+                    "tabId": "64b43039-9efa-4853-edd7-e1f1dc5f9240",
+                    "resultId": "3247935a-e3d9-4f95-a056-58627ff1f15a",
                     "rows": [
                         {
                             "0": 4,
@@ -4296,7 +4296,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "6619919d-3289-439c-e35d-60bb8813111e"
+                        "155562ab-f7e1-45de-e78b-972b3b590112"
                     ]
                 },
                 "currentHeight": 106.640625,
@@ -4314,8 +4314,8 @@
             },
             "data": [
                 {
-                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
-                    "resultId": "6619919d-3289-439c-e35d-60bb8813111e",
+                    "tabId": "64b43039-9efa-4853-edd7-e1f1dc5f9240",
+                    "resultId": "155562ab-f7e1-45de-e78b-972b3b590112",
                     "rows": [
                         {
                             "0": 2,
@@ -4389,7 +4389,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "2aa7c56d-91d9-457c-ebb5-493bde7d90eb"
+                        "df103641-cfb5-480c-818b-7f32c8cd0475"
                     ]
                 },
                 "currentHeight": 106.640625,
@@ -4407,8 +4407,8 @@
             },
             "data": [
                 {
-                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
-                    "resultId": "2aa7c56d-91d9-457c-ebb5-493bde7d90eb",
+                    "tabId": "64b43039-9efa-4853-edd7-e1f1dc5f9240",
+                    "resultId": "df103641-cfb5-480c-818b-7f32c8cd0475",
                     "rows": [
                         {
                             "0": 8
@@ -4442,7 +4442,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "e7605025-472c-429f-a19f-d3b835795526"
+                        "771d6747-2259-4bf6-d7a5-8817d321fd8d"
                     ]
                 },
                 "currentHeight": 204.5625,
@@ -4460,8 +4460,8 @@
             },
             "data": [
                 {
-                    "tabId": "cfb725ab-a000-428b-a492-bd39a3148dd9",
-                    "resultId": "e7605025-472c-429f-a19f-d3b835795526",
+                    "tabId": "64b43039-9efa-4853-edd7-e1f1dc5f9240",
+                    "resultId": "771d6747-2259-4bf6-d7a5-8817d321fd8d",
                     "rows": [
                         {
                             "0": "Aaron",
@@ -4510,7 +4510,550 @@
         {
             "state": {
                 "start": 90,
-                "end": 90,
+                "end": 94,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "50193d7e-5606-44c3-818f-e3545c2a8317"
+                    ]
+                },
+                "currentHeight": 36,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 240
+                        },
+                        "contentStart": 116,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "64b43039-9efa-4853-edd7-e1f1dc5f9240",
+                    "resultId": "50193d7e-5606-44c3-818f-e3545c2a8317",
+                    "rows": [
+                        {
+                            "0": "barb",
+                            "1": "saturn"
+                        },
+                        {
+                            "0": "tricia",
+                            "1": "mars"
+                        },
+                        {
+                            "0": "phil",
+                            "1": "mars"
+                        },
+                        {
+                            "0": "gene",
+                            "1": "venus"
+                        },
+                        {
+                            "0": "barb",
+                            "1": "venus"
+                        },
+                        {
+                            "0": "tricia",
+                            "1": "saturn"
+                        },
+                        {
+                            "0": "gene",
+                            "1": "mars"
+                        },
+                        {
+                            "0": "phil",
+                            "1": "venus"
+                        },
+                        {
+                            "0": "gene",
+                            "1": "saturn"
+                        },
+                        {
+                            "0": "phil",
+                            "1": "saturn"
+                        },
+                        {
+                            "0": "tricia",
+                            "1": "venus"
+                        },
+                        {
+                            "0": "barb",
+                            "1": "mars"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "user",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "host",
+                            "field": "1",
+                            "dataType": {
+                                "type": 17
+                            }
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 12 records retrieved in 0s"
+                    },
+                    "totalRowCount": 12,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "-- Combining two are more SELECT result by using UNION and UNION ALL\n-- One condition is no of columns must be same\nSELECT DISTINCT srcuser as user, srchost as host from mail\nUNION\nSELECT DISTINCT dstuser as user, dsthost as host from mail"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 95,
+                "end": 99,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "f9eb935f-7c8c-4be4-99da-1fd600d8fb0f"
+                    ]
+                },
+                "currentHeight": 36,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 383
+                        },
+                        "contentStart": 99,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "64b43039-9efa-4853-edd7-e1f1dc5f9240",
+                    "resultId": "f9eb935f-7c8c-4be4-99da-1fd600d8fb0f",
+                    "rows": [
+                        {
+                            "0": "barb@mars",
+                            "1": 2
+                        },
+                        {
+                            "0": "barb@saturn",
+                            "1": 2
+                        },
+                        {
+                            "0": "barb@venus",
+                            "1": 2
+                        },
+                        {
+                            "0": "gene@saturn",
+                            "1": 2
+                        },
+                        {
+                            "0": "gene@venus",
+                            "1": 2
+                        },
+                        {
+                            "0": "gene@venus",
+                            "1": 2
+                        },
+                        {
+                            "0": "phil@mars",
+                            "1": 3
+                        },
+                        {
+                            "0": "tricia@saturn",
+                            "1": 3
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "user",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "emails",
+                            "field": "1",
+                            "dataType": {
+                                "type": 4
+                            }
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 8 records retrieved in 0s"
+                    },
+                    "totalRowCount": 8,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "-- Let's find 4 users who send highest no of emails, and 4 users who received highest no of emails\n(SELECT CONCAT(srcuser,'@',srchost) AS user, COUNT(*) AS emails FROM mail GROUP BY srcuser, srchost ORDER BY emails DESC LIMIT 4)\nUNION ALL\n(SELECT CONCAT(dstuser,'@',dsthost) AS user, COUNT(*) AS emails FROM mail GROUP BY dstuser, dsthost ORDER BY emails DESC LIMIT 4)\norder by user;"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 100,
+                "end": 100,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "c30900a8-1dc3-4b55-c599-4d835383d9d6"
+                    ]
+                },
+                "currentHeight": 36,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 128
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "64b43039-9efa-4853-edd7-e1f1dc5f9240",
+                    "resultId": "c30900a8-1dc3-4b55-c599-4d835383d9d6",
+                    "rows": [
+                        {
+                            "0": "phil@mars",
+                            "1": 3
+                        },
+                        {
+                            "0": "barb@saturn",
+                            "1": 2
+                        },
+                        {
+                            "0": "gene@saturn",
+                            "1": 2
+                        },
+                        {
+                            "0": "gene@venus",
+                            "1": 2
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "user",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "emails",
+                            "field": "1",
+                            "dataType": {
+                                "type": 4
+                            }
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 4 records retrieved in 1.058ms"
+                    },
+                    "totalRowCount": 4,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT CONCAT(srcuser,'@',srchost) AS user, COUNT(*) AS emails FROM mail GROUP BY srcuser, srchost ORDER BY emails DESC LIMIT 4"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 101,
+                "end": 101,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "0af5d900-42c5-46a9-a5a4-dcc2b6ebbc17"
+                    ]
+                },
+                "currentHeight": 36,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 128
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "64b43039-9efa-4853-edd7-e1f1dc5f9240",
+                    "resultId": "0af5d900-42c5-46a9-a5a4-dcc2b6ebbc17",
+                    "rows": [
+                        {
+                            "0": "tricia@saturn",
+                            "1": 3
+                        },
+                        {
+                            "0": "gene@venus",
+                            "1": 2
+                        },
+                        {
+                            "0": "barb@venus",
+                            "1": 2
+                        },
+                        {
+                            "0": "barb@mars",
+                            "1": 2
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "user",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "emails",
+                            "field": "1",
+                            "dataType": {
+                                "type": 4
+                            }
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 4 records retrieved in 0s"
+                    },
+                    "totalRowCount": 4,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT CONCAT(dstuser,'@',dsthost) AS user, COUNT(*) AS emails FROM mail GROUP BY dstuser, dsthost ORDER BY emails DESC LIMIT 4;"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 102,
+                "end": 106,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "d7852726-9097-4bec-daab-6ee1eab8946f"
+                    ]
+                },
+                "currentHeight": 36,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 280
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    },
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 280,
+                            "length": 58
+                        },
+                        "contentStart": 280,
+                        "state": 1
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "64b43039-9efa-4853-edd7-e1f1dc5f9240",
+                    "resultId": "d7852726-9097-4bec-daab-6ee1eab8946f",
+                    "rows": [
+                        {
+                            "0": "barb@mars",
+                            "1": 2
+                        },
+                        {
+                            "0": "barb@saturn",
+                            "1": 2
+                        },
+                        {
+                            "0": "barb@venus",
+                            "1": 2
+                        },
+                        {
+                            "0": "gene@saturn",
+                            "1": 2
+                        },
+                        {
+                            "0": "gene@venus",
+                            "1": 2
+                        },
+                        {
+                            "0": "phil@mars",
+                            "1": 3
+                        },
+                        {
+                            "0": "tricia@saturn",
+                            "1": 3
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "user",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "emails",
+                            "field": "1",
+                            "dataType": {
+                                "type": 4
+                            }
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 7 records retrieved in 0s"
+                    },
+                    "totalRowCount": 7,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "(SELECT CONCAT(srcuser,'@',srchost) AS user, COUNT(*) AS emails FROM mail GROUP BY srcuser, srchost ORDER BY emails DESC LIMIT 4)\nUNION\n(SELECT CONCAT(dstuser,'@',dsthost) AS user, COUNT(*) AS emails FROM mail GROUP BY dstuser, dsthost ORDER BY emails DESC LIMIT 4)\norder by user"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 107,
+                "end": 113,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "5d5d95e9-eec9-4dda-ae66-e91376697c09"
+                    ]
+                },
+                "currentHeight": 352,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 276
+                        },
+                        "contentStart": 57,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "64b43039-9efa-4853-edd7-e1f1dc5f9240",
+                    "resultId": "5d5d95e9-eec9-4dda-ae66-e91376697c09",
+                    "rows": [
+                        {
+                            "0": "phil@mars",
+                            "1": 3,
+                            "2": 0
+                        },
+                        {
+                            "0": "barb@saturn",
+                            "1": 2,
+                            "2": 0
+                        },
+                        {
+                            "0": "gene@venus",
+                            "1": 2,
+                            "2": 2
+                        },
+                        {
+                            "0": "gene@mars",
+                            "1": 2,
+                            "2": 1
+                        },
+                        {
+                            "0": "phil@venus",
+                            "1": 2,
+                            "2": 2
+                        },
+                        {
+                            "0": "gene@saturn",
+                            "1": 2,
+                            "2": 1
+                        },
+                        {
+                            "0": "tricia@mars",
+                            "1": 1,
+                            "2": 1
+                        },
+                        {
+                            "0": "barb@venus",
+                            "1": 1,
+                            "2": 2
+                        },
+                        {
+                            "0": "tricia@saturn",
+                            "1": 1,
+                            "2": 3
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "user",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "send",
+                            "field": "1",
+                            "dataType": {
+                                "type": 4
+                            }
+                        },
+                        {
+                            "title": "received",
+                            "field": "2",
+                            "dataType": {
+                                "type": 4
+                            }
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 9 records retrieved in 0s"
+                    },
+                    "totalRowCount": 9,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "-- find user send and receive mail count from mail TABLE\nSELECT CONCAT(srcuser,'@',srchost) AS user, \nCOUNT(*) AS send, \n(SELECT COUNT(*) FROM mail d WHERE d.dstuser = m.srcuser AND d.dsthost = m.srchost) AS received \nFROM mail m \nGROUP BY srcuser, srchost\nORDER BY send DESC"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 114,
+                "end": 114,
                 "language": "mysql",
                 "currentHeight": 180,
                 "statements": [
@@ -4518,10 +5061,10 @@
                         "delimiter": ";",
                         "span": {
                             "start": 0,
-                            "length": 0
+                            "length": 1
                         },
-                        "contentStart": 0,
-                        "state": 0
+                        "contentStart": -1,
+                        "state": 3
                     }
                 ]
             },
