@@ -43,8 +43,8 @@
                         {
                             "type": 4,
                             "index": 0,
-                            "resultId": "754a749a-2f77-4539-b0b1-0701eeec43c7",
-                            "content": "OK, 0 records retrieved in 3.14ms"
+                            "resultId": "e8b298aa-b982-4528-c6b4-20a190105c27",
+                            "content": "OK, 0 records retrieved in 0s"
                         }
                     ]
                 },
@@ -133,7 +133,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "560a0cc1-e0ff-44a6-a7e7-c0a37f725525"
+                        "1adcef07-8701-47b9-aae0-16cc369b29ee"
                     ]
                 },
                 "currentHeight": 171.921875,
@@ -151,8 +151,8 @@
             },
             "data": [
                 {
-                    "tabId": "911810f0-cbe3-4971-83f2-c28d9bb79172",
-                    "resultId": "560a0cc1-e0ff-44a6-a7e7-c0a37f725525",
+                    "tabId": "cb072154-de2e-4de6-acd7-d60906586f0f",
+                    "resultId": "1adcef07-8701-47b9-aae0-16cc369b29ee",
                     "rows": [
                         {
                             "0": 1,
