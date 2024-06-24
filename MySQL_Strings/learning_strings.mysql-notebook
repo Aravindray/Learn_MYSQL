@@ -2,29 +2,29 @@
     "type": "MySQLNotebook",
     "version": "1.0",
     "caption": "Untitled",
-    "content": "USE cookbook;\r\nCREATE TABLE t (\r\n    c CHAR(3) CHARACTER SET utf8mb4\r\n);\r\nINSERT INTO t (c) VALUE('AAA'),('bbb'),('aaa'),('BBB');\r\nSELECT c FROM t;\r\nSELECT c FROM t ORDER BY c COLLATE utf8mb4_turkish_ci;\r\nSELECT c FROM t ORDER BY c COLLATE utf8mb4_tr_0900_as_cs;\r\nSELECT c FROM t ORDER BY c COLLATE utf8mb4_bin;\r\n",
+    "content": "USE cookbook;\r\nCREATE TABLE t (\r\n    c CHAR(3) CHARACTER SET utf8mb4\r\n);\r\nINSERT INTO t (c) VALUE('AAA'),('bbb'),('aaa'),('BBB');\r\nSELECT c FROM t;\r\nSELECT c FROM t ORDER BY c COLLATE utf8mb4_turkish_ci;\r\nSELECT c FROM t ORDER BY c COLLATE utf8mb4_tr_0900_as_cs;\r\nSELECT c FROM t ORDER BY c COLLATE utf8mb4_bin;\r\nCREATE TABLE t2 (\r\n    c CHAR(2) CHARACTER SET utf8mb4\r\n);\r\nINSERT INTO t2 (c) VALUES ('cg'), ('ch'), ('ci'), ('lk'), ('ll'),('lm');\r\nSELECT c FROM t2;\r\nSELECT c FROM t2 ORDER BY c COLLATE utf8mb4_general_ci;\r\nSELECT c FROM t2 ORDER BY c COLLATE utf8mb4_spanish2_ci;\r\n",
     "options": {},
     "viewState": {
         "cursorState": [
             {
                 "inSelectionMode": false,
                 "selectionStart": {
-                    "lineNumber": 4,
-                    "column": 3
+                    "lineNumber": 17,
+                    "column": 1
                 },
                 "position": {
-                    "lineNumber": 4,
-                    "column": 3
+                    "lineNumber": 17,
+                    "column": 1
                 }
             }
         ],
         "viewState": {
             "scrollLeft": 0,
             "firstPosition": {
-                "lineNumber": 1,
+                "lineNumber": 15,
                 "column": 1
             },
-            "firstPositionDeltaTop": 0
+            "firstPositionDeltaTop": 6
         },
         "contributionsState": {
             "editor.contrib.folding": {},
@@ -37,7 +37,18 @@
                 "start": 1,
                 "end": 1,
                 "language": "mysql",
-                "currentHeight": 34,
+                "result": {
+                    "type": "text",
+                    "text": [
+                        {
+                            "type": 4,
+                            "index": 0,
+                            "resultId": "0fb905ee-ac7c-4133-81d5-e9dff6ef6fc5",
+                            "content": "OK, 0 records retrieved in 8.756ms"
+                        }
+                    ]
+                },
+                "currentHeight": 28,
                 "statements": [
                     {
                         "delimiter": ";",
@@ -122,7 +133,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "d94149fe-3d33-4da9-978c-9f7e0800b172"
+                        "b817d69a-3941-459c-f07b-e8f9f846ff00"
                     ]
                 },
                 "currentHeight": 204.5625,
@@ -140,8 +151,8 @@
             },
             "data": [
                 {
-                    "tabId": "143b9dcc-128b-439b-df68-ac963cf0bc70",
-                    "resultId": "d94149fe-3d33-4da9-978c-9f7e0800b172",
+                    "tabId": "d7b666ab-1596-49c6-908d-94e2189ea0d2",
+                    "resultId": "b817d69a-3941-459c-f07b-e8f9f846ff00",
                     "rows": [
                         {
                             "0": "AAA"
@@ -184,7 +195,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "f275247e-0e91-46e0-a140-48459f0909fc"
+                        "37599ce8-d655-495a-ab00-6f48d31bb80e"
                     ]
                 },
                 "currentHeight": 204.5625,
@@ -202,8 +213,8 @@
             },
             "data": [
                 {
-                    "tabId": "143b9dcc-128b-439b-df68-ac963cf0bc70",
-                    "resultId": "f275247e-0e91-46e0-a140-48459f0909fc",
+                    "tabId": "d7b666ab-1596-49c6-908d-94e2189ea0d2",
+                    "resultId": "37599ce8-d655-495a-ab00-6f48d31bb80e",
                     "rows": [
                         {
                             "0": "AAA"
@@ -246,7 +257,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "7d65a9f9-05e7-4de5-d09a-19fb00081207"
+                        "b5cbaf3d-56e8-4549-e470-7eb964786339"
                     ]
                 },
                 "currentHeight": 36,
@@ -264,8 +275,8 @@
             },
             "data": [
                 {
-                    "tabId": "143b9dcc-128b-439b-df68-ac963cf0bc70",
-                    "resultId": "7d65a9f9-05e7-4de5-d09a-19fb00081207",
+                    "tabId": "d7b666ab-1596-49c6-908d-94e2189ea0d2",
+                    "resultId": "b5cbaf3d-56e8-4549-e470-7eb964786339",
                     "rows": [
                         {
                             "0": "aaa"
@@ -308,7 +319,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "6498d9c2-5776-4670-c281-4dd1a71db91e"
+                        "d1605e5c-e086-4184-94d5-04302061ddbb"
                     ]
                 },
                 "currentHeight": 36,
@@ -326,8 +337,8 @@
             },
             "data": [
                 {
-                    "tabId": "143b9dcc-128b-439b-df68-ac963cf0bc70",
-                    "resultId": "6498d9c2-5776-4670-c281-4dd1a71db91e",
+                    "tabId": "d7b666ab-1596-49c6-908d-94e2189ea0d2",
+                    "resultId": "d1605e5c-e086-4184-94d5-04302061ddbb",
                     "rows": [
                         {
                             "0": "AAA"
@@ -365,7 +376,273 @@
         {
             "state": {
                 "start": 10,
-                "end": 10,
+                "end": 12,
+                "language": "mysql",
+                "result": {
+                    "type": "text",
+                    "text": [
+                        {
+                            "type": 4,
+                            "index": 0,
+                            "resultId": "9ebadec5-e163-4cf1-c1fe-04200e3b1245",
+                            "content": "OK, 0 records retrieved in 148.74ms"
+                        }
+                    ]
+                },
+                "currentHeight": 28,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 56
+                        },
+                        "contentStart": 0,
+                        "state": 3
+                    }
+                ]
+            },
+            "data": []
+        },
+        {
+            "state": {
+                "start": 13,
+                "end": 13,
+                "language": "mysql",
+                "result": {
+                    "type": "text",
+                    "text": [
+                        {
+                            "type": 4,
+                            "index": 0,
+                            "resultId": "2fda8381-36d9-4051-bf63-32c94a7605aa",
+                            "content": "OK, 6 rows affected in 30.841ms"
+                        }
+                    ]
+                },
+                "currentHeight": 28,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 72
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": []
+        },
+        {
+            "state": {
+                "start": 14,
+                "end": 14,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "c24b2eb7-d81d-42a5-a275-f756ed56a7e0"
+                    ]
+                },
+                "currentHeight": 269.84375,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 17
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "d7b666ab-1596-49c6-908d-94e2189ea0d2",
+                    "resultId": "c24b2eb7-d81d-42a5-a275-f756ed56a7e0",
+                    "rows": [
+                        {
+                            "0": "cg"
+                        },
+                        {
+                            "0": "ch"
+                        },
+                        {
+                            "0": "ci"
+                        },
+                        {
+                            "0": "lk"
+                        },
+                        {
+                            "0": "ll"
+                        },
+                        {
+                            "0": "lm"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "c",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17
+                            }
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 6 records retrieved in 0s"
+                    },
+                    "totalRowCount": 6,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT c FROM t2"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 15,
+                "end": 15,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "fa019394-8dbe-4b0d-97f6-fe2393dc059d"
+                    ]
+                },
+                "currentHeight": 269.84375,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 55
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "d7b666ab-1596-49c6-908d-94e2189ea0d2",
+                    "resultId": "fa019394-8dbe-4b0d-97f6-fe2393dc059d",
+                    "rows": [
+                        {
+                            "0": "cg"
+                        },
+                        {
+                            "0": "ch"
+                        },
+                        {
+                            "0": "ci"
+                        },
+                        {
+                            "0": "lk"
+                        },
+                        {
+                            "0": "ll"
+                        },
+                        {
+                            "0": "lm"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "c",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17
+                            }
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 6 records retrieved in 0s"
+                    },
+                    "totalRowCount": 6,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT c FROM t2 ORDER BY c COLLATE utf8mb4_general_ci"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 16,
+                "end": 16,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "1edae376-5e26-434c-f80a-ad14d6e3870f"
+                    ]
+                },
+                "currentHeight": 269.84375,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 56
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "d7b666ab-1596-49c6-908d-94e2189ea0d2",
+                    "resultId": "1edae376-5e26-434c-f80a-ad14d6e3870f",
+                    "rows": [
+                        {
+                            "0": "cg"
+                        },
+                        {
+                            "0": "ci"
+                        },
+                        {
+                            "0": "ch"
+                        },
+                        {
+                            "0": "lk"
+                        },
+                        {
+                            "0": "lm"
+                        },
+                        {
+                            "0": "ll"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "c",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17
+                            }
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 6 records retrieved in 0s"
+                    },
+                    "totalRowCount": 6,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT c FROM t2 ORDER BY c COLLATE utf8mb4_spanish2_ci"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 17,
+                "end": 17,
                 "language": "mysql",
                 "currentHeight": 180,
                 "statements": [
