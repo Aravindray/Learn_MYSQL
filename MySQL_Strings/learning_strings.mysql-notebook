@@ -2,18 +2,18 @@
     "type": "MySQLNotebook",
     "version": "1.0",
     "caption": "Untitled",
-    "content": "USE cookbook;\r\nCREATE TABLE t (\r\n    c CHAR(3) CHARACTER SET utf8mb4\r\n);\r\nINSERT INTO t (c) VALUE('AAA'),('bbb'),('aaa'),('BBB');\r\nSELECT c FROM t;\r\nSELECT c FROM t ORDER BY c COLLATE utf8mb4_turkish_ci;\r\nSELECT c FROM t ORDER BY c COLLATE utf8mb4_tr_0900_as_cs;\r\nSELECT c FROM t ORDER BY c COLLATE utf8mb4_bin;\r\nCREATE TABLE t2 (\r\n    c CHAR(2) CHARACTER SET utf8mb4\r\n);\r\nINSERT INTO t2 (c) VALUES ('cg'), ('ch'), ('ci'), ('lk'), ('ll'),('lm');\r\nSELECT c FROM t2;\r\nSELECT c FROM t2 ORDER BY c COLLATE utf8mb4_general_ci;\r\nSELECT c FROM t2 ORDER BY c COLLATE utf8mb4_spanish2_ci;\r\n\\s\r\n\\s;\r\nSELECT 0x49276D2061736C656570;\r\n",
+    "content": "USE cookbook;\r\nCREATE TABLE t (\r\n    c CHAR(3) CHARACTER SET utf8mb4\r\n);\r\nINSERT INTO t (c) VALUE('AAA'),('bbb'),('aaa'),('BBB');\r\nSELECT c FROM t;\r\nSELECT c FROM t ORDER BY c COLLATE utf8mb4_turkish_ci;\r\nSELECT c FROM t ORDER BY c COLLATE utf8mb4_tr_0900_as_cs;\r\nSELECT c FROM t ORDER BY c COLLATE utf8mb4_bin;\r\nCREATE TABLE t2 (\r\n    c CHAR(2) CHARACTER SET utf8mb4\r\n);\r\nINSERT INTO t2 (c) VALUES ('cg'), ('ch'), ('ci'), ('lk'), ('ll'),('lm');\r\nSELECT c FROM t2;\r\nSELECT c FROM t2 ORDER BY c COLLATE utf8mb4_general_ci;\r\nSELECT c FROM t2 ORDER BY c COLLATE utf8mb4_spanish2_ci;\r\n\\s\r\n\\s;\r\nSELECT 0x49276D2061736C656570;\r\nSET @s1 = _latin1 'my string', @s2 = CONVERT(@s1 USING utf8mb4);\r\nSELECT CHARSET(@s1), CHARSET(@s2);\r\n@s2 = @s1 COLLATE latin1_spanish_ci;\r\nSET @s2 = @s1 COLLATE latin1_spanish_ci;\r\nSELECT COLLATE(@s1), COLLATE(@s2);\r\nSELECT COLLATION(@s1), COLLATION(@s2);\r\nSELECT thing, UPPER(thing), LOWER(thing) FROM limbs;\r\n",
     "options": {},
     "viewState": {
         "cursorState": [
             {
                 "inSelectionMode": false,
                 "selectionStart": {
-                    "lineNumber": 20,
+                    "lineNumber": 27,
                     "column": 1
                 },
                 "position": {
-                    "lineNumber": 20,
+                    "lineNumber": 27,
                     "column": 1
                 }
             }
@@ -21,10 +21,10 @@
         "viewState": {
             "scrollLeft": 0,
             "firstPosition": {
-                "lineNumber": 16,
+                "lineNumber": 25,
                 "column": 1
             },
-            "firstPositionDeltaTop": 1
+            "firstPositionDeltaTop": 86
         },
         "contributionsState": {
             "editor.contrib.folding": {},
@@ -43,7 +43,7 @@
                         {
                             "type": 4,
                             "index": 0,
-                            "resultId": "d084c173-1334-4126-fc00-c223f6a78e51",
+                            "resultId": "1158bf4e-5365-436f-afb9-8042470c5313",
                             "content": "OK, 0 records retrieved in 0s"
                         }
                     ]
@@ -133,7 +133,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "3711eb4b-043c-462f-d3cc-9058ab4b87c2"
+                        "f780e0f3-e1ac-4fbd-b0a0-c2d7fbcf93b4"
                     ]
                 },
                 "currentHeight": 204.5625,
@@ -151,8 +151,8 @@
             },
             "data": [
                 {
-                    "tabId": "33441b9a-d7b1-4093-ee77-d521821a3ec9",
-                    "resultId": "3711eb4b-043c-462f-d3cc-9058ab4b87c2",
+                    "tabId": "58843411-d4f4-4d3c-9da3-6797c40e971a",
+                    "resultId": "f780e0f3-e1ac-4fbd-b0a0-c2d7fbcf93b4",
                     "rows": [
                         {
                             "0": "AAA"
@@ -195,7 +195,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "7fa78545-81d8-4bce-fe10-11aca2784b41"
+                        "d53e82c7-a7a7-48df-b724-218713aab1f0"
                     ]
                 },
                 "currentHeight": 204.5625,
@@ -213,8 +213,8 @@
             },
             "data": [
                 {
-                    "tabId": "33441b9a-d7b1-4093-ee77-d521821a3ec9",
-                    "resultId": "7fa78545-81d8-4bce-fe10-11aca2784b41",
+                    "tabId": "58843411-d4f4-4d3c-9da3-6797c40e971a",
+                    "resultId": "d53e82c7-a7a7-48df-b724-218713aab1f0",
                     "rows": [
                         {
                             "0": "AAA"
@@ -257,7 +257,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "16f89997-afd2-4d4d-c01a-0575f07503e0"
+                        "25a69509-17a9-43c0-d712-04283792e3d8"
                     ]
                 },
                 "currentHeight": 36,
@@ -275,8 +275,8 @@
             },
             "data": [
                 {
-                    "tabId": "33441b9a-d7b1-4093-ee77-d521821a3ec9",
-                    "resultId": "16f89997-afd2-4d4d-c01a-0575f07503e0",
+                    "tabId": "58843411-d4f4-4d3c-9da3-6797c40e971a",
+                    "resultId": "25a69509-17a9-43c0-d712-04283792e3d8",
                     "rows": [
                         {
                             "0": "aaa"
@@ -319,7 +319,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "da08febe-247a-4d4f-f490-2bc614458780"
+                        "e007cc25-4dee-46e1-d782-6f587a38a33a"
                     ]
                 },
                 "currentHeight": 36,
@@ -337,8 +337,8 @@
             },
             "data": [
                 {
-                    "tabId": "33441b9a-d7b1-4093-ee77-d521821a3ec9",
-                    "resultId": "da08febe-247a-4d4f-f490-2bc614458780",
+                    "tabId": "58843411-d4f4-4d3c-9da3-6797c40e971a",
+                    "resultId": "e007cc25-4dee-46e1-d782-6f587a38a33a",
                     "rows": [
                         {
                             "0": "AAA"
@@ -443,7 +443,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "a37f1e48-d4fd-46e8-b519-1ea5e8326129"
+                        "ab85c10e-1003-4408-b5ae-f648d746718d"
                     ]
                 },
                 "currentHeight": 269.84375,
@@ -461,8 +461,8 @@
             },
             "data": [
                 {
-                    "tabId": "33441b9a-d7b1-4093-ee77-d521821a3ec9",
-                    "resultId": "a37f1e48-d4fd-46e8-b519-1ea5e8326129",
+                    "tabId": "58843411-d4f4-4d3c-9da3-6797c40e971a",
+                    "resultId": "ab85c10e-1003-4408-b5ae-f648d746718d",
                     "rows": [
                         {
                             "0": "cg"
@@ -511,7 +511,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "fc1935f6-3af1-4a94-866c-40df2dfb50d3"
+                        "cda6d629-7064-4e5d-ccdd-fbd3f93e013f"
                     ]
                 },
                 "currentHeight": 269.84375,
@@ -529,8 +529,8 @@
             },
             "data": [
                 {
-                    "tabId": "33441b9a-d7b1-4093-ee77-d521821a3ec9",
-                    "resultId": "fc1935f6-3af1-4a94-866c-40df2dfb50d3",
+                    "tabId": "58843411-d4f4-4d3c-9da3-6797c40e971a",
+                    "resultId": "cda6d629-7064-4e5d-ccdd-fbd3f93e013f",
                     "rows": [
                         {
                             "0": "cg"
@@ -579,7 +579,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "e758e264-b470-450e-83ff-38c992b49eef"
+                        "3156084b-f60d-4184-a0fc-6762d3457437"
                     ]
                 },
                 "currentHeight": 269.84375,
@@ -597,8 +597,8 @@
             },
             "data": [
                 {
-                    "tabId": "33441b9a-d7b1-4093-ee77-d521821a3ec9",
-                    "resultId": "e758e264-b470-450e-83ff-38c992b49eef",
+                    "tabId": "58843411-d4f4-4d3c-9da3-6797c40e971a",
+                    "resultId": "3156084b-f60d-4184-a0fc-6762d3457437",
                     "rows": [
                         {
                             "0": "cg"
@@ -715,7 +715,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "394b2fb4-18b4-4a8e-abd7-20646e50b99b"
+                        "4124149a-f9a1-4280-c219-7657213c2bd1"
                     ]
                 },
                 "currentHeight": 106.640625,
@@ -733,8 +733,8 @@
             },
             "data": [
                 {
-                    "tabId": "33441b9a-d7b1-4093-ee77-d521821a3ec9",
-                    "resultId": "394b2fb4-18b4-4a8e-abd7-20646e50b99b",
+                    "tabId": "58843411-d4f4-4d3c-9da3-6797c40e971a",
+                    "resultId": "4124149a-f9a1-4280-c219-7657213c2bd1",
                     "rows": [
                         {
                             "0": "SSdtIGFzbGVlcA=="
@@ -764,6 +764,377 @@
             "state": {
                 "start": 20,
                 "end": 20,
+                "language": "mysql",
+                "result": {
+                    "type": "text",
+                    "text": [
+                        {
+                            "type": 4,
+                            "index": 0,
+                            "resultId": "c2f1584c-7a75-4168-dd85-d3e49c54c235",
+                            "content": "OK, 0 records retrieved in 0s"
+                        }
+                    ]
+                },
+                "currentHeight": 28,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 64
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": []
+        },
+        {
+            "state": {
+                "start": 21,
+                "end": 21,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "9d3777bf-3908-4e77-bb1c-99ecbf100394"
+                    ]
+                },
+                "currentHeight": 36,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 34
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "58843411-d4f4-4d3c-9da3-6797c40e971a",
+                    "resultId": "9d3777bf-3908-4e77-bb1c-99ecbf100394",
+                    "rows": [
+                        {
+                            "0": "latin1",
+                            "1": "utf8mb4"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "CHARSET(@s1)",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "CHARSET(@s2)",
+                            "field": "1",
+                            "dataType": {
+                                "type": 17
+                            }
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 2.005ms"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT CHARSET(@s1), CHARSET(@s2)"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 22,
+                "end": 22,
+                "language": "mysql",
+                "result": {
+                    "type": "text",
+                    "text": [
+                        {
+                            "type": 0,
+                            "index": 0,
+                            "content": "MySQL Error (1064): ClassicSession.run_sql: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '@s2 = @s1 COLLATE latin1_spanish_ci' at line 1",
+                            "language": "ansi"
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": ""
+                    }
+                },
+                "currentHeight": 28,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 36
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": []
+        },
+        {
+            "state": {
+                "start": 23,
+                "end": 23,
+                "language": "mysql",
+                "result": {
+                    "type": "text",
+                    "text": [
+                        {
+                            "type": 4,
+                            "index": 0,
+                            "resultId": "da09d655-4077-4b99-fd02-4b829f14838c",
+                            "content": "OK, 0 records retrieved in 13.906ms"
+                        }
+                    ]
+                },
+                "currentHeight": 28,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 40
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": []
+        },
+        {
+            "state": {
+                "start": 24,
+                "end": 24,
+                "language": "mysql",
+                "result": {
+                    "type": "text",
+                    "text": [
+                        {
+                            "type": 0,
+                            "index": 0,
+                            "content": "MySQL Error (1064): ClassicSession.run_sql: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'COLLATE(@s1), COLLATE(@s2)' at line 1",
+                            "language": "ansi"
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": ""
+                    }
+                },
+                "currentHeight": 86,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 34
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": []
+        },
+        {
+            "state": {
+                "start": 25,
+                "end": 25,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "3cdd795a-2501-416b-96eb-aac33b2da57e"
+                    ]
+                },
+                "currentHeight": 106.640625,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 38
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "58843411-d4f4-4d3c-9da3-6797c40e971a",
+                    "resultId": "3cdd795a-2501-416b-96eb-aac33b2da57e",
+                    "rows": [
+                        {
+                            "0": "latin1_swedish_ci",
+                            "1": "latin1_spanish_ci"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "COLLATION(@s1)",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "COLLATION(@s2)",
+                            "field": "1",
+                            "dataType": {
+                                "type": 17
+                            }
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 0s"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT COLLATION(@s1), COLLATION(@s2)"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 26,
+                "end": 26,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "e3ed9357-8f55-43e7-9d2a-b1ca80c498ab"
+                    ]
+                },
+                "currentHeight": 352,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 52
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "58843411-d4f4-4d3c-9da3-6797c40e971a",
+                    "resultId": "e3ed9357-8f55-43e7-9d2a-b1ca80c498ab",
+                    "rows": [
+                        {
+                            "0": "armchair",
+                            "1": "ARMCHAIR",
+                            "2": "armchair"
+                        },
+                        {
+                            "0": "centipede",
+                            "1": "CENTIPEDE",
+                            "2": "centipede"
+                        },
+                        {
+                            "0": "fish",
+                            "1": "FISH",
+                            "2": "fish"
+                        },
+                        {
+                            "0": "human",
+                            "1": "HUMAN",
+                            "2": "human"
+                        },
+                        {
+                            "0": "insect",
+                            "1": "INSECT",
+                            "2": "insect"
+                        },
+                        {
+                            "0": "Peg Leg Pete",
+                            "1": "PEG LEG PETE",
+                            "2": "peg leg pete"
+                        },
+                        {
+                            "0": "phonograph",
+                            "1": "PHONOGRAPH",
+                            "2": "phonograph"
+                        },
+                        {
+                            "0": "space alien",
+                            "1": "SPACE ALIEN",
+                            "2": "space alien"
+                        },
+                        {
+                            "0": "squid",
+                            "1": "SQUID",
+                            "2": "squid"
+                        },
+                        {
+                            "0": "table",
+                            "1": "TABLE",
+                            "2": "table"
+                        },
+                        {
+                            "0": "tripod",
+                            "1": "TRIPOD",
+                            "2": "tripod"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "thing",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "UPPER(thing)",
+                            "field": "1",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "LOWER(thing)",
+                            "field": "2",
+                            "dataType": {
+                                "type": 17
+                            }
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 11 records retrieved in 20.875ms"
+                    },
+                    "totalRowCount": 11,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT thing, UPPER(thing), LOWER(thing) FROM limbs"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 27,
+                "end": 27,
                 "language": "mysql",
                 "currentHeight": 180,
                 "statements": [
