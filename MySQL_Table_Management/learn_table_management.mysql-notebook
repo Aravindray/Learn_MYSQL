@@ -1,0 +1,658 @@
+{
+    "type": "MySQLNotebook",
+    "version": "1.0",
+    "caption": "Untitled",
+    "content": "USE cookbook;\r\n-- Clone a table\r\nCREATE TABLE cloned_mail1 LIKE mail;\r\nINSERT INTO cloned_mail1 SELECT * FROM mail WHERE srcuser = 'barb';\r\nSELECT * FROM cloned_mail1;\r\n# Different approach to save the query result into a table\r\n# If Table already exist\r\n-- INSERT INTO dst_table SELECT * FROM src_table;\r\n-- INSERT INTO dst_table SELECT * FROM src_table WHERE conditions;\r\n-- INSERT INTO dst_table (l, s) SELECT col1, col2 FROM src_table; \r\n# If Table does not exist - create the table on the fly and insert the rows\r\n-- CREATE TABLE dst_table SELECT * FROM src_table;\r\n# If you don't want to insert the rows into the dst table\r\n-- CREATE TABLE dst_table SELECT * FROM WHERE FALSE;\r\n# IF you want to copy only few columns define the column name explicity in SELECT statement\r\n-- CREATE TABLE dst_table SELECT d, e FROM src_table;\r\n# IF you want order or column differet from src table\r\n-- CREATE TABLE dst_table SELECT c, d, a FROM src_table;\r\n# IF you want to inser new column along with src table\r\n-- CREATE TABLE dst_table\r\n-- (id INT NOT NULL AUTO_INCREMENT, \r\n--  PRIMARY KEY (ID)\r\n-- ) SELECT a, b, c FROM src_table;\r\n-- --------------------------------------\r\n# Creating a Temporary Table\r\n-- If name of the temporary table already exist in database it will hide the original table\r\nCREATE TEMPORARY TABLE mail SELECT * FROM mail;\r\nSELECT COUNT(*) FROM mail;\r\nDELETE FROM mail;\r\nSELECT COUNT(*) FROM mail;\r\nDROP TEMPORARY TABLE mail;\r\nSELECT COUNT(*) FROM mail;\r\nSET @tbl_name = CONCAT(\"tmp_tbl_\",UUID());\r\nSET @stm = CONCAT(\"CREATE TABLE `\",@tbl_name,\"` (i INT)\");\r\nSELECT @stm;\r\nPREPARE stmt FROM @stm;\r\nEXECUTE stmt;\r\n",
+    "options": {},
+    "viewState": {
+        "cursorState": [
+            {
+                "inSelectionMode": false,
+                "selectionStart": {
+                    "lineNumber": 38,
+                    "column": 1
+                },
+                "position": {
+                    "lineNumber": 38,
+                    "column": 1
+                }
+            }
+        ],
+        "viewState": {
+            "scrollLeft": 0,
+            "firstPosition": {
+                "lineNumber": 31,
+                "column": 1
+            },
+            "firstPositionDeltaTop": -19
+        },
+        "contributionsState": {
+            "editor.contrib.folding": {},
+            "editor.contrib.wordHighlighter": false
+        }
+    },
+    "contexts": [
+        {
+            "state": {
+                "start": 1,
+                "end": 1,
+                "language": "mysql",
+                "result": {
+                    "type": "text",
+                    "text": [
+                        {
+                            "type": 4,
+                            "index": 0,
+                            "resultId": "e71d651f-10cd-4dc1-a896-c9b5b4f44d2c",
+                            "content": "OK, 0 records retrieved in 8.606ms"
+                        }
+                    ]
+                },
+                "currentHeight": 28,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 13
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": []
+        },
+        {
+            "state": {
+                "start": 2,
+                "end": 4,
+                "language": "mysql",
+                "result": {
+                    "type": "text",
+                    "text": [
+                        {
+                            "type": 4,
+                            "index": 0,
+                            "resultId": "3cc7392a-d4c2-4e45-f431-14b80117b635",
+                            "content": "OK, 0 records retrieved in 93.45ms"
+                        },
+                        {
+                            "type": 4,
+                            "index": 2,
+                            "resultId": "cbb2e06a-7dae-419a-e3bb-f9f2b6a90697",
+                            "content": "OK, 3 rows affected in 17.261ms"
+                        }
+                    ]
+                },
+                "currentHeight": 28,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 53
+                        },
+                        "contentStart": 17,
+                        "state": 0
+                    },
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 53,
+                            "length": 1
+                        },
+                        "contentStart": 53,
+                        "state": 0
+                    },
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 54,
+                            "length": 67
+                        },
+                        "contentStart": 55,
+                        "state": 2
+                    }
+                ]
+            },
+            "data": []
+        },
+        {
+            "state": {
+                "start": 5,
+                "end": 5,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "7d276f88-dda6-4659-f1a1-13d093d52bc5"
+                    ]
+                },
+                "currentHeight": 36,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 27
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "385c2c9c-4f35-4067-90b7-f5c7d0b16408",
+                    "resultId": "7d276f88-dda6-4659-f1a1-13d093d52bc5",
+                    "rows": [
+                        {
+                            "0": 1,
+                            "1": "2014-05-11 10:15:08",
+                            "2": "barb",
+                            "3": "saturn",
+                            "4": "tricia",
+                            "5": "mars",
+                            "6": 58274
+                        },
+                        {
+                            "0": 4,
+                            "1": "2014-05-12 18:59:18",
+                            "2": "barb",
+                            "3": "saturn",
+                            "4": "tricia",
+                            "5": "venus",
+                            "6": 271
+                        },
+                        {
+                            "0": 7,
+                            "1": "2014-05-14 14:42:21",
+                            "2": "barb",
+                            "3": "venus",
+                            "4": "barb",
+                            "5": "venus",
+                            "6": 98151
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "id",
+                            "field": "0",
+                            "dataType": {
+                                "type": 4
+                            }
+                        },
+                        {
+                            "title": "t",
+                            "field": "1",
+                            "dataType": {
+                                "type": 26
+                            }
+                        },
+                        {
+                            "title": "srcuser",
+                            "field": "2",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "srchost",
+                            "field": "3",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "dstuser",
+                            "field": "4",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "dsthost",
+                            "field": "5",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "size",
+                            "field": "6",
+                            "dataType": {
+                                "type": 5
+                            }
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 3 records retrieved in 0s"
+                    },
+                    "totalRowCount": 3,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT * FROM cloned_mail1"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 6,
+                "end": 27,
+                "language": "mysql",
+                "result": {
+                    "type": "text",
+                    "text": [
+                        {
+                            "type": 4,
+                            "index": 0,
+                            "resultId": "395e5250-461b-4b6d-8ad7-a05441827a77",
+                            "content": "OK, 16 rows affected in 17.47ms"
+                        }
+                    ]
+                },
+                "currentHeight": 34,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 1148
+                        },
+                        "contentStart": 1101,
+                        "state": 3
+                    }
+                ]
+            },
+            "data": []
+        },
+        {
+            "state": {
+                "start": 28,
+                "end": 28,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "1c300fd2-ecca-4db4-ac20-9c713b615379"
+                    ]
+                },
+                "currentHeight": 106.640625,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 26
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "385c2c9c-4f35-4067-90b7-f5c7d0b16408",
+                    "resultId": "1c300fd2-ecca-4db4-ac20-9c713b615379",
+                    "rows": [
+                        {
+                            "0": 16
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "COUNT(*)",
+                            "field": "0",
+                            "dataType": {
+                                "type": 4
+                            }
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 0s"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT COUNT(*) FROM mail"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 29,
+                "end": 29,
+                "language": "mysql",
+                "result": {
+                    "type": "text",
+                    "text": [
+                        {
+                            "type": 4,
+                            "index": 0,
+                            "resultId": "d256b6c3-b6d1-4d82-d98f-83403122ebe6",
+                            "content": "OK, 16 rows affected in 0s"
+                        }
+                    ]
+                },
+                "currentHeight": 34,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 17
+                        },
+                        "contentStart": 1,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": []
+        },
+        {
+            "state": {
+                "start": 30,
+                "end": 30,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "f71033b9-f026-4be3-c319-744a9a6221fe"
+                    ]
+                },
+                "currentHeight": 106.640625,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 26
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "385c2c9c-4f35-4067-90b7-f5c7d0b16408",
+                    "resultId": "f71033b9-f026-4be3-c319-744a9a6221fe",
+                    "rows": [
+                        {
+                            "0": 0
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "COUNT(*)",
+                            "field": "0",
+                            "dataType": {
+                                "type": 4
+                            }
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 1.959ms"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT COUNT(*) FROM mail"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 31,
+                "end": 31,
+                "language": "mysql",
+                "result": {
+                    "type": "text",
+                    "text": [
+                        {
+                            "type": 4,
+                            "index": 0,
+                            "resultId": "e432dbda-6fa6-460f-9494-e2d765562446",
+                            "content": "OK, 0 records retrieved in 0s"
+                        }
+                    ]
+                },
+                "currentHeight": 34,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 26
+                        },
+                        "contentStart": 1,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": []
+        },
+        {
+            "state": {
+                "start": 32,
+                "end": 32,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "29dda0b7-3851-4eac-8724-d2254e70ea2e"
+                    ]
+                },
+                "currentHeight": 106.640625,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 26
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "385c2c9c-4f35-4067-90b7-f5c7d0b16408",
+                    "resultId": "29dda0b7-3851-4eac-8724-d2254e70ea2e",
+                    "rows": [
+                        {
+                            "0": 16
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "COUNT(*)",
+                            "field": "0",
+                            "dataType": {
+                                "type": 4
+                            }
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 0s"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT COUNT(*) FROM mail"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 33,
+                "end": 34,
+                "language": "mysql",
+                "result": {
+                    "type": "text",
+                    "text": [
+                        {
+                            "type": 4,
+                            "index": 0,
+                            "resultId": "3f7d8d7f-f914-4c2f-d74c-472b1a5eb3c7",
+                            "content": "OK, 0 records retrieved in 24.852ms"
+                        },
+                        {
+                            "type": 4,
+                            "index": 1,
+                            "resultId": "2680ff1d-1160-4f81-e70d-5b49cef0e517",
+                            "content": "OK, 0 records retrieved in 0s"
+                        }
+                    ]
+                },
+                "currentHeight": 60,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 42
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    },
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 42,
+                            "length": 59
+                        },
+                        "contentStart": 43,
+                        "state": 3
+                    }
+                ]
+            },
+            "data": []
+        },
+        {
+            "state": {
+                "start": 35,
+                "end": 35,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "5bfce18f-618e-4a1f-9d3c-8e24200d648b"
+                    ]
+                },
+                "currentHeight": 183,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 12
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "385c2c9c-4f35-4067-90b7-f5c7d0b16408",
+                    "resultId": "5bfce18f-618e-4a1f-9d3c-8e24200d648b",
+                    "rows": [
+                        {
+                            "0": "CREATE TABLE `tmp_tbl_bb19b685-32d0-11ef-8da5-e86a642cec41` (i INT)"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "@stm",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17
+                            }
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 0s"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT @stm"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 36,
+                "end": 37,
+                "language": "mysql",
+                "result": {
+                    "type": "text",
+                    "text": [
+                        {
+                            "type": 4,
+                            "index": 0,
+                            "resultId": "a4166a46-af13-4895-f31c-a739a636dc58",
+                            "content": "OK, 0 records retrieved in 40.578ms"
+                        },
+                        {
+                            "type": 4,
+                            "index": 1,
+                            "resultId": "dc05fa65-73de-4aba-9467-2472edf37eba",
+                            "content": "OK, 0 records retrieved in 93.865ms"
+                        }
+                    ]
+                },
+                "currentHeight": 60,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 23
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    },
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 23,
+                            "length": 14
+                        },
+                        "contentStart": 24,
+                        "state": 3
+                    }
+                ]
+            },
+            "data": []
+        },
+        {
+            "state": {
+                "start": 38,
+                "end": 38,
+                "language": "mysql",
+                "currentHeight": 180,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 0
+                        },
+                        "contentStart": 0,
+                        "state": 3
+                    }
+                ]
+            },
+            "data": []
+        }
+    ]
+}
