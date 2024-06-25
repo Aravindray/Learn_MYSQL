@@ -2,29 +2,29 @@
     "type": "MySQLNotebook",
     "version": "1.0",
     "caption": "Untitled",
-    "content": "USE cookbook;\r\n-- Clone a table\r\nCREATE TABLE cloned_mail1 LIKE mail;\r\nINSERT INTO cloned_mail1 SELECT * FROM mail WHERE srcuser = 'barb';\r\nSELECT * FROM cloned_mail1;\r\n# Different approach to save the query result into a table\r\n# If Table already exist\r\n-- INSERT INTO dst_table SELECT * FROM src_table;\r\n-- INSERT INTO dst_table SELECT * FROM src_table WHERE conditions;\r\n-- INSERT INTO dst_table (l, s) SELECT col1, col2 FROM src_table; \r\n# If Table does not exist - create the table on the fly and insert the rows\r\n-- CREATE TABLE dst_table SELECT * FROM src_table;\r\n# If you don't want to insert the rows into the dst table\r\n-- CREATE TABLE dst_table SELECT * FROM WHERE FALSE;\r\n# IF you want to copy only few columns define the column name explicity in SELECT statement\r\n-- CREATE TABLE dst_table SELECT d, e FROM src_table;\r\n# IF you want order or column differet from src table\r\n-- CREATE TABLE dst_table SELECT c, d, a FROM src_table;\r\n# IF you want to inser new column along with src table\r\n-- CREATE TABLE dst_table\r\n-- (id INT NOT NULL AUTO_INCREMENT, \r\n--  PRIMARY KEY (ID)\r\n-- ) SELECT a, b, c FROM src_table;\r\n-- --------------------------------------\r\n# Creating a Temporary Table\r\n-- If name of the temporary table already exist in database it will hide the original table\r\nCREATE TEMPORARY TABLE mail SELECT * FROM mail;\r\nSELECT COUNT(*) FROM mail;\r\nDELETE FROM mail;\r\nSELECT COUNT(*) FROM mail;\r\nDROP TEMPORARY TABLE mail;\r\nSELECT COUNT(*) FROM mail;\r\nSET @tbl_name = CONCAT(\"tmp_tbl_\",UUID());\r\nSET @stm = CONCAT(\"CREATE TABLE `\",@tbl_name,\"` (i INT)\");\r\nSELECT @stm;\r\nPREPARE stmt FROM @stm;\r\nEXECUTE stmt;\r\n",
+    "content": "USE cookbook;\r\n-- Clone a table\r\nCREATE TABLE cloned_mail1 LIKE mail;\r\nINSERT INTO cloned_mail1 SELECT * FROM mail WHERE srcuser = 'barb';\r\nSELECT * FROM cloned_mail1;\r\n# Different approach to save the query result into a table\r\n# If Table already exist\r\n-- INSERT INTO dst_table SELECT * FROM src_table;\r\n-- INSERT INTO dst_table SELECT * FROM src_table WHERE conditions;\r\n-- INSERT INTO dst_table (l, s) SELECT col1, col2 FROM src_table; \r\n# If Table does not exist - create the table on the fly and insert the rows\r\n-- CREATE TABLE dst_table SELECT * FROM src_table;\r\n# If you don't want to insert the rows into the dst table\r\n-- CREATE TABLE dst_table SELECT * FROM WHERE FALSE;\r\n# IF you want to copy only few columns define the column name explicity in SELECT statement\r\n-- CREATE TABLE dst_table SELECT d, e FROM src_table;\r\n# IF you want order or column differet from src table\r\n-- CREATE TABLE dst_table SELECT c, d, a FROM src_table;\r\n# IF you want to inser new column along with src table\r\n-- CREATE TABLE dst_table\r\n-- (id INT NOT NULL AUTO_INCREMENT, \r\n--  PRIMARY KEY (ID)\r\n-- ) SELECT a, b, c FROM src_table;\r\n-- --------------------------------------\r\n# Creating a Temporary Table\r\n-- If name of the temporary table already exist in database it will hide the original table\r\nCREATE TEMPORARY TABLE mail SELECT * FROM mail;\r\nSELECT COUNT(*) FROM mail;\r\nDELETE FROM mail;\r\nSELECT COUNT(*) FROM mail;\r\nDROP TEMPORARY TABLE mail;\r\nSELECT COUNT(*) FROM mail;\r\nSET @tbl_name = CONCAT(\"tmp_tbl_\",UUID());\r\nSET @stm = CONCAT(\"CREATE TABLE `\",@tbl_name,\"` (i INT)\");\r\nSELECT @stm;\r\nPREPARE stmt FROM @stm;\r\nEXECUTE stmt;\r\nSELECT @tbl_name;\r\nDROP TABLE IF EXISTS tmp_tbl_bb19b685-32d0-11ef-8da5-e86a642cec41;\r\nDROP TABLE IF EXISTS 'tmp_tbl_bb19b685-32d0-11ef-8da5-e86a642cec41';\r\nDROP TABLE IF EXISTS `tmp_tbl_bb19b685-32d0-11ef-8da5-e86a642cec41`;\r\n# Cheacking or Changing Table storage engine\r\nSHOW TABLE STATUS LIKE 'cloned_mail1';\r\nSHOW CREATE TABLE cloned_mail1;\r\nSHOW CREATE TABLE cloned_mail1\\G\r\nALTER TABLE cloned_mail1 ENGINE = Memory;\r\nSHOW TABLE STATUS LIKE 'cloned_mail1';\r\nSHOW ENGINES;\r\n# Copying table using mysql program\r\n-- $ > mysqldump -u cbuser -pcbpass cookbook mail > filename.sql\r\n-- $ > mysqldump -u cbuser -pcbpass cookbook mail --skip-add-drop-table > filename.sql",
     "options": {},
     "viewState": {
         "cursorState": [
             {
                 "inSelectionMode": false,
                 "selectionStart": {
-                    "lineNumber": 38,
-                    "column": 1
+                    "lineNumber": 51,
+                    "column": 87
                 },
                 "position": {
-                    "lineNumber": 38,
-                    "column": 1
+                    "lineNumber": 51,
+                    "column": 87
                 }
             }
         ],
         "viewState": {
             "scrollLeft": 0,
             "firstPosition": {
-                "lineNumber": 31,
+                "lineNumber": 47,
                 "column": 1
             },
-            "firstPositionDeltaTop": -19
+            "firstPositionDeltaTop": 7
         },
         "contributionsState": {
             "editor.contrib.folding": {},
@@ -43,8 +43,8 @@
                         {
                             "type": 4,
                             "index": 0,
-                            "resultId": "e71d651f-10cd-4dc1-a896-c9b5b4f44d2c",
-                            "content": "OK, 0 records retrieved in 8.606ms"
+                            "resultId": "3889af37-2300-4aa5-98e7-4ac87744782d",
+                            "content": "OK, 0 records retrieved in 0s"
                         }
                     ]
                 },
@@ -126,7 +126,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "7d276f88-dda6-4659-f1a1-13d093d52bc5"
+                        "e50cecbf-30a6-4b0a-ba81-e3018164aa02"
                     ]
                 },
                 "currentHeight": 36,
@@ -144,8 +144,8 @@
             },
             "data": [
                 {
-                    "tabId": "385c2c9c-4f35-4067-90b7-f5c7d0b16408",
-                    "resultId": "7d276f88-dda6-4659-f1a1-13d093d52bc5",
+                    "tabId": "1ba064dc-25b3-4b3b-ccf9-f87f56ffbcee",
+                    "resultId": "e50cecbf-30a6-4b0a-ba81-e3018164aa02",
                     "rows": [
                         {
                             "0": 1,
@@ -276,7 +276,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "1c300fd2-ecca-4db4-ac20-9c713b615379"
+                        "7388d48d-460b-43d0-831f-8f93af749e57"
                     ]
                 },
                 "currentHeight": 106.640625,
@@ -294,8 +294,8 @@
             },
             "data": [
                 {
-                    "tabId": "385c2c9c-4f35-4067-90b7-f5c7d0b16408",
-                    "resultId": "1c300fd2-ecca-4db4-ac20-9c713b615379",
+                    "tabId": "1ba064dc-25b3-4b3b-ccf9-f87f56ffbcee",
+                    "resultId": "7388d48d-460b-43d0-831f-8f93af749e57",
                     "rows": [
                         {
                             "0": 16
@@ -360,7 +360,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "f71033b9-f026-4be3-c319-744a9a6221fe"
+                        "f8e5ead0-0d33-4a57-a22f-94bb45a33efd"
                     ]
                 },
                 "currentHeight": 106.640625,
@@ -378,8 +378,8 @@
             },
             "data": [
                 {
-                    "tabId": "385c2c9c-4f35-4067-90b7-f5c7d0b16408",
-                    "resultId": "f71033b9-f026-4be3-c319-744a9a6221fe",
+                    "tabId": "1ba064dc-25b3-4b3b-ccf9-f87f56ffbcee",
+                    "resultId": "f8e5ead0-0d33-4a57-a22f-94bb45a33efd",
                     "rows": [
                         {
                             "0": 0
@@ -444,7 +444,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "29dda0b7-3851-4eac-8724-d2254e70ea2e"
+                        "ae9bcf21-c53a-411f-ec84-25138dbde037"
                     ]
                 },
                 "currentHeight": 106.640625,
@@ -462,8 +462,8 @@
             },
             "data": [
                 {
-                    "tabId": "385c2c9c-4f35-4067-90b7-f5c7d0b16408",
-                    "resultId": "29dda0b7-3851-4eac-8724-d2254e70ea2e",
+                    "tabId": "1ba064dc-25b3-4b3b-ccf9-f87f56ffbcee",
+                    "resultId": "ae9bcf21-c53a-411f-ec84-25138dbde037",
                     "rows": [
                         {
                             "0": 16
@@ -543,7 +543,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "5bfce18f-618e-4a1f-9d3c-8e24200d648b"
+                        "ad47eec1-378b-4c53-dfd9-0329f55f47a6"
                     ]
                 },
                 "currentHeight": 183,
@@ -561,8 +561,8 @@
             },
             "data": [
                 {
-                    "tabId": "385c2c9c-4f35-4067-90b7-f5c7d0b16408",
-                    "resultId": "5bfce18f-618e-4a1f-9d3c-8e24200d648b",
+                    "tabId": "1ba064dc-25b3-4b3b-ccf9-f87f56ffbcee",
+                    "resultId": "ad47eec1-378b-4c53-dfd9-0329f55f47a6",
                     "rows": [
                         {
                             "0": "CREATE TABLE `tmp_tbl_bb19b685-32d0-11ef-8da5-e86a642cec41` (i INT)"
@@ -639,16 +639,845 @@
                 "start": 38,
                 "end": 38,
                 "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "ba05696b-39b3-4fce-8c6d-81715d25f023"
+                    ]
+                },
+                "currentHeight": 104.640625,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 17
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "1ba064dc-25b3-4b3b-ccf9-f87f56ffbcee",
+                    "resultId": "ba05696b-39b3-4fce-8c6d-81715d25f023",
+                    "rows": [
+                        {
+                            "0": null
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "@tbl_name",
+                            "field": "0",
+                            "dataType": {
+                                "type": 23
+                            }
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 0s"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT @tbl_name"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 39,
+                "end": 39,
+                "language": "mysql",
+                "result": {
+                    "type": "text",
+                    "text": [
+                        {
+                            "type": 0,
+                            "index": 0,
+                            "content": "MySQL Error (1064): ClassicSession.run_sql: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '-32d0-11ef-8da5-e86a642cec41' at line 1",
+                            "language": "ansi"
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": ""
+                    }
+                },
+                "currentHeight": 86,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 66
+                        },
+                        "contentStart": 1,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": []
+        },
+        {
+            "state": {
+                "start": 40,
+                "end": 40,
+                "language": "mysql",
+                "result": {
+                    "type": "text",
+                    "text": [
+                        {
+                            "type": 0,
+                            "index": 0,
+                            "content": "MySQL Error (1064): ClassicSession.run_sql: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ''tmp_tbl_bb19b685-32d0-11ef-8da5-e86a642cec41'' at line 1",
+                            "language": "ansi"
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": ""
+                    }
+                },
+                "currentHeight": 86,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 68
+                        },
+                        "contentStart": 1,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": []
+        },
+        {
+            "state": {
+                "start": 41,
+                "end": 41,
+                "language": "mysql",
+                "result": {
+                    "type": "text",
+                    "text": [
+                        {
+                            "type": 4,
+                            "index": 0,
+                            "resultId": "fcd53b22-6331-4791-de1b-5b0319ba2964",
+                            "content": "OK, 0 records retrieved in 50.423ms"
+                        }
+                    ]
+                },
+                "currentHeight": 34,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 68
+                        },
+                        "contentStart": 1,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": []
+        },
+        {
+            "state": {
+                "start": 42,
+                "end": 43,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "68b7bd2b-26aa-4f6d-e5b4-b2dc52faeec1"
+                    ]
+                },
+                "currentHeight": 36,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 83
+                        },
+                        "contentStart": 45,
+                        "state": 3
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "1ba064dc-25b3-4b3b-ccf9-f87f56ffbcee",
+                    "resultId": "68b7bd2b-26aa-4f6d-e5b4-b2dc52faeec1",
+                    "rows": [
+                        {
+                            "0": "cloned_mail1",
+                            "1": "InnoDB",
+                            "2": 10,
+                            "3": "Dynamic",
+                            "4": 3,
+                            "5": 5461,
+                            "6": 16384,
+                            "7": 0,
+                            "8": 16384,
+                            "9": 0,
+                            "10": 7,
+                            "11": "2024-06-25 13:02:58",
+                            "12": null,
+                            "13": null,
+                            "14": "utf8mb4_0900_ai_ci",
+                            "15": null,
+                            "16": "",
+                            "17": ""
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "Name",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "Engine",
+                            "field": "1",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "Version",
+                            "field": "2",
+                            "dataType": {
+                                "type": 1
+                            }
+                        },
+                        {
+                            "title": "Row_format",
+                            "field": "3",
+                            "dataType": {
+                                "type": 46
+                            }
+                        },
+                        {
+                            "title": "Rows",
+                            "field": "4",
+                            "dataType": {
+                                "type": 4
+                            }
+                        },
+                        {
+                            "title": "Avg_row_length",
+                            "field": "5",
+                            "dataType": {
+                                "type": 4
+                            }
+                        },
+                        {
+                            "title": "Data_length",
+                            "field": "6",
+                            "dataType": {
+                                "type": 4
+                            }
+                        },
+                        {
+                            "title": "Max_data_length",
+                            "field": "7",
+                            "dataType": {
+                                "type": 4
+                            }
+                        },
+                        {
+                            "title": "Index_length",
+                            "field": "8",
+                            "dataType": {
+                                "type": 4
+                            }
+                        },
+                        {
+                            "title": "Data_free",
+                            "field": "9",
+                            "dataType": {
+                                "type": 4
+                            }
+                        },
+                        {
+                            "title": "Auto_increment",
+                            "field": "10",
+                            "dataType": {
+                                "type": 4
+                            }
+                        },
+                        {
+                            "title": "Create_time",
+                            "field": "11",
+                            "dataType": {
+                                "type": 26
+                            }
+                        },
+                        {
+                            "title": "Update_time",
+                            "field": "12",
+                            "dataType": {
+                                "type": 26
+                            }
+                        },
+                        {
+                            "title": "Check_time",
+                            "field": "13",
+                            "dataType": {
+                                "type": 26
+                            }
+                        },
+                        {
+                            "title": "Collation",
+                            "field": "14",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "Checksum",
+                            "field": "15",
+                            "dataType": {
+                                "type": 4
+                            }
+                        },
+                        {
+                            "title": "Create_options",
+                            "field": "16",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "Comment",
+                            "field": "17",
+                            "dataType": {
+                                "type": 17
+                            }
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 16.718ms"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "# Cheacking or Changing Table storage engine\nSHOW TABLE STATUS LIKE 'cloned_mail1';"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 44,
+                "end": 44,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "853e1e7a-4582-4698-f40c-79863c04fe98"
+                    ]
+                },
+                "currentHeight": 36,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 31
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "1ba064dc-25b3-4b3b-ccf9-f87f56ffbcee",
+                    "resultId": "853e1e7a-4582-4698-f40c-79863c04fe98",
+                    "rows": [
+                        {
+                            "0": "cloned_mail1",
+                            "1": "CREATE TABLE `cloned_mail1` (\n  `id` int NOT NULL AUTO_INCREMENT,\n  `t` datetime DEFAULT NULL,\n  `srcuser` varchar(8) DEFAULT NULL,\n  `srchost` varchar(20) DEFAULT NULL,\n  `dstuser` varchar(8) DEFAULT NULL,\n  `dsthost` varchar(20) DEFAULT NULL,\n  `size` bigint DEFAULT NULL,\n  PRIMARY KEY (`id`),\n  KEY `t` (`t`)\n) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "Table",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "Create Table",
+                            "field": "1",
+                            "dataType": {
+                                "type": 17
+                            }
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 8.003ms"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SHOW CREATE TABLE cloned_mail1"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 45,
+                "end": 45,
+                "language": "mysql",
+                "result": {
+                    "type": "text",
+                    "text": [
+                        {
+                            "type": 0,
+                            "index": 0,
+                            "content": "MySQL Error (1064): ClassicSession.run_sql: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '\\G' at line 1",
+                            "language": "ansi"
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": ""
+                    }
+                },
+                "currentHeight": 28,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 32
+                        },
+                        "contentStart": 0,
+                        "state": 3
+                    }
+                ]
+            },
+            "data": []
+        },
+        {
+            "state": {
+                "start": 46,
+                "end": 46,
+                "language": "mysql",
+                "result": {
+                    "type": "text",
+                    "text": [
+                        {
+                            "type": 4,
+                            "index": 0,
+                            "resultId": "d41b9753-5983-4a7d-e27c-83754647f052",
+                            "content": "OK, 3 rows affected in 106.451ms"
+                        }
+                    ]
+                },
+                "currentHeight": 34,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 41
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": []
+        },
+        {
+            "state": {
+                "start": 47,
+                "end": 47,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "599a894a-c314-4b96-f5ca-c22dbcffe505"
+                    ]
+                },
+                "currentHeight": 113.640625,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 38
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "1ba064dc-25b3-4b3b-ccf9-f87f56ffbcee",
+                    "resultId": "599a894a-c314-4b96-f5ca-c22dbcffe505",
+                    "rows": [
+                        {
+                            "0": "cloned_mail1",
+                            "1": "MEMORY",
+                            "2": 10,
+                            "3": "Fixed",
+                            "4": 3,
+                            "5": 5461,
+                            "6": 16384,
+                            "7": 0,
+                            "8": 16384,
+                            "9": 0,
+                            "10": 7,
+                            "11": "2024-06-25 16:09:51",
+                            "12": null,
+                            "13": null,
+                            "14": "utf8mb4_0900_ai_ci",
+                            "15": null,
+                            "16": "",
+                            "17": ""
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "Name",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "Engine",
+                            "field": "1",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "Version",
+                            "field": "2",
+                            "dataType": {
+                                "type": 1
+                            }
+                        },
+                        {
+                            "title": "Row_format",
+                            "field": "3",
+                            "dataType": {
+                                "type": 46
+                            }
+                        },
+                        {
+                            "title": "Rows",
+                            "field": "4",
+                            "dataType": {
+                                "type": 4
+                            }
+                        },
+                        {
+                            "title": "Avg_row_length",
+                            "field": "5",
+                            "dataType": {
+                                "type": 4
+                            }
+                        },
+                        {
+                            "title": "Data_length",
+                            "field": "6",
+                            "dataType": {
+                                "type": 4
+                            }
+                        },
+                        {
+                            "title": "Max_data_length",
+                            "field": "7",
+                            "dataType": {
+                                "type": 4
+                            }
+                        },
+                        {
+                            "title": "Index_length",
+                            "field": "8",
+                            "dataType": {
+                                "type": 4
+                            }
+                        },
+                        {
+                            "title": "Data_free",
+                            "field": "9",
+                            "dataType": {
+                                "type": 4
+                            }
+                        },
+                        {
+                            "title": "Auto_increment",
+                            "field": "10",
+                            "dataType": {
+                                "type": 4
+                            }
+                        },
+                        {
+                            "title": "Create_time",
+                            "field": "11",
+                            "dataType": {
+                                "type": 26
+                            }
+                        },
+                        {
+                            "title": "Update_time",
+                            "field": "12",
+                            "dataType": {
+                                "type": 26
+                            }
+                        },
+                        {
+                            "title": "Check_time",
+                            "field": "13",
+                            "dataType": {
+                                "type": 26
+                            }
+                        },
+                        {
+                            "title": "Collation",
+                            "field": "14",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "Checksum",
+                            "field": "15",
+                            "dataType": {
+                                "type": 4
+                            }
+                        },
+                        {
+                            "title": "Create_options",
+                            "field": "16",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "Comment",
+                            "field": "17",
+                            "dataType": {
+                                "type": 17
+                            }
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 0s"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SHOW TABLE STATUS LIKE 'cloned_mail1'"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 48,
+                "end": 48,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "35ddae27-343e-470d-87d1-24eb33c57174"
+                    ]
+                },
+                "currentHeight": 352,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 13
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "1ba064dc-25b3-4b3b-ccf9-f87f56ffbcee",
+                    "resultId": "35ddae27-343e-470d-87d1-24eb33c57174",
+                    "rows": [
+                        {
+                            "0": "MEMORY",
+                            "1": "YES",
+                            "2": "Hash based, stored in memory, useful for temporary tables",
+                            "3": "NO",
+                            "4": "NO",
+                            "5": "NO"
+                        },
+                        {
+                            "0": "MRG_MYISAM",
+                            "1": "YES",
+                            "2": "Collection of identical MyISAM tables",
+                            "3": "NO",
+                            "4": "NO",
+                            "5": "NO"
+                        },
+                        {
+                            "0": "CSV",
+                            "1": "YES",
+                            "2": "CSV storage engine",
+                            "3": "NO",
+                            "4": "NO",
+                            "5": "NO"
+                        },
+                        {
+                            "0": "FEDERATED",
+                            "1": "NO",
+                            "2": "Federated MySQL storage engine",
+                            "3": null,
+                            "4": null,
+                            "5": null
+                        },
+                        {
+                            "0": "PERFORMANCE_SCHEMA",
+                            "1": "YES",
+                            "2": "Performance Schema",
+                            "3": "NO",
+                            "4": "NO",
+                            "5": "NO"
+                        },
+                        {
+                            "0": "MyISAM",
+                            "1": "YES",
+                            "2": "MyISAM storage engine",
+                            "3": "NO",
+                            "4": "NO",
+                            "5": "NO"
+                        },
+                        {
+                            "0": "InnoDB",
+                            "1": "DEFAULT",
+                            "2": "Supports transactions, row-level locking, and foreign keys",
+                            "3": "YES",
+                            "4": "YES",
+                            "5": "YES"
+                        },
+                        {
+                            "0": "ndbinfo",
+                            "1": "NO",
+                            "2": "MySQL Cluster system information storage engine",
+                            "3": null,
+                            "4": null,
+                            "5": null
+                        },
+                        {
+                            "0": "BLACKHOLE",
+                            "1": "YES",
+                            "2": "/dev/null storage engine (anything you write to it disappears)",
+                            "3": "NO",
+                            "4": "NO",
+                            "5": "NO"
+                        },
+                        {
+                            "0": "ARCHIVE",
+                            "1": "YES",
+                            "2": "Archive storage engine",
+                            "3": "NO",
+                            "4": "NO",
+                            "5": "NO"
+                        },
+                        {
+                            "0": "ndbcluster",
+                            "1": "NO",
+                            "2": "Clustered, fault-tolerant tables",
+                            "3": null,
+                            "4": null,
+                            "5": null
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "Engine",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "Support",
+                            "field": "1",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "Comment",
+                            "field": "2",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "Transactions",
+                            "field": "3",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "XA",
+                            "field": "4",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "Savepoints",
+                            "field": "5",
+                            "dataType": {
+                                "type": 17
+                            }
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 11 records retrieved in 3.884ms"
+                    },
+                    "totalRowCount": 11,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SHOW ENGINES"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 49,
+                "end": 51,
+                "language": "mysql",
                 "currentHeight": 180,
                 "statements": [
                     {
                         "delimiter": ";",
                         "span": {
                             "start": 0,
-                            "length": 0
+                            "length": 187
                         },
                         "contentStart": 0,
-                        "state": 3
+                        "state": 1
                     }
                 ]
             },
