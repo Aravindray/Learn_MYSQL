@@ -2,29 +2,29 @@
     "type": "MySQLNotebook",
     "version": "1.0",
     "caption": "Untitled",
-    "content": "USE cookbook;\r\n-- Clone a table\r\nCREATE TABLE cloned_mail1 LIKE mail;\r\nINSERT INTO cloned_mail1 SELECT * FROM mail WHERE srcuser = 'barb';\r\nSELECT * FROM cloned_mail1;\r\n# Different approach to save the query result into a table\r\n# If Table already exist\r\n-- INSERT INTO dst_table SELECT * FROM src_table;\r\n-- INSERT INTO dst_table SELECT * FROM src_table WHERE conditions;\r\n-- INSERT INTO dst_table (l, s) SELECT col1, col2 FROM src_table; \r\n# If Table does not exist - create the table on the fly and insert the rows\r\n-- CREATE TABLE dst_table SELECT * FROM src_table;\r\n# If you don't want to insert the rows into the dst table\r\n-- CREATE TABLE dst_table SELECT * FROM WHERE FALSE;\r\n# IF you want to copy only few columns define the column name explicity in SELECT statement\r\n-- CREATE TABLE dst_table SELECT d, e FROM src_table;\r\n# IF you want order or column differet from src table\r\n-- CREATE TABLE dst_table SELECT c, d, a FROM src_table;\r\n# IF you want to inser new column along with src table\r\n-- CREATE TABLE dst_table\r\n-- (id INT NOT NULL AUTO_INCREMENT, \r\n--  PRIMARY KEY (ID)\r\n-- ) SELECT a, b, c FROM src_table;\r\n-- --------------------------------------\r\n# Creating a Temporary Table\r\n-- If name of the temporary table already exist in database it will hide the original table\r\nCREATE TEMPORARY TABLE mail SELECT * FROM mail;\r\nSELECT COUNT(*) FROM mail;\r\nDELETE FROM mail;\r\nSELECT COUNT(*) FROM mail;\r\nDROP TEMPORARY TABLE mail;\r\nSELECT COUNT(*) FROM mail;\r\nSET @tbl_name = CONCAT(\"tmp_tbl_\",UUID());\r\nSET @stm = CONCAT(\"CREATE TABLE `\",@tbl_name,\"` (i INT)\");\r\nSELECT @stm;\r\nPREPARE stmt FROM @stm;\r\nEXECUTE stmt;\r\nSELECT @tbl_name;\r\nDROP TABLE IF EXISTS tmp_tbl_bb19b685-32d0-11ef-8da5-e86a642cec41;\r\nDROP TABLE IF EXISTS 'tmp_tbl_bb19b685-32d0-11ef-8da5-e86a642cec41';\r\nDROP TABLE IF EXISTS `tmp_tbl_bb19b685-32d0-11ef-8da5-e86a642cec41`;\r\n# Cheacking or Changing Table storage engine\r\nSHOW TABLE STATUS LIKE 'cloned_mail1';\r\nSHOW CREATE TABLE cloned_mail1;\r\nSHOW CREATE TABLE cloned_mail1\\G\r\nALTER TABLE cloned_mail1 ENGINE = Memory;\r\nSHOW TABLE STATUS LIKE 'cloned_mail1';\r\nSHOW ENGINES;\r\n# Copying table using mysql program\r\n-- $ > mysqldump -u cbuser -pcbpass cookbook mail > filename.sql\r\n-- $ > mysqldump -u cbuser -pcbpass cookbook mail --skip-add-drop-table > filename.sql\r\n# To rename the table\r\n-- mysql > RENAME TABLE old_name TO new_name;\r\n# To copy the table without intermediary file\r\n-- $ > mysqldump -u root -p world country | mysql -u cbuser -pcbpass cookbook\r\nSELECT * FROM country;\r\n",
+    "content": "USE cookbook;\r\n-- Clone a table\r\nCREATE TABLE cloned_mail1 LIKE mail;\r\nINSERT INTO cloned_mail1 SELECT * FROM mail WHERE srcuser = 'barb';\r\nSELECT * FROM cloned_mail1;\r\n# Different approach to save the query result into a table\r\n# If Table already exist\r\n-- INSERT INTO dst_table SELECT * FROM src_table;\r\n-- INSERT INTO dst_table SELECT * FROM src_table WHERE conditions;\r\n-- INSERT INTO dst_table (l, s) SELECT col1, col2 FROM src_table; \r\n# If Table does not exist - create the table on the fly and insert the rows\r\n-- CREATE TABLE dst_table SELECT * FROM src_table;\r\n# If you don't want to insert the rows into the dst table\r\n-- CREATE TABLE dst_table SELECT * FROM WHERE FALSE;\r\n# IF you want to copy only few columns define the column name explicity in SELECT statement\r\n-- CREATE TABLE dst_table SELECT d, e FROM src_table;\r\n# IF you want order or column differet from src table\r\n-- CREATE TABLE dst_table SELECT c, d, a FROM src_table;\r\n# IF you want to inser new column along with src table\r\n-- CREATE TABLE dst_table\r\n-- (id INT NOT NULL AUTO_INCREMENT, \r\n--  PRIMARY KEY (ID)\r\n-- ) SELECT a, b, c FROM src_table;\r\n-- --------------------------------------\r\n# Creating a Temporary Table\r\n-- If name of the temporary table already exist in database it will hide the original table\r\nCREATE TEMPORARY TABLE mail SELECT * FROM mail;\r\nSELECT COUNT(*) FROM mail;\r\nDELETE FROM mail;\r\nSELECT COUNT(*) FROM mail;\r\nDROP TEMPORARY TABLE mail;\r\nSELECT COUNT(*) FROM mail;\r\nSET @tbl_name = CONCAT(\"tmp_tbl_\",UUID());\r\nSET @stm = CONCAT(\"CREATE TABLE `\",@tbl_name,\"` (i INT)\");\r\nSELECT @stm;\r\nPREPARE stmt FROM @stm;\r\nEXECUTE stmt;\r\nSELECT @tbl_name;\r\nDROP TABLE IF EXISTS tmp_tbl_bb19b685-32d0-11ef-8da5-e86a642cec41;\r\nDROP TABLE IF EXISTS 'tmp_tbl_bb19b685-32d0-11ef-8da5-e86a642cec41';\r\nDROP TABLE IF EXISTS `tmp_tbl_bb19b685-32d0-11ef-8da5-e86a642cec41`;\r\n# Cheacking or Changing Table storage engine\r\nSHOW TABLE STATUS LIKE 'cloned_mail1';\r\nSHOW CREATE TABLE cloned_mail1;\r\nSHOW CREATE TABLE cloned_mail1\\G\r\nALTER TABLE cloned_mail1 ENGINE = Memory;\r\nSHOW TABLE STATUS LIKE 'cloned_mail1';\r\nSHOW ENGINES;\r\n# Copying table using mysql program\r\n-- $ > mysqldump -u cbuser -pcbpass cookbook mail > filename.sql\r\n-- $ > mysqldump -u cbuser -pcbpass cookbook mail --skip-add-drop-table > filename.sql\r\n# To rename the table\r\n-- mysql > RENAME TABLE old_name TO new_name;\r\n# To copy the table without intermediary file\r\n-- $ > mysqldump -u root -p world country | mysql -u cbuser -pcbpass cookbook\r\nSELECT * FROM country;\r\n# Copying Table from one server to another server\r\n-- $ > mysqldump -u cbuser -pcbpass cookbook mail | mysql -h other-host other_db # From local host\r\n-- $ > mysqldump -u cubser -pcbpass cookbook mail | ssh -h other-host mysql other_bd\r\n# Copying InnoDB table using transportable tablespace\r\n-- There are 3 types of table space in InnoDB engine there are individual, general and system\r\n-- If tablesapce is general or system first need to conver it to individual type\r\n-- mysql > ALTER TABLE tbl_name TABLESPACE innodb-file-per-table\r\n-- I didn't practice to cook this recipe 6.7 and 6.8",
     "options": {},
     "viewState": {
         "cursorState": [
             {
                 "inSelectionMode": false,
                 "selectionStart": {
-                    "lineNumber": 57,
-                    "column": 1
+                    "lineNumber": 64,
+                    "column": 53
                 },
                 "position": {
-                    "lineNumber": 57,
-                    "column": 1
+                    "lineNumber": 64,
+                    "column": 53
                 }
             }
         ],
         "viewState": {
             "scrollLeft": 0,
             "firstPosition": {
-                "lineNumber": 49,
+                "lineNumber": 55,
                 "column": 1
             },
-            "firstPositionDeltaTop": 48
+            "firstPositionDeltaTop": -10
         },
         "contributionsState": {
             "editor.contrib.folding": {},
@@ -43,8 +43,8 @@
                         {
                             "type": 4,
                             "index": 0,
-                            "resultId": "0ca56439-816c-48dc-e024-bace847f7cc0",
-                            "content": "OK, 0 records retrieved in 0s"
+                            "resultId": "90a0a7a9-eecc-40bc-cb99-1af312402fb2",
+                            "content": "OK, 0 records retrieved in 0.767ms"
                         }
                     ]
                 },
@@ -126,7 +126,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "e50cecbf-30a6-4b0a-ba81-e3018164aa02"
+                        "d046780a-0509-4fc0-d601-a7e9a566f7d7"
                     ]
                 },
                 "currentHeight": 36,
@@ -144,8 +144,8 @@
             },
             "data": [
                 {
-                    "tabId": "1ba064dc-25b3-4b3b-ccf9-f87f56ffbcee",
-                    "resultId": "e50cecbf-30a6-4b0a-ba81-e3018164aa02",
+                    "tabId": "6e06e08e-9be5-4ac7-bf55-3024d1e347a1",
+                    "resultId": "d046780a-0509-4fc0-d601-a7e9a566f7d7",
                     "rows": [
                         {
                             "0": 1,
@@ -276,7 +276,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "7388d48d-460b-43d0-831f-8f93af749e57"
+                        "0ff9ea71-0584-47c4-818f-b0bff036bd3f"
                     ]
                 },
                 "currentHeight": 106.640625,
@@ -294,8 +294,8 @@
             },
             "data": [
                 {
-                    "tabId": "1ba064dc-25b3-4b3b-ccf9-f87f56ffbcee",
-                    "resultId": "7388d48d-460b-43d0-831f-8f93af749e57",
+                    "tabId": "6e06e08e-9be5-4ac7-bf55-3024d1e347a1",
+                    "resultId": "0ff9ea71-0584-47c4-818f-b0bff036bd3f",
                     "rows": [
                         {
                             "0": 16
@@ -360,7 +360,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "f8e5ead0-0d33-4a57-a22f-94bb45a33efd"
+                        "e8788a98-a3d0-4f9c-859e-e95593e29496"
                     ]
                 },
                 "currentHeight": 106.640625,
@@ -378,8 +378,8 @@
             },
             "data": [
                 {
-                    "tabId": "1ba064dc-25b3-4b3b-ccf9-f87f56ffbcee",
-                    "resultId": "f8e5ead0-0d33-4a57-a22f-94bb45a33efd",
+                    "tabId": "6e06e08e-9be5-4ac7-bf55-3024d1e347a1",
+                    "resultId": "e8788a98-a3d0-4f9c-859e-e95593e29496",
                     "rows": [
                         {
                             "0": 0
@@ -444,7 +444,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "ae9bcf21-c53a-411f-ec84-25138dbde037"
+                        "da5f4dcd-6f92-4c44-942f-3560ce9a3833"
                     ]
                 },
                 "currentHeight": 106.640625,
@@ -462,8 +462,8 @@
             },
             "data": [
                 {
-                    "tabId": "1ba064dc-25b3-4b3b-ccf9-f87f56ffbcee",
-                    "resultId": "ae9bcf21-c53a-411f-ec84-25138dbde037",
+                    "tabId": "6e06e08e-9be5-4ac7-bf55-3024d1e347a1",
+                    "resultId": "da5f4dcd-6f92-4c44-942f-3560ce9a3833",
                     "rows": [
                         {
                             "0": 16
@@ -543,7 +543,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "ad47eec1-378b-4c53-dfd9-0329f55f47a6"
+                        "75f49d95-8ff5-47fe-f3c4-cd5eb607f3e5"
                     ]
                 },
                 "currentHeight": 183,
@@ -561,8 +561,8 @@
             },
             "data": [
                 {
-                    "tabId": "1ba064dc-25b3-4b3b-ccf9-f87f56ffbcee",
-                    "resultId": "ad47eec1-378b-4c53-dfd9-0329f55f47a6",
+                    "tabId": "6e06e08e-9be5-4ac7-bf55-3024d1e347a1",
+                    "resultId": "75f49d95-8ff5-47fe-f3c4-cd5eb607f3e5",
                     "rows": [
                         {
                             "0": "CREATE TABLE `tmp_tbl_bb19b685-32d0-11ef-8da5-e86a642cec41` (i INT)"
@@ -642,7 +642,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "ba05696b-39b3-4fce-8c6d-81715d25f023"
+                        "30b2cc0b-94ee-45a1-d9f9-6529d1181737"
                     ]
                 },
                 "currentHeight": 104.640625,
@@ -660,8 +660,8 @@
             },
             "data": [
                 {
-                    "tabId": "1ba064dc-25b3-4b3b-ccf9-f87f56ffbcee",
-                    "resultId": "ba05696b-39b3-4fce-8c6d-81715d25f023",
+                    "tabId": "6e06e08e-9be5-4ac7-bf55-3024d1e347a1",
+                    "resultId": "30b2cc0b-94ee-45a1-d9f9-6529d1181737",
                     "rows": [
                         {
                             "0": null
@@ -794,7 +794,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "68b7bd2b-26aa-4f6d-e5b4-b2dc52faeec1"
+                        "a6c3da13-d254-4737-a2e6-8dcbcdf16fb3"
                     ]
                 },
                 "currentHeight": 36,
@@ -812,8 +812,8 @@
             },
             "data": [
                 {
-                    "tabId": "1ba064dc-25b3-4b3b-ccf9-f87f56ffbcee",
-                    "resultId": "68b7bd2b-26aa-4f6d-e5b4-b2dc52faeec1",
+                    "tabId": "6e06e08e-9be5-4ac7-bf55-3024d1e347a1",
+                    "resultId": "a6c3da13-d254-4737-a2e6-8dcbcdf16fb3",
                     "rows": [
                         {
                             "0": "cloned_mail1",
@@ -983,7 +983,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "853e1e7a-4582-4698-f40c-79863c04fe98"
+                        "b773a3aa-c8e9-43db-9f16-792b20e7bcba"
                     ]
                 },
                 "currentHeight": 36,
@@ -1001,8 +1001,8 @@
             },
             "data": [
                 {
-                    "tabId": "1ba064dc-25b3-4b3b-ccf9-f87f56ffbcee",
-                    "resultId": "853e1e7a-4582-4698-f40c-79863c04fe98",
+                    "tabId": "6e06e08e-9be5-4ac7-bf55-3024d1e347a1",
+                    "resultId": "b773a3aa-c8e9-43db-9f16-792b20e7bcba",
                     "rows": [
                         {
                             "0": "cloned_mail1",
@@ -1109,7 +1109,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "599a894a-c314-4b96-f5ca-c22dbcffe505"
+                        "c2be1ee5-1bb1-43df-f982-4733b7b69a83"
                     ]
                 },
                 "currentHeight": 36,
@@ -1127,8 +1127,8 @@
             },
             "data": [
                 {
-                    "tabId": "1ba064dc-25b3-4b3b-ccf9-f87f56ffbcee",
-                    "resultId": "599a894a-c314-4b96-f5ca-c22dbcffe505",
+                    "tabId": "6e06e08e-9be5-4ac7-bf55-3024d1e347a1",
+                    "resultId": "c2be1ee5-1bb1-43df-f982-4733b7b69a83",
                     "rows": [
                         {
                             "0": "cloned_mail1",
@@ -1298,7 +1298,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "35ddae27-343e-470d-87d1-24eb33c57174"
+                        "b62befa7-3573-4979-dae5-ad0eb9c37ca6"
                     ]
                 },
                 "currentHeight": 352,
@@ -1316,8 +1316,8 @@
             },
             "data": [
                 {
-                    "tabId": "1ba064dc-25b3-4b3b-ccf9-f87f56ffbcee",
-                    "resultId": "35ddae27-343e-470d-87d1-24eb33c57174",
+                    "tabId": "6e06e08e-9be5-4ac7-bf55-3024d1e347a1",
+                    "resultId": "b62befa7-3573-4979-dae5-ad0eb9c37ca6",
                     "rows": [
                         {
                             "0": "MEMORY",
@@ -1471,7 +1471,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "f2fb9802-e5ff-4708-9329-4b91a5c01fc2"
+                        "66d24284-cc6e-4b52-d0ba-a0d1484b12dd"
                     ]
                 },
                 "currentHeight": 352,
@@ -1489,8 +1489,8 @@
             },
             "data": [
                 {
-                    "tabId": "1ba064dc-25b3-4b3b-ccf9-f87f56ffbcee",
-                    "resultId": "f2fb9802-e5ff-4708-9329-4b91a5c01fc2",
+                    "tabId": "6e06e08e-9be5-4ac7-bf55-3024d1e347a1",
+                    "resultId": "66d24284-cc6e-4b52-d0ba-a0d1484b12dd",
                     "rows": [
                         {
                             "0": "ABW",
@@ -5677,18 +5677,29 @@
         {
             "state": {
                 "start": 57,
-                "end": 57,
+                "end": 64,
                 "language": "mysql",
-                "currentHeight": 180,
+                "result": {
+                    "type": "text",
+                    "text": [
+                        {
+                            "type": 4,
+                            "index": 0,
+                            "resultId": "a2c4b461-006f-483a-d42d-b61989c96f66",
+                            "content": "OK, 0 records retrieved in 0s"
+                        }
+                    ]
+                },
+                "currentHeight": 34,
                 "statements": [
                     {
                         "delimiter": ";",
                         "span": {
                             "start": 0,
-                            "length": 0
+                            "length": 580
                         },
                         "contentStart": 0,
-                        "state": 0
+                        "state": 1
                     }
                 ]
             },
