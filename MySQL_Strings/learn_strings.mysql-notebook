@@ -2,18 +2,18 @@
     "type": "MySQLNotebook",
     "version": "1.0",
     "caption": "Untitled",
-    "content": "USE cookbook;\r\n# Strings\r\n-- There are two types of string one is binary string which stored image, songs, compressed and \r\n-- encrypted data and another is non-binary string which stores text with character set and collation\r\n# Character Set\r\n-- Character set define which format string to be stored.\r\nSHOW CHARACTER SET;\r\n-- To determine Whereater given string is mulibyte character check it like\r\nSET @s = 'abc';\r\nSELECT @s, LENGTH(@s), CHAR_LENGTH(@s);\r\nSET @s1 = CONVERT('abc' uSING utf16);\r\nSELECT @s1, LENGTH(@s1), CHAR_LENGTH(@s1);\r\n# Collation\r\n-- Another property of non-binary string is collation which defines comparison and sorting.\r\nSHOW COLLATION LIKE 'utf8mb4%';\r\nCREATE TABLE tmp_tbl_1 (\r\n    c CHAR(3) CHARACTER SET utf8mb4\r\n);\r\nINSERT INTO tmp_tbl_1 (c) VALUE('AAA'), ('bbb'), ('aaa'), ('BBB');\r\nSELECT c FROM tmp_tbl_1;\r\nSELECT c FROM tmp_tbl_1 ORDER BY c COLLATE utf8mb4_turkish_ci;\r\nSELECT c FROM tmp_tbl_1 ORDER BY c COLLATE utf8mb4_tr_0900_as_cs;\r\nSELECT c FROM tmp_tbl_1 ORDER BY c COLLATE utf8mb4_bin;\r\nCREATE TABLE tmp_tbl_2 (\r\n    c CHAR(2) CHARACTER SET utf8mb4\r\n);\r\nINSERT INTO tmp_tbl_2 (c) VALUE('cg'),('ch'),('ci'),('lk'),('ll'),('lm');\r\nSELECT c FROM tmp_tbl_2;\r\nSELECT c FROM tmp_tbl_2 ORDER BY c COLLATE utf8mb4_general_ci;\r\nSELECT c FROM tmp_tbl_2 ORDER BY c COLLATE utf8mb4_spanish2_ci;\r\n# String Data types\r\n",
+    "content": "USE cookbook;\r\n# Strings\r\n-- There are two types of string one is binary string which stored image, songs, compressed and \r\n-- encrypted data and another is non-binary string which stores text with character set and collation\r\n# Character Set\r\n-- Character set define which format string to be stored.\r\nSHOW CHARACTER SET;\r\n-- To determine Whereater given string is mulibyte character check it like\r\nSET @s = 'abc';\r\nSELECT @s, LENGTH(@s), CHAR_LENGTH(@s);\r\nSET @s1 = CONVERT('abc' uSING utf16);\r\nSELECT @s1, LENGTH(@s1), CHAR_LENGTH(@s1);\r\n# Collation\r\n-- Another property of non-binary string is collation which defines comparison and sorting.\r\nSHOW COLLATION LIKE 'utf8mb4%';\r\nCREATE TABLE tmp_tbl_1 (\r\n    c CHAR(3) CHARACTER SET utf8mb4\r\n);\r\nINSERT INTO tmp_tbl_1 (c) VALUE('AAA'), ('bbb'), ('aaa'), ('BBB');\r\nSELECT c FROM tmp_tbl_1;\r\nSELECT c FROM tmp_tbl_1 ORDER BY c COLLATE utf8mb4_turkish_ci;\r\nSELECT c FROM tmp_tbl_1 ORDER BY c COLLATE utf8mb4_tr_0900_as_cs;\r\nSELECT c FROM tmp_tbl_1 ORDER BY c COLLATE utf8mb4_bin;\r\nCREATE TABLE tmp_tbl_2 (\r\n    c CHAR(2) CHARACTER SET utf8mb4\r\n);\r\nINSERT INTO tmp_tbl_2 (c) VALUE('cg'),('ch'),('ci'),('lk'),('ll'),('lm');\r\nSELECT c FROM tmp_tbl_2;\r\nSELECT c FROM tmp_tbl_2 ORDER BY c COLLATE utf8mb4_general_ci;\r\nSELECT c FROM tmp_tbl_2 ORDER BY c COLLATE utf8mb4_spanish2_ci;\r\n# String Data types\r\nCREATE TABLE tmp_tbl_3 (\r\n    c1 CHAR(10),\r\n    c2 VARCHAR(10)\r\n);\r\nINSERT INTO tmp_tbl_3 (c1,c2) VALUES ('abc       ','abc       ');\r\nSELECT * FROM tmp_tbl_3;\r\nSELECT c1, c2, CHAR_LENGTH(c1), CHAR_LENGTH(c2) FROM tmp_tbl_3;\r\n",
     "options": {},
     "viewState": {
         "cursorState": [
             {
                 "inSelectionMode": false,
                 "selectionStart": {
-                    "lineNumber": 32,
+                    "lineNumber": 39,
                     "column": 1
                 },
                 "position": {
-                    "lineNumber": 32,
+                    "lineNumber": 39,
                     "column": 1
                 }
             }
@@ -21,10 +21,10 @@
         "viewState": {
             "scrollLeft": 0,
             "firstPosition": {
-                "lineNumber": 29,
+                "lineNumber": 31,
                 "column": 1
             },
-            "firstPositionDeltaTop": -18
+            "firstPositionDeltaTop": 120
         },
         "contributionsState": {
             "editor.contrib.folding": {},
@@ -43,7 +43,7 @@
                         {
                             "type": 4,
                             "index": 0,
-                            "resultId": "0cde34ae-af93-49f6-a3ba-85cc4f0751c0",
+                            "resultId": "06949476-4e2b-4a59-c22b-e0bab9029430",
                             "content": "OK, 0 records retrieved in 0s"
                         }
                     ]
@@ -71,7 +71,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "919f4805-bcea-45ae-abec-ae9f0c9c8ac6"
+                        "8a94af2d-3b2a-4ace-ed1f-dd37f6377d85"
                     ]
                 },
                 "currentHeight": 36,
@@ -89,8 +89,8 @@
             },
             "data": [
                 {
-                    "tabId": "d20ce9c7-5b66-459f-d9de-f375e82bb8ce",
-                    "resultId": "919f4805-bcea-45ae-abec-ae9f0c9c8ac6",
+                    "tabId": "af80bf3a-4fdc-4545-b8c9-979f21135845",
+                    "resultId": "8a94af2d-3b2a-4ace-ed1f-dd37f6377d85",
                     "rows": [
                         {
                             "0": "armscii8",
@@ -388,8 +388,8 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "61f8de7b-b6eb-41a5-ac23-90f78a160d51",
-                        "e5a7c5df-a838-4152-e818-f6906ab4723c"
+                        "9ec988c7-faf6-419b-c62f-b599bc83d9b6",
+                        "352c5a9b-4d70-47c4-f7de-3d2374fd7e3c"
                     ]
                 },
                 "currentHeight": 36,
@@ -425,8 +425,8 @@
             },
             "data": [
                 {
-                    "tabId": "d20ce9c7-5b66-459f-d9de-f375e82bb8ce",
-                    "resultId": "61f8de7b-b6eb-41a5-ac23-90f78a160d51",
+                    "tabId": "af80bf3a-4fdc-4545-b8c9-979f21135845",
+                    "resultId": "9ec988c7-faf6-419b-c62f-b599bc83d9b6",
                     "rows": [
                         {
                             "0": "abc",
@@ -467,8 +467,8 @@
                     "sql": "SELECT @s, LENGTH(@s), CHAR_LENGTH(@s);"
                 },
                 {
-                    "tabId": "d20ce9c7-5b66-459f-d9de-f375e82bb8ce",
-                    "resultId": "e5a7c5df-a838-4152-e818-f6906ab4723c",
+                    "tabId": "af80bf3a-4fdc-4545-b8c9-979f21135845",
+                    "resultId": "352c5a9b-4d70-47c4-f7de-3d2374fd7e3c",
                     "rows": [],
                     "executionInfo": {
                         "text": "OK, 0 records retrieved in 0s",
@@ -490,8 +490,8 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "e9bfa683-a7c0-47a1-fbee-906259e25c4d",
-                        "17febfac-35ed-42a0-c266-b9adf886709d"
+                        "8c16851e-e793-4a28-bdc8-45fc6c53ad63",
+                        "9a90bd61-8ed8-4263-d93b-99f58e07216c"
                     ]
                 },
                 "currentHeight": 133.640625,
@@ -518,8 +518,8 @@
             },
             "data": [
                 {
-                    "tabId": "d20ce9c7-5b66-459f-d9de-f375e82bb8ce",
-                    "resultId": "e9bfa683-a7c0-47a1-fbee-906259e25c4d",
+                    "tabId": "af80bf3a-4fdc-4545-b8c9-979f21135845",
+                    "resultId": "8c16851e-e793-4a28-bdc8-45fc6c53ad63",
                     "rows": [
                         {
                             "0": "abc",
@@ -560,8 +560,8 @@
                     "sql": "\nSELECT @s1, LENGTH(@s1), CHAR_LENGTH(@s1)"
                 },
                 {
-                    "tabId": "d20ce9c7-5b66-459f-d9de-f375e82bb8ce",
-                    "resultId": "17febfac-35ed-42a0-c266-b9adf886709d",
+                    "tabId": "af80bf3a-4fdc-4545-b8c9-979f21135845",
+                    "resultId": "9a90bd61-8ed8-4263-d93b-99f58e07216c",
                     "rows": [],
                     "executionInfo": {
                         "text": "OK, 0 records retrieved in 0s",
@@ -583,7 +583,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "bcb43e25-ed09-4972-ff21-f4184d656c5d"
+                        "9520d142-33e7-46f9-c9a2-bc8a0b03c1d7"
                     ]
                 },
                 "currentHeight": 352,
@@ -601,8 +601,8 @@
             },
             "data": [
                 {
-                    "tabId": "d20ce9c7-5b66-459f-d9de-f375e82bb8ce",
-                    "resultId": "bcb43e25-ed09-4972-ff21-f4184d656c5d",
+                    "tabId": "af80bf3a-4fdc-4545-b8c9-979f21135845",
+                    "resultId": "9520d142-33e7-46f9-c9a2-bc8a0b03c1d7",
                     "rows": [
                         {
                             "0": "utf8mb4_0900_ai_ci",
@@ -1538,7 +1538,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "4001e87b-58fb-426f-8019-d7c16e27778c"
+                        "089967e0-521b-44f0-bcca-425343395d97"
                     ]
                 },
                 "currentHeight": 36,
@@ -1556,8 +1556,8 @@
             },
             "data": [
                 {
-                    "tabId": "d20ce9c7-5b66-459f-d9de-f375e82bb8ce",
-                    "resultId": "4001e87b-58fb-426f-8019-d7c16e27778c",
+                    "tabId": "af80bf3a-4fdc-4545-b8c9-979f21135845",
+                    "resultId": "089967e0-521b-44f0-bcca-425343395d97",
                     "rows": [
                         {
                             "0": "AAA"
@@ -1600,7 +1600,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "e1ef51bf-72bd-459d-c5c2-017bd0aaa3ae"
+                        "d01f4e45-01cb-425d-eaa7-daccf77ec333"
                     ]
                 },
                 "currentHeight": 36,
@@ -1618,8 +1618,8 @@
             },
             "data": [
                 {
-                    "tabId": "d20ce9c7-5b66-459f-d9de-f375e82bb8ce",
-                    "resultId": "e1ef51bf-72bd-459d-c5c2-017bd0aaa3ae",
+                    "tabId": "af80bf3a-4fdc-4545-b8c9-979f21135845",
+                    "resultId": "d01f4e45-01cb-425d-eaa7-daccf77ec333",
                     "rows": [
                         {
                             "0": "AAA"
@@ -1662,7 +1662,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "6e309117-bcfe-418b-f92b-133a9270999f"
+                        "301a8145-1add-427b-f64a-d06d04dca02e"
                     ]
                 },
                 "currentHeight": 36,
@@ -1680,8 +1680,8 @@
             },
             "data": [
                 {
-                    "tabId": "d20ce9c7-5b66-459f-d9de-f375e82bb8ce",
-                    "resultId": "6e309117-bcfe-418b-f92b-133a9270999f",
+                    "tabId": "af80bf3a-4fdc-4545-b8c9-979f21135845",
+                    "resultId": "301a8145-1add-427b-f64a-d06d04dca02e",
                     "rows": [
                         {
                             "0": "aaa"
@@ -1724,7 +1724,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "fec4bf60-6d6f-45c7-c369-9060329ba0cf"
+                        "95d80355-b654-4fd6-d49a-c34deb9a2477"
                     ]
                 },
                 "currentHeight": 36,
@@ -1742,8 +1742,8 @@
             },
             "data": [
                 {
-                    "tabId": "d20ce9c7-5b66-459f-d9de-f375e82bb8ce",
-                    "resultId": "fec4bf60-6d6f-45c7-c369-9060329ba0cf",
+                    "tabId": "af80bf3a-4fdc-4545-b8c9-979f21135845",
+                    "resultId": "95d80355-b654-4fd6-d49a-c34deb9a2477",
                     "rows": [
                         {
                             "0": "AAA"
@@ -1848,7 +1848,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "b14a5532-4bb2-4e8b-c688-035cbfb5e88d"
+                        "c5569291-ed4f-4022-fb83-b2cc86c6ee8c"
                     ]
                 },
                 "currentHeight": 36,
@@ -1866,8 +1866,8 @@
             },
             "data": [
                 {
-                    "tabId": "d20ce9c7-5b66-459f-d9de-f375e82bb8ce",
-                    "resultId": "b14a5532-4bb2-4e8b-c688-035cbfb5e88d",
+                    "tabId": "af80bf3a-4fdc-4545-b8c9-979f21135845",
+                    "resultId": "c5569291-ed4f-4022-fb83-b2cc86c6ee8c",
                     "rows": [
                         {
                             "0": "cg"
@@ -1916,7 +1916,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "838e0861-8fa7-4773-e4ce-330f6276a83f"
+                        "66483617-dcae-417f-aec3-47c2b1699627"
                     ]
                 },
                 "currentHeight": 269.84375,
@@ -1934,8 +1934,8 @@
             },
             "data": [
                 {
-                    "tabId": "d20ce9c7-5b66-459f-d9de-f375e82bb8ce",
-                    "resultId": "838e0861-8fa7-4773-e4ce-330f6276a83f",
+                    "tabId": "af80bf3a-4fdc-4545-b8c9-979f21135845",
+                    "resultId": "66483617-dcae-417f-aec3-47c2b1699627",
                     "rows": [
                         {
                             "0": "cg"
@@ -1984,7 +1984,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "3067a6c7-b38d-47a4-cc02-17386878a6c9"
+                        "8d1d5d8d-d47b-4441-fc7f-74baebe9a2f6"
                     ]
                 },
                 "currentHeight": 269.84375,
@@ -2002,8 +2002,8 @@
             },
             "data": [
                 {
-                    "tabId": "d20ce9c7-5b66-459f-d9de-f375e82bb8ce",
-                    "resultId": "3067a6c7-b38d-47a4-cc02-17386878a6c9",
+                    "tabId": "af80bf3a-4fdc-4545-b8c9-979f21135845",
+                    "resultId": "8d1d5d8d-d47b-4441-fc7f-74baebe9a2f6",
                     "rows": [
                         {
                             "0": "cg"
@@ -2047,7 +2047,207 @@
         {
             "state": {
                 "start": 31,
-                "end": 32,
+                "end": 35,
+                "language": "mysql",
+                "result": {
+                    "type": "text",
+                    "text": [
+                        {
+                            "type": 4,
+                            "index": 0,
+                            "resultId": "f99c7e8a-08c3-49b7-d0a5-80028def81b7",
+                            "content": "OK, 0 records retrieved in 73.803ms"
+                        }
+                    ]
+                },
+                "currentHeight": 34,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 83
+                        },
+                        "contentStart": 20,
+                        "state": 3
+                    }
+                ]
+            },
+            "data": []
+        },
+        {
+            "state": {
+                "start": 36,
+                "end": 36,
+                "language": "mysql",
+                "result": {
+                    "type": "text",
+                    "text": [
+                        {
+                            "type": 4,
+                            "index": 0,
+                            "resultId": "94111b1a-27d0-4f8b-d131-609ef1ce31a7",
+                            "content": "OK, 1 row affected in 10.656ms"
+                        }
+                    ]
+                },
+                "currentHeight": 34,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 65
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": []
+        },
+        {
+            "state": {
+                "start": 37,
+                "end": 37,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "2679ac1e-5897-4326-992e-864bb73e62fa"
+                    ]
+                },
+                "currentHeight": 106.640625,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 24
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "af80bf3a-4fdc-4545-b8c9-979f21135845",
+                    "resultId": "2679ac1e-5897-4326-992e-864bb73e62fa",
+                    "rows": [
+                        {
+                            "0": "abc",
+                            "1": "abc       "
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "c1",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "c2",
+                            "field": "1",
+                            "dataType": {
+                                "type": 17
+                            }
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 0s"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT * FROM tmp_tbl_3"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 38,
+                "end": 38,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "04b1ff90-b05d-4df2-addb-6d4134a6b624"
+                    ]
+                },
+                "currentHeight": 106.640625,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 63
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "af80bf3a-4fdc-4545-b8c9-979f21135845",
+                    "resultId": "04b1ff90-b05d-4df2-addb-6d4134a6b624",
+                    "rows": [
+                        {
+                            "0": "abc",
+                            "1": "abc       ",
+                            "2": 3,
+                            "3": 10
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "c1",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "c2",
+                            "field": "1",
+                            "dataType": {
+                                "type": 17
+                            }
+                        },
+                        {
+                            "title": "CHAR_LENGTH(c1)",
+                            "field": "2",
+                            "dataType": {
+                                "type": 4
+                            }
+                        },
+                        {
+                            "title": "CHAR_LENGTH(c2)",
+                            "field": "3",
+                            "dataType": {
+                                "type": 4
+                            }
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 0s"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT c1, c2, CHAR_LENGTH(c1), CHAR_LENGTH(c2) FROM tmp_tbl_3"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 39,
+                "end": 39,
                 "language": "mysql",
                 "currentHeight": 180,
                 "statements": [
@@ -2055,10 +2255,10 @@
                         "delimiter": ";",
                         "span": {
                             "start": 0,
-                            "length": 20
+                            "length": 0
                         },
                         "contentStart": 0,
-                        "state": 1
+                        "state": 0
                     }
                 ]
             },
