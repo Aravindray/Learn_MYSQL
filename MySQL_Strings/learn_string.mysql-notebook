@@ -2,29 +2,29 @@
     "type": "MySQLNotebook",
     "version": "1.0",
     "caption": "Untitled",
-    "content": "USE COOKBOOK;\r\n# MySQL Strings divided into 2 types - Binary and Non-binary.\r\n-- Binary will store data like image, mp3, encrypted files.\r\n-- Non-binary will store date like Text with character set and collate.\r\n-- Data type for Binary strings are BINARY, VARBINARY, and BLOB. Data type of non-binary strings are \r\n-- CHAR, VARCHAR and TEXT each of which permit CHARACTER SET and COLLATE attribute.\r\n# CHARACTER SET\r\n-- To display all the character set for nonbinary strings use this statement\r\nSHOW CHARACTER SET;\r\nSET @s = CONVERT('abc' USING utf8mb4); -- All characters as stored as 1 to 4 bytes\r\nSELECT @s, LENGTH(@s), CHAR_LENGTH(@s);\r\nSET @s = CONVERT('abc' USING utf16); -- All characters stored as 2 bytes\r\nSELECT @s, LENGTH(@s), CHAR_LENGTH(@s);\r\n-- It store characters as single byte or multi byte based on the character set.\r\n# Collation\r\n-- To display all the collation use this statement\r\nSHOW COLLATION;\r\n-- Collation will take care of character searching and sorting operations.\r\n-- Examples of collation how it will effect the sorting order\r\nCREATE TABLE tmp_tbl_1 ( c CHAR(3) CHARACTER SET utf8mb4);\r\nINSERT INTO tmp_tbl_1 VALUES ('AAA'), ('bbb'), ('aaa'), ('BBB');\r\nSELECT c from tmp_tbl_1;\r\nSELECT c from tmp_tbl_1 ORDER BY c COLLATE utf8mb4_turkish_ci;\r\nSELECT c from tmp_tbl_1 ORDER BY c COLLATE utf8mb4_tr_0900_as_cs;\r\nSELECT c FROM tmp_tbl_1 ORDER BY c COLLATE utf8mb4_bin;\r\nCREATE TABLE tmp_spanish_tbl (c CHAR(2) CHARACTER SET utf8mb4);\r\nINSERT INTO tmp_spanish_tbl (c) VALUES ('cg'), ('ch'), ('ci'), ('lk'), ('ll'), ('lm');\r\nSELECT c FROM tmp_spanish_tbl ORDER BY c COLLATE utf8mb4_general_ci;\r\nSELECT c FROM tmp_spanish_tbl ORDER BY c COLLATE utf8mb4_spanish2_ci;\r\n# Choosing a string data type\r\nCREATE TABLE tmp_tbl_2 (c1 CHAR(10), c2 VARCHAR(10));\r\nINSERT INTO tmp_tbl_2 (c1, c2) VALUES ('abc       ','abc       ');\r\nSELECT c1, c2, CHAR_LENGTH(c1), CHAR_LENGTH(c2) FROM tmp_tbl_2;\r\nCREATE TABLE tmp_turkish_tbl (c CHAR(3) CHARACTER SET utf8mb4);\r\nINSERT INTO tmp_turkish_tbl VALUES('iii'), ('şşş'), ('ööö'), ('ççç');\r\nSELECT * FROM tmp_turkish_tbl;\r\n",
+    "content": "USE COOKBOOK;\r\n# MySQL Strings divided into 2 types - Binary and Non-binary.\r\n-- Binary will store data like image, mp3, encrypted files.\r\n-- Non-binary will store date like Text with character set and collate.\r\n-- Data type for Binary strings are BINARY, VARBINARY, and BLOB. Data type of non-binary strings are \r\n-- CHAR, VARCHAR and TEXT each of which permit CHARACTER SET and COLLATE attribute.\r\n# CHARACTER SET\r\n-- To display all the character set for nonbinary strings use this statement\r\nSHOW CHARACTER SET;\r\nSET @s = CONVERT('abc' USING utf8mb4); -- All characters as stored as 1 to 4 bytes\r\nSELECT @s, LENGTH(@s), CHAR_LENGTH(@s);\r\nSET @s = CONVERT('abc' USING utf16); -- All characters stored as 2 bytes\r\nSELECT @s, LENGTH(@s), CHAR_LENGTH(@s);\r\n-- It store characters as single byte or multi byte based on the character set.\r\n# Collation\r\n-- To display all the collation use this statement\r\nSHOW COLLATION;\r\n-- Collation will take care of character searching and sorting operations.\r\n-- Examples of collation how it will effect the sorting order\r\nCREATE TABLE tmp_tbl_1 ( c CHAR(3) CHARACTER SET utf8mb4);\r\nINSERT INTO tmp_tbl_1 VALUES ('AAA'), ('bbb'), ('aaa'), ('BBB');\r\nSELECT c from tmp_tbl_1;\r\nSELECT c from tmp_tbl_1 ORDER BY c COLLATE utf8mb4_turkish_ci;\r\nSELECT c from tmp_tbl_1 ORDER BY c COLLATE utf8mb4_tr_0900_as_cs;\r\nSELECT c FROM tmp_tbl_1 ORDER BY c COLLATE utf8mb4_bin;\r\nCREATE TABLE tmp_spanish_tbl (c CHAR(2) CHARACTER SET utf8mb4);\r\nINSERT INTO tmp_spanish_tbl (c) VALUES ('cg'), ('ch'), ('ci'), ('lk'), ('ll'), ('lm');\r\nSELECT c FROM tmp_spanish_tbl ORDER BY c COLLATE utf8mb4_general_ci;\r\nSELECT c FROM tmp_spanish_tbl ORDER BY c COLLATE utf8mb4_spanish2_ci;\r\n# Choosing a string data type\r\nCREATE TABLE tmp_tbl_2 (c1 CHAR(10), c2 VARCHAR(10));\r\nINSERT INTO tmp_tbl_2 (c1, c2) VALUES ('abc       ','abc       ');\r\nSELECT c1, c2, CHAR_LENGTH(c1), CHAR_LENGTH(c2) FROM tmp_tbl_2;\r\nCREATE TABLE tmp_turkish_tbl (c CHAR(3) CHARACTER SET utf8mb4);\r\nINSERT INTO tmp_turkish_tbl VALUES('iii'), ('şşş'), ('ööö'), ('ççç');\r\nSELECT * FROM tmp_turkish_tbl;\r\n# String Literals\r\n-- Enclose the text of string with single quotes and dobule quotes, 'Hello, World!' or \"Hello, World!\"\r\n-- Use Hexadecimal notation x'61626364' is equalant to 'abcd'\r\n-- Use Introducer which means write the character set with underscore, _utf8mb4 'abcd' or _ucs2 'abcd'\r\n-- Use different quotes for example if you set variable to @s = 'I'm asleep'. This would through an error use opposite quotaion like this statement\r\nSELECT \"I'm asleep\", 'He said, \"Boo!\"';\r\n-- This will also work\r\nSELECT 'I''m asleep', 'I\\'m wide awake';\r\nSELECT \"He said, \"\"BOO!\"\"\", \"And I said, \\\"Yikes\\\"\";\r\n-- To write a literal blackslash within a string dobule it\r\nSELECT \"In windows to indentify the download path c:\\\\user\\\\downloads\" AS `double blackslash`;\r\n-- Some of escape sequences are \\', \\\", \\\\, \\b (backslash), \\n (newline or linefeed), \\t (tab) and \\0 (ASCII NULL)",
     "options": {},
     "viewState": {
         "cursorState": [
             {
                 "inSelectionMode": false,
                 "selectionStart": {
-                    "lineNumber": 37,
-                    "column": 1
+                    "lineNumber": 48,
+                    "column": 115
                 },
                 "position": {
-                    "lineNumber": 37,
-                    "column": 1
+                    "lineNumber": 48,
+                    "column": 115
                 }
             }
         ],
         "viewState": {
             "scrollLeft": 0,
             "firstPosition": {
-                "lineNumber": 32,
+                "lineNumber": 42,
                 "column": 1
             },
-            "firstPositionDeltaTop": 9
+            "firstPositionDeltaTop": -4
         },
         "contributionsState": {
             "editor.contrib.folding": {},
@@ -72,7 +72,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "57bd2774-70ad-4870-efbc-92b33b311126"
+                        "36482414-a741-4555-a900-02631c0308d1"
                     ]
                 },
                 "currentHeight": 36,
@@ -91,8 +91,8 @@
             },
             "data": [
                 {
-                    "tabId": "b682084a-0b32-4b15-a0f1-fe36d780495d",
-                    "resultId": "57bd2774-70ad-4870-efbc-92b33b311126",
+                    "tabId": "0d0c5f47-aa62-402d-92dc-49f281d1ed94",
+                    "resultId": "36482414-a741-4555-a900-02631c0308d1",
                     "rows": [
                         {
                             "0": "armscii8",
@@ -478,7 +478,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "4126e525-d34e-4c9d-c9a1-a13877c49485"
+                        "a3b633d1-2d13-4b4c-f1b4-3ecf57f53194"
                     ]
                 },
                 "currentHeight": 36,
@@ -497,8 +497,8 @@
             },
             "data": [
                 {
-                    "tabId": "b682084a-0b32-4b15-a0f1-fe36d780495d",
-                    "resultId": "4126e525-d34e-4c9d-c9a1-a13877c49485",
+                    "tabId": "0d0c5f47-aa62-402d-92dc-49f281d1ed94",
+                    "resultId": "a3b633d1-2d13-4b4c-f1b4-3ecf57f53194",
                     "rows": [
                         {
                             "0": "abc",
@@ -628,7 +628,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "2926682b-6ae4-4242-c5ac-942c7d2a43fe"
+                        "27512ae1-6137-4d73-d071-2ac681d6d566"
                     ]
                 },
                 "currentHeight": 36,
@@ -647,8 +647,8 @@
             },
             "data": [
                 {
-                    "tabId": "b682084a-0b32-4b15-a0f1-fe36d780495d",
-                    "resultId": "2926682b-6ae4-4242-c5ac-942c7d2a43fe",
+                    "tabId": "0d0c5f47-aa62-402d-92dc-49f281d1ed94",
+                    "resultId": "27512ae1-6137-4d73-d071-2ac681d6d566",
                     "rows": [
                         {
                             "0": "abc",
@@ -737,7 +737,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "7a37ae2c-8bd7-4eac-f1c2-587a5974619f"
+                        "96dd16f8-93ef-4380-dead-31ddbdd93667"
                     ]
                 },
                 "currentHeight": 36,
@@ -756,8 +756,8 @@
             },
             "data": [
                 {
-                    "tabId": "b682084a-0b32-4b15-a0f1-fe36d780495d",
-                    "resultId": "7a37ae2c-8bd7-4eac-f1c2-587a5974619f",
+                    "tabId": "0d0c5f47-aa62-402d-92dc-49f281d1ed94",
+                    "resultId": "96dd16f8-93ef-4380-dead-31ddbdd93667",
                     "rows": [
                         {
                             "0": "armscii8_bin",
@@ -3543,7 +3543,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "2748fbce-ff47-4217-ea2f-4555583ec1d1"
+                        "8f39ba3f-2a6c-4cdc-8502-c9d5051f6942"
                     ]
                 },
                 "currentHeight": 36,
@@ -3562,8 +3562,8 @@
             },
             "data": [
                 {
-                    "tabId": "b682084a-0b32-4b15-a0f1-fe36d780495d",
-                    "resultId": "2748fbce-ff47-4217-ea2f-4555583ec1d1",
+                    "tabId": "0d0c5f47-aa62-402d-92dc-49f281d1ed94",
+                    "resultId": "8f39ba3f-2a6c-4cdc-8502-c9d5051f6942",
                     "rows": [
                         {
                             "0": "AAA"
@@ -3619,7 +3619,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "7fe2a437-2bdf-452b-d5bf-aa574c19bbc8"
+                        "64c68523-0366-477e-9bb0-13f25353cbc8"
                     ]
                 },
                 "currentHeight": 206.5625,
@@ -3638,8 +3638,8 @@
             },
             "data": [
                 {
-                    "tabId": "b682084a-0b32-4b15-a0f1-fe36d780495d",
-                    "resultId": "7fe2a437-2bdf-452b-d5bf-aa574c19bbc8",
+                    "tabId": "0d0c5f47-aa62-402d-92dc-49f281d1ed94",
+                    "resultId": "64c68523-0366-477e-9bb0-13f25353cbc8",
                     "rows": [
                         {
                             "0": "AAA"
@@ -3695,7 +3695,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "51c88501-8033-40db-e5c9-15e0f301dbf0"
+                        "e474bb89-288e-4562-ee6e-f254494fe0cf"
                     ]
                 },
                 "currentHeight": 206.5625,
@@ -3714,8 +3714,8 @@
             },
             "data": [
                 {
-                    "tabId": "b682084a-0b32-4b15-a0f1-fe36d780495d",
-                    "resultId": "51c88501-8033-40db-e5c9-15e0f301dbf0",
+                    "tabId": "0d0c5f47-aa62-402d-92dc-49f281d1ed94",
+                    "resultId": "e474bb89-288e-4562-ee6e-f254494fe0cf",
                     "rows": [
                         {
                             "0": "aaa"
@@ -3771,7 +3771,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "8a11e787-37ef-422f-d50c-b52d72b4934b"
+                        "e5cc84a4-19b1-4d96-fba7-674e4716d1f1"
                     ]
                 },
                 "currentHeight": 206.5625,
@@ -3790,8 +3790,8 @@
             },
             "data": [
                 {
-                    "tabId": "b682084a-0b32-4b15-a0f1-fe36d780495d",
-                    "resultId": "8a11e787-37ef-422f-d50c-b52d72b4934b",
+                    "tabId": "0d0c5f47-aa62-402d-92dc-49f281d1ed94",
+                    "resultId": "e5cc84a4-19b1-4d96-fba7-674e4716d1f1",
                     "rows": [
                         {
                             "0": "AAA"
@@ -3911,7 +3911,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "1f077ee4-9422-45b2-f170-63f9fd0df228"
+                        "65741209-081b-4c88-cc60-0ed5e258d50d"
                     ]
                 },
                 "currentHeight": 272.84375,
@@ -3930,8 +3930,8 @@
             },
             "data": [
                 {
-                    "tabId": "b682084a-0b32-4b15-a0f1-fe36d780495d",
-                    "resultId": "1f077ee4-9422-45b2-f170-63f9fd0df228",
+                    "tabId": "0d0c5f47-aa62-402d-92dc-49f281d1ed94",
+                    "resultId": "65741209-081b-4c88-cc60-0ed5e258d50d",
                     "rows": [
                         {
                             "0": "cg"
@@ -3993,7 +3993,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "31a7d15a-aac1-48da-e0a2-d25499beabc7"
+                        "c6530d7b-e445-4624-877d-8ef1c8a9a083"
                     ]
                 },
                 "currentHeight": 272.84375,
@@ -4012,8 +4012,8 @@
             },
             "data": [
                 {
-                    "tabId": "b682084a-0b32-4b15-a0f1-fe36d780495d",
-                    "resultId": "31a7d15a-aac1-48da-e0a2-d25499beabc7",
+                    "tabId": "0d0c5f47-aa62-402d-92dc-49f281d1ed94",
+                    "resultId": "c6530d7b-e445-4624-877d-8ef1c8a9a083",
                     "rows": [
                         {
                             "0": "cg"
@@ -4115,7 +4115,7 @@
                         }
                     ]
                 },
-                "currentHeight": 34,
+                "currentHeight": 28,
                 "currentSet": 1,
                 "statements": [
                     {
@@ -4139,7 +4139,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "19682543-7b70-42cd-c8a5-e5369572f933"
+                        "f5e2ee2f-2e7f-4031-c323-4c40f7f69659"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -4158,8 +4158,8 @@
             },
             "data": [
                 {
-                    "tabId": "b682084a-0b32-4b15-a0f1-fe36d780495d",
-                    "resultId": "19682543-7b70-42cd-c8a5-e5369572f933",
+                    "tabId": "0d0c5f47-aa62-402d-92dc-49f281d1ed94",
+                    "resultId": "f5e2ee2f-2e7f-4031-c323-4c40f7f69659",
                     "rows": [
                         {
                             "0": "abc",
@@ -4275,7 +4275,7 @@
                         }
                     ]
                 },
-                "currentHeight": 34,
+                "currentHeight": 28,
                 "currentSet": 1,
                 "statements": [
                     {
@@ -4307,7 +4307,7 @@
                         }
                     ]
                 },
-                "currentHeight": 34,
+                "currentHeight": 28,
                 "currentSet": 1,
                 "statements": [
                     {
@@ -4331,7 +4331,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "2c4eebf6-a5b6-4406-d8c7-338e681a1c82"
+                        "da3c84e0-423b-4410-fa7a-d61829d1c883"
                     ]
                 },
                 "currentHeight": 206.5625,
@@ -4350,8 +4350,8 @@
             },
             "data": [
                 {
-                    "tabId": "b682084a-0b32-4b15-a0f1-fe36d780495d",
-                    "resultId": "2c4eebf6-a5b6-4406-d8c7-338e681a1c82",
+                    "tabId": "0d0c5f47-aa62-402d-92dc-49f281d1ed94",
+                    "resultId": "da3c84e0-423b-4410-fa7a-d61829d1c883",
                     "rows": [
                         {
                             "0": "iii"
@@ -4402,7 +4402,338 @@
         {
             "state": {
                 "start": 37,
-                "end": 37,
+                "end": 42,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "4ede5ddc-a13c-48dc-96db-9bdf7d3a8a0b"
+                    ]
+                },
+                "currentHeight": 107.140625,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 473
+                        },
+                        "contentStart": 434,
+                        "state": 0
+                    },
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 473,
+                            "length": 0
+                        },
+                        "contentStart": 473,
+                        "state": 3
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "0d0c5f47-aa62-402d-92dc-49f281d1ed94",
+                    "resultId": "4ede5ddc-a13c-48dc-96db-9bdf7d3a8a0b",
+                    "rows": [
+                        {
+                            "0": "I'm asleep",
+                            "1": "He said, \"Boo!\""
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "I'm asleep",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "He said, \"Boo!\"",
+                            "field": "1",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 0s"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "# String Literals\n-- Enclose the text of string with single quotes and dobule quotes, 'Hello, World!' or \"Hello, World!\"\n-- Use Hexadecimal notation x'61626364' is equalant to 'abcd'\n-- Use Introducer which means write the character set with underscore, _utf8mb4 'abcd' or _ucs2 'abcd'\n-- Use different quotes for example if you set variable to @s = 'I'm asleep'. This would through an error use opposite quotaion like this statement\nSELECT \"I'm asleep\", 'He said, \"Boo!\"'",
+                    "updatable": false
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 43,
+                "end": 44,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "c4f49409-42f1-405f-d33b-4518a147efc0"
+                    ]
+                },
+                "currentHeight": 107.140625,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 63
+                        },
+                        "contentStart": 23,
+                        "state": 3
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "0d0c5f47-aa62-402d-92dc-49f281d1ed94",
+                    "resultId": "c4f49409-42f1-405f-d33b-4518a147efc0",
+                    "rows": [
+                        {
+                            "0": "I'm asleep",
+                            "1": "I'm wide awake"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "I'm asleep",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "I'm wide awake",
+                            "field": "1",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 0s"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "-- This will also work\nSELECT 'I''m asleep', 'I\\'m wide awake';",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 45,
+                "end": 45,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "e2ec76b0-03be-4f5b-b5f6-635a3056427c"
+                    ]
+                },
+                "currentHeight": 107.140625,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 52
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "0d0c5f47-aa62-402d-92dc-49f281d1ed94",
+                    "resultId": "e2ec76b0-03be-4f5b-b5f6-635a3056427c",
+                    "rows": [
+                        {
+                            "0": "He said, \"BOO!\"",
+                            "1": "And I said, \"Yikes\""
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "He said, \"BOO!\"",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "And I said, \"Yikes\"",
+                            "field": "1",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 0s"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT \"He said, \"\"BOO!\"\"\", \"And I said, \\\"Yikes\\\"\"",
+                    "updatable": false
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 46,
+                "end": 47,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "1a4c5aae-5ddf-46bc-a526-1c4f1cdc66e7"
+                    ]
+                },
+                "currentHeight": 107.140625,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 153
+                        },
+                        "contentStart": 59,
+                        "state": 3
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "0d0c5f47-aa62-402d-92dc-49f281d1ed94",
+                    "resultId": "1a4c5aae-5ddf-46bc-a526-1c4f1cdc66e7",
+                    "rows": [
+                        {
+                            "0": "In windows to indentify the download path c:\\user\\downloads"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "double blackslash",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 0s"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "-- To write a literal blackslash within a string dobule it\nSELECT \"In windows to indentify the download path c:\\\\user\\\\downloads\" AS `double blackslash`;",
+                    "updatable": false
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 48,
+                "end": 48,
                 "language": "mysql",
                 "currentSet": 1,
                 "statements": [
@@ -4410,10 +4741,10 @@
                         "delimiter": ";",
                         "span": {
                             "start": 0,
-                            "length": 0
+                            "length": 114
                         },
                         "contentStart": 0,
-                        "state": 0
+                        "state": 1
                     }
                 ]
             },
