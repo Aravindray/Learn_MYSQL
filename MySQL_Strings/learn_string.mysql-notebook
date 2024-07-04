@@ -2,29 +2,29 @@
     "type": "MySQLNotebook",
     "version": "1.0",
     "caption": "Untitled",
-    "content": "USE COOKBOOK;\r\n# MySQL Strings divided into 2 types - Binary and Non-binary.\r\n-- Binary will store data like image, mp3, encrypted files.\r\n-- Non-binary will store date like Text with character set and collate.\r\n-- Data type for Binary strings are BINARY, VARBINARY, and BLOB. Data type of non-binary strings are \r\n-- CHAR, VARCHAR and TEXT each of which permit CHARACTER SET and COLLATE attribute.\r\n# CHARACTER SET\r\n-- To display all the character set for nonbinary strings use this statement\r\nSHOW CHARACTER SET;\r\nSET @s = CONVERT('abc' USING utf8mb4); -- All characters as stored as 1 to 4 bytes\r\nSELECT @s, LENGTH(@s), CHAR_LENGTH(@s);\r\nSET @s = CONVERT('abc' USING utf16); -- All characters stored as 2 bytes\r\nSELECT @s, LENGTH(@s), CHAR_LENGTH(@s);\r\n-- It store characters as single byte or multi byte based on the character set.\r\n# Collation\r\n-- To display all the collation use this statement\r\nSHOW COLLATION;\r\n-- Collation will take care of character searching and sorting operations.\r\n-- Examples of collation how it will effect the sorting order\r\nCREATE TABLE tmp_tbl_1 ( c CHAR(3) CHARACTER SET utf8mb4);\r\nINSERT INTO tmp_tbl_1 VALUES ('AAA'), ('bbb'), ('aaa'), ('BBB');\r\nSELECT c from tmp_tbl_1;\r\nSELECT c from tmp_tbl_1 ORDER BY c COLLATE utf8mb4_turkish_ci;\r\nSELECT c from tmp_tbl_1 ORDER BY c COLLATE utf8mb4_tr_0900_as_cs;\r\nSELECT c FROM tmp_tbl_1 ORDER BY c COLLATE utf8mb4_bin;\r\nCREATE TABLE tmp_spanish_tbl (c CHAR(2) CHARACTER SET utf8mb4);\r\nINSERT INTO tmp_spanish_tbl (c) VALUES ('cg'), ('ch'), ('ci'), ('lk'), ('ll'), ('lm');\r\nSELECT c FROM tmp_spanish_tbl ORDER BY c COLLATE utf8mb4_general_ci;\r\nSELECT c FROM tmp_spanish_tbl ORDER BY c COLLATE utf8mb4_spanish2_ci;\r\n# Choosing a string data type\r\nCREATE TABLE tmp_tbl_2 (c1 CHAR(10), c2 VARCHAR(10));\r\nINSERT INTO tmp_tbl_2 (c1, c2) VALUES ('abc       ','abc       ');\r\nSELECT c1, c2, CHAR_LENGTH(c1), CHAR_LENGTH(c2) FROM tmp_tbl_2;\r\nCREATE TABLE tmp_turkish_tbl (c CHAR(3) CHARACTER SET utf8mb4);\r\nINSERT INTO tmp_turkish_tbl VALUES('iii'), ('şşş'), ('ööö'), ('ççç');\r\nSELECT * FROM tmp_turkish_tbl;\r\n# String Literals\r\n-- Enclose the text of string with single quotes and dobule quotes, 'Hello, World!' or \"Hello, World!\"\r\n-- Use Hexadecimal notation x'61626364' is equalant to 'abcd'\r\n-- Use Introducer which means write the character set with underscore, _utf8mb4 'abcd' or _ucs2 'abcd'\r\n-- Use different quotes for example if you set variable to @s = 'I'm asleep'. This would through an error use opposite quotaion like this statement\r\nSELECT \"I'm asleep\", 'He said, \"Boo!\"';\r\n-- This will also work\r\nSELECT 'I''m asleep', 'I\\'m wide awake';\r\nSELECT \"He said, \"\"BOO!\"\"\", \"And I said, \\\"Yikes\\\"\";\r\n-- To write a literal blackslash within a string dobule it\r\nSELECT \"In windows to indentify the download path c:\\\\user\\\\downloads\" AS `double blackslash`;\r\n-- Some of escape sequences are \\', \\\", \\\\, \\b (backslash), \\n (newline or linefeed), \\t (tab) and \\0 (ASCII NULL)",
+    "content": "USE COOKBOOK;\r\n# MySQL Strings divided into 2 types - Binary and Non-binary.\r\n-- Binary will store data like image, mp3, encrypted files.\r\n-- Non-binary will store date like Text with character set and collate.\r\n-- Data type for Binary strings are BINARY, VARBINARY, and BLOB. Data type of non-binary strings are \r\n-- CHAR, VARCHAR and TEXT each of which permit CHARACTER SET and COLLATE attribute.\r\n# CHARACTER SET\r\n-- To display all the character set for nonbinary strings use this statement\r\nSHOW CHARACTER SET;\r\nSET @s = CONVERT('abc' USING utf8mb4); -- All characters as stored as 1 to 4 bytes\r\nSELECT @s, LENGTH(@s), CHAR_LENGTH(@s);\r\nSET @s = CONVERT('abc' USING utf16); -- All characters stored as 2 bytes\r\nSELECT @s, LENGTH(@s), CHAR_LENGTH(@s);\r\n-- It store characters as single byte or multi byte based on the character set.\r\n# Collation\r\n-- To display all the collation use this statement\r\nSHOW COLLATION;\r\n-- Collation will take care of character searching and sorting operations.\r\n-- Examples of collation how it will effect the sorting order\r\nCREATE TABLE tmp_tbl_1 ( c CHAR(3) CHARACTER SET utf8mb4);\r\nINSERT INTO tmp_tbl_1 VALUES ('AAA'), ('bbb'), ('aaa'), ('BBB');\r\nSELECT c from tmp_tbl_1;\r\nSELECT c from tmp_tbl_1 ORDER BY c COLLATE utf8mb4_turkish_ci;\r\nSELECT c from tmp_tbl_1 ORDER BY c COLLATE utf8mb4_tr_0900_as_cs;\r\nSELECT c FROM tmp_tbl_1 ORDER BY c COLLATE utf8mb4_bin;\r\nCREATE TABLE tmp_spanish_tbl (c CHAR(2) CHARACTER SET utf8mb4);\r\nINSERT INTO tmp_spanish_tbl (c) VALUES ('cg'), ('ch'), ('ci'), ('lk'), ('ll'), ('lm');\r\nSELECT c FROM tmp_spanish_tbl ORDER BY c COLLATE utf8mb4_general_ci;\r\nSELECT c FROM tmp_spanish_tbl ORDER BY c COLLATE utf8mb4_spanish2_ci;\r\n# Choosing a string data type\r\nCREATE TABLE tmp_tbl_2 (c1 CHAR(10), c2 VARCHAR(10));\r\nINSERT INTO tmp_tbl_2 (c1, c2) VALUES ('abc       ','abc       ');\r\nSELECT c1, c2, CHAR_LENGTH(c1), CHAR_LENGTH(c2) FROM tmp_tbl_2;\r\nCREATE TABLE tmp_turkish_tbl (c CHAR(3) CHARACTER SET utf8mb4);\r\nINSERT INTO tmp_turkish_tbl VALUES('iii'), ('şşş'), ('ööö'), ('ççç');\r\nSELECT * FROM tmp_turkish_tbl;\r\n# String Literals\r\n-- Enclose the text of string with single quotes and dobule quotes, 'Hello, World!' or \"Hello, World!\"\r\n-- Use Hexadecimal notation x'61626364' is equalant to 'abcd'\r\n-- Use Introducer which means write the character set with underscore, _utf8mb4 'abcd' or _ucs2 'abcd'\r\n-- Use different quotes for example if you set variable to @s = 'I'm asleep'. This would through an error use opposite quotaion like this statement\r\nSELECT \"I'm asleep\", 'He said, \"Boo!\"';\r\n-- This will also work\r\nSELECT 'I''m asleep', 'I\\'m wide awake';\r\nSELECT \"He said, \"\"BOO!\"\"\", \"And I said, \\\"Yikes\\\"\";\r\n-- To write a literal blackslash within a string dobule it\r\nSELECT \"In windows to indentify the download path c:\\\\user\\\\downloads\" AS `double blackslash`;\r\n-- Some of escape sequences are \\', \\\", \\\\, \\b (backslash), \\n (newline or linefeed), \\t (tab) and \\0 (ASCII NULL)\r\nSELECT 0x49276D2061736C656570;\r\n-- Above select value return the hex value, because by default mysql 8.0 set --binary-as-hex is true.\r\n-- To view the atual result invoke the client program with --binary-as-hex = 0\r\n# Checking or changing string character set or collation\r\n",
     "options": {},
     "viewState": {
         "cursorState": [
             {
                 "inSelectionMode": false,
                 "selectionStart": {
-                    "lineNumber": 48,
-                    "column": 115
+                    "lineNumber": 53,
+                    "column": 1
                 },
                 "position": {
-                    "lineNumber": 48,
-                    "column": 115
+                    "lineNumber": 53,
+                    "column": 1
                 }
             }
         ],
         "viewState": {
             "scrollLeft": 0,
             "firstPosition": {
-                "lineNumber": 42,
+                "lineNumber": 45,
                 "column": 1
             },
-            "firstPositionDeltaTop": -4
+            "firstPositionDeltaTop": 55
         },
         "contributionsState": {
             "editor.contrib.folding": {},
@@ -43,7 +43,7 @@
                         {
                             "type": 4,
                             "index": 0,
-                            "resultId": "909f8279-63d2-4cf3-d6e7-25fa9df08370",
+                            "resultId": "a5b4a3cd-458b-405a-e51b-3f65c202f808",
                             "content": "OK, 0 records retrieved in 0s"
                         }
                     ]
@@ -72,7 +72,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "36482414-a741-4555-a900-02631c0308d1"
+                        "ab1fed5d-895a-4320-bf7b-4f98f83a059e"
                     ]
                 },
                 "currentHeight": 36,
@@ -91,8 +91,8 @@
             },
             "data": [
                 {
-                    "tabId": "0d0c5f47-aa62-402d-92dc-49f281d1ed94",
-                    "resultId": "36482414-a741-4555-a900-02631c0308d1",
+                    "tabId": "f97a9683-8c6b-49fc-c8ca-138c9add4e15",
+                    "resultId": "ab1fed5d-895a-4320-bf7b-4f98f83a059e",
                     "rows": [
                         {
                             "0": "armscii8",
@@ -478,7 +478,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "a3b633d1-2d13-4b4c-f1b4-3ecf57f53194"
+                        "8d27fb4d-882f-403f-f3c4-903ce7038ef0"
                     ]
                 },
                 "currentHeight": 36,
@@ -497,8 +497,8 @@
             },
             "data": [
                 {
-                    "tabId": "0d0c5f47-aa62-402d-92dc-49f281d1ed94",
-                    "resultId": "a3b633d1-2d13-4b4c-f1b4-3ecf57f53194",
+                    "tabId": "f97a9683-8c6b-49fc-c8ca-138c9add4e15",
+                    "resultId": "8d27fb4d-882f-403f-f3c4-903ce7038ef0",
                     "rows": [
                         {
                             "0": "abc",
@@ -628,7 +628,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "27512ae1-6137-4d73-d071-2ac681d6d566"
+                        "3ea4b67c-a7d0-4485-8f62-28e62c29fdc2"
                     ]
                 },
                 "currentHeight": 36,
@@ -647,8 +647,8 @@
             },
             "data": [
                 {
-                    "tabId": "0d0c5f47-aa62-402d-92dc-49f281d1ed94",
-                    "resultId": "27512ae1-6137-4d73-d071-2ac681d6d566",
+                    "tabId": "f97a9683-8c6b-49fc-c8ca-138c9add4e15",
+                    "resultId": "3ea4b67c-a7d0-4485-8f62-28e62c29fdc2",
                     "rows": [
                         {
                             "0": "abc",
@@ -737,7 +737,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "96dd16f8-93ef-4380-dead-31ddbdd93667"
+                        "eb2f0322-d72e-4930-98ff-d88d07208f6f"
                     ]
                 },
                 "currentHeight": 36,
@@ -756,8 +756,8 @@
             },
             "data": [
                 {
-                    "tabId": "0d0c5f47-aa62-402d-92dc-49f281d1ed94",
-                    "resultId": "96dd16f8-93ef-4380-dead-31ddbdd93667",
+                    "tabId": "f97a9683-8c6b-49fc-c8ca-138c9add4e15",
+                    "resultId": "eb2f0322-d72e-4930-98ff-d88d07208f6f",
                     "rows": [
                         {
                             "0": "armscii8_bin",
@@ -3543,7 +3543,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "8f39ba3f-2a6c-4cdc-8502-c9d5051f6942"
+                        "5bfc1792-300f-4125-dec6-b83f16ceb40b"
                     ]
                 },
                 "currentHeight": 36,
@@ -3562,8 +3562,8 @@
             },
             "data": [
                 {
-                    "tabId": "0d0c5f47-aa62-402d-92dc-49f281d1ed94",
-                    "resultId": "8f39ba3f-2a6c-4cdc-8502-c9d5051f6942",
+                    "tabId": "f97a9683-8c6b-49fc-c8ca-138c9add4e15",
+                    "resultId": "5bfc1792-300f-4125-dec6-b83f16ceb40b",
                     "rows": [
                         {
                             "0": "AAA"
@@ -3619,7 +3619,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "64c68523-0366-477e-9bb0-13f25353cbc8"
+                        "b00a3828-4f16-4b68-a25a-d6ece582aed6"
                     ]
                 },
                 "currentHeight": 206.5625,
@@ -3638,8 +3638,8 @@
             },
             "data": [
                 {
-                    "tabId": "0d0c5f47-aa62-402d-92dc-49f281d1ed94",
-                    "resultId": "64c68523-0366-477e-9bb0-13f25353cbc8",
+                    "tabId": "f97a9683-8c6b-49fc-c8ca-138c9add4e15",
+                    "resultId": "b00a3828-4f16-4b68-a25a-d6ece582aed6",
                     "rows": [
                         {
                             "0": "AAA"
@@ -3695,7 +3695,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "e474bb89-288e-4562-ee6e-f254494fe0cf"
+                        "fbe22d1a-cfc7-48c1-deb1-63d74c418bae"
                     ]
                 },
                 "currentHeight": 206.5625,
@@ -3714,8 +3714,8 @@
             },
             "data": [
                 {
-                    "tabId": "0d0c5f47-aa62-402d-92dc-49f281d1ed94",
-                    "resultId": "e474bb89-288e-4562-ee6e-f254494fe0cf",
+                    "tabId": "f97a9683-8c6b-49fc-c8ca-138c9add4e15",
+                    "resultId": "fbe22d1a-cfc7-48c1-deb1-63d74c418bae",
                     "rows": [
                         {
                             "0": "aaa"
@@ -3771,7 +3771,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "e5cc84a4-19b1-4d96-fba7-674e4716d1f1"
+                        "d13b49e7-04a3-4bad-b7dd-51127577f695"
                     ]
                 },
                 "currentHeight": 206.5625,
@@ -3790,8 +3790,8 @@
             },
             "data": [
                 {
-                    "tabId": "0d0c5f47-aa62-402d-92dc-49f281d1ed94",
-                    "resultId": "e5cc84a4-19b1-4d96-fba7-674e4716d1f1",
+                    "tabId": "f97a9683-8c6b-49fc-c8ca-138c9add4e15",
+                    "resultId": "d13b49e7-04a3-4bad-b7dd-51127577f695",
                     "rows": [
                         {
                             "0": "AAA"
@@ -3911,7 +3911,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "65741209-081b-4c88-cc60-0ed5e258d50d"
+                        "7fa10fcc-2627-4945-9eca-0bd3cc17bbfc"
                     ]
                 },
                 "currentHeight": 272.84375,
@@ -3930,8 +3930,8 @@
             },
             "data": [
                 {
-                    "tabId": "0d0c5f47-aa62-402d-92dc-49f281d1ed94",
-                    "resultId": "65741209-081b-4c88-cc60-0ed5e258d50d",
+                    "tabId": "f97a9683-8c6b-49fc-c8ca-138c9add4e15",
+                    "resultId": "7fa10fcc-2627-4945-9eca-0bd3cc17bbfc",
                     "rows": [
                         {
                             "0": "cg"
@@ -3993,7 +3993,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "c6530d7b-e445-4624-877d-8ef1c8a9a083"
+                        "adee90a3-0ed8-4b08-f48e-3950621fbf5e"
                     ]
                 },
                 "currentHeight": 272.84375,
@@ -4012,8 +4012,8 @@
             },
             "data": [
                 {
-                    "tabId": "0d0c5f47-aa62-402d-92dc-49f281d1ed94",
-                    "resultId": "c6530d7b-e445-4624-877d-8ef1c8a9a083",
+                    "tabId": "f97a9683-8c6b-49fc-c8ca-138c9add4e15",
+                    "resultId": "adee90a3-0ed8-4b08-f48e-3950621fbf5e",
                     "rows": [
                         {
                             "0": "cg"
@@ -4139,7 +4139,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "f5e2ee2f-2e7f-4031-c323-4c40f7f69659"
+                        "c6281fc8-a244-4659-8c1d-ff2e06228fc6"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -4158,8 +4158,8 @@
             },
             "data": [
                 {
-                    "tabId": "0d0c5f47-aa62-402d-92dc-49f281d1ed94",
-                    "resultId": "f5e2ee2f-2e7f-4031-c323-4c40f7f69659",
+                    "tabId": "f97a9683-8c6b-49fc-c8ca-138c9add4e15",
+                    "resultId": "c6281fc8-a244-4659-8c1d-ff2e06228fc6",
                     "rows": [
                         {
                             "0": "abc",
@@ -4331,7 +4331,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "da3c84e0-423b-4410-fa7a-d61829d1c883"
+                        "78edaa8c-2f81-4651-8ddd-f8d0eef5666a"
                     ]
                 },
                 "currentHeight": 206.5625,
@@ -4350,8 +4350,8 @@
             },
             "data": [
                 {
-                    "tabId": "0d0c5f47-aa62-402d-92dc-49f281d1ed94",
-                    "resultId": "da3c84e0-423b-4410-fa7a-d61829d1c883",
+                    "tabId": "f97a9683-8c6b-49fc-c8ca-138c9add4e15",
+                    "resultId": "78edaa8c-2f81-4651-8ddd-f8d0eef5666a",
                     "rows": [
                         {
                             "0": "iii"
@@ -4407,7 +4407,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "4ede5ddc-a13c-48dc-96db-9bdf7d3a8a0b"
+                        "13f25a6d-b0a7-43dd-f4b2-160ad637b4ad"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -4435,8 +4435,8 @@
             },
             "data": [
                 {
-                    "tabId": "0d0c5f47-aa62-402d-92dc-49f281d1ed94",
-                    "resultId": "4ede5ddc-a13c-48dc-96db-9bdf7d3a8a0b",
+                    "tabId": "f97a9683-8c6b-49fc-c8ca-138c9add4e15",
+                    "resultId": "13f25a6d-b0a7-43dd-f4b2-160ad637b4ad",
                     "rows": [
                         {
                             "0": "I'm asleep",
@@ -4501,7 +4501,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "c4f49409-42f1-405f-d33b-4518a147efc0"
+                        "126b84cf-268a-459e-ecdb-4d2fdd959f4a"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -4520,8 +4520,8 @@
             },
             "data": [
                 {
-                    "tabId": "0d0c5f47-aa62-402d-92dc-49f281d1ed94",
-                    "resultId": "c4f49409-42f1-405f-d33b-4518a147efc0",
+                    "tabId": "f97a9683-8c6b-49fc-c8ca-138c9add4e15",
+                    "resultId": "126b84cf-268a-459e-ecdb-4d2fdd959f4a",
                     "rows": [
                         {
                             "0": "I'm asleep",
@@ -4587,7 +4587,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "e2ec76b0-03be-4f5b-b5f6-635a3056427c"
+                        "7ad57a0a-69ff-4872-f25b-0b2b504309ef"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -4606,8 +4606,8 @@
             },
             "data": [
                 {
-                    "tabId": "0d0c5f47-aa62-402d-92dc-49f281d1ed94",
-                    "resultId": "e2ec76b0-03be-4f5b-b5f6-635a3056427c",
+                    "tabId": "f97a9683-8c6b-49fc-c8ca-138c9add4e15",
+                    "resultId": "7ad57a0a-69ff-4872-f25b-0b2b504309ef",
                     "rows": [
                         {
                             "0": "He said, \"BOO!\"",
@@ -4672,7 +4672,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "1a4c5aae-5ddf-46bc-a526-1c4f1cdc66e7"
+                        "4c43e69b-0cca-430f-b917-28c9cec77402"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -4691,8 +4691,8 @@
             },
             "data": [
                 {
-                    "tabId": "0d0c5f47-aa62-402d-92dc-49f281d1ed94",
-                    "resultId": "1a4c5aae-5ddf-46bc-a526-1c4f1cdc66e7",
+                    "tabId": "f97a9683-8c6b-49fc-c8ca-138c9add4e15",
+                    "resultId": "4c43e69b-0cca-430f-b917-28c9cec77402",
                     "rows": [
                         {
                             "0": "In windows to indentify the download path c:\\user\\downloads"
@@ -4733,7 +4733,66 @@
         {
             "state": {
                 "start": 48,
-                "end": 48,
+                "end": 49,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "a30bd1ef-c8b5-4d54-d8ba-b25f66cb20be"
+                    ]
+                },
+                "currentHeight": 107.140625,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 145
+                        },
+                        "contentStart": 115,
+                        "state": 3
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "f97a9683-8c6b-49fc-c8ca-138c9add4e15",
+                    "resultId": "a30bd1ef-c8b5-4d54-d8ba-b25f66cb20be",
+                    "rows": [
+                        {
+                            "0": "SSdtIGFzbGVlcA=="
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "0x49276D2061736C656570",
+                            "field": "0",
+                            "dataType": {
+                                "type": 11
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 0s"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "-- Some of escape sequences are \\', \\\", \\\\, \\b (backslash), \\n (newline or linefeed), \\t (tab) and \\0 (ASCII NULL)\nSELECT 0x49276D2061736C656570;",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 50,
+                "end": 53,
                 "language": "mysql",
                 "currentSet": 1,
                 "statements": [
@@ -4741,7 +4800,7 @@
                         "delimiter": ";",
                         "span": {
                             "start": 0,
-                            "length": 114
+                            "length": 238
                         },
                         "contentStart": 0,
                         "state": 1
