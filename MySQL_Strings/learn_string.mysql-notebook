@@ -2,18 +2,18 @@
     "type": "MySQLNotebook",
     "version": "1.0",
     "caption": "Untitled",
-    "content": "USE COOKBOOK;\r\n# MySQL Strings divided into 2 types - Binary and Non-binary.\r\n-- Binary will store data like image, mp3, encrypted files.\r\n-- Non-binary will store date like Text with character set and collate.\r\n-- Data type for Binary strings are BINARY, VARBINARY, and BLOB. Data type of non-binary strings are \r\n-- CHAR, VARCHAR and TEXT each of which permit CHARACTER SET and COLLATE attribute.\r\n# CHARACTER SET\r\n-- To display all the character set for nonbinary strings use this statement\r\nSHOW CHARACTER SET;\r\nSET @s = CONVERT('abc' USING utf8mb4); -- All characters as stored as 1 to 4 bytes\r\nSELECT @s, LENGTH(@s), CHAR_LENGTH(@s);\r\nSET @s = CONVERT('abc' USING utf16); -- All characters stored as 2 bytes\r\nSELECT @s, LENGTH(@s), CHAR_LENGTH(@s);\r\n-- It store characters as single byte or multi byte based on the character set.\r\n# Collation\r\n-- To display all the collation use this statement\r\nSHOW COLLATION;\r\n-- Collation will take care of character searching and sorting operations.\r\n-- Examples of collation how it will effect the sorting order\r\nCREATE TABLE tmp_tbl_1 ( c CHAR(3) CHARACTER SET utf8mb4);\r\nINSERT INTO tmp_tbl_1 VALUES ('AAA'), ('bbb'), ('aaa'), ('BBB');\r\nSELECT c from tmp_tbl_1;\r\nSELECT c from tmp_tbl_1 ORDER BY c COLLATE utf8mb4_turkish_ci;\r\nSELECT c from tmp_tbl_1 ORDER BY c COLLATE utf8mb4_tr_0900_as_cs;\r\nSELECT c FROM tmp_tbl_1 ORDER BY c COLLATE utf8mb4_bin;\r\nCREATE TABLE tmp_spanish_tbl (c CHAR(2) CHARACTER SET utf8mb4);\r\nINSERT INTO tmp_spanish_tbl (c) VALUES ('cg'), ('ch'), ('ci'), ('lk'), ('ll'), ('lm');\r\nSELECT c FROM tmp_spanish_tbl ORDER BY c COLLATE utf8mb4_general_ci;\r\nSELECT c FROM tmp_spanish_tbl ORDER BY c COLLATE utf8mb4_spanish2_ci;\r\n# Choosing a string data type\r\nCREATE TABLE tmp_tbl_2 (c1 CHAR(10), c2 VARCHAR(10));\r\nINSERT INTO tmp_tbl_2 (c1, c2) VALUES ('abc       ','abc       ');\r\nSELECT c1, c2, CHAR_LENGTH(c1), CHAR_LENGTH(c2) FROM tmp_tbl_2;\r\nCREATE TABLE tmp_turkish_tbl (c CHAR(3) CHARACTER SET utf8mb4);\r\nINSERT INTO tmp_turkish_tbl VALUES('iii'), ('şşş'), ('ööö'), ('ççç');\r\nSELECT * FROM tmp_turkish_tbl;\r\n# String Literals\r\n-- Enclose the text of string with single quotes and dobule quotes, 'Hello, World!' or \"Hello, World!\"\r\n-- Use Hexadecimal notation x'61626364' is equalant to 'abcd'\r\n-- Use Introducer which means write the character set with underscore, _utf8mb4 'abcd' or _ucs2 'abcd'\r\n-- Use different quotes for example if you set variable to @s = 'I'm asleep'. This would through an error use opposite quotaion like this statement\r\nSELECT \"I'm asleep\", 'He said, \"Boo!\"';\r\n-- This will also work\r\nSELECT 'I''m asleep', 'I\\'m wide awake';\r\nSELECT \"He said, \"\"BOO!\"\"\", \"And I said, \\\"Yikes\\\"\";\r\n-- To write a literal blackslash within a string dobule it\r\nSELECT \"In windows to indentify the download path c:\\\\user\\\\downloads\" AS `double blackslash`;\r\n-- Some of escape sequences are \\', \\\", \\\\, \\b (backslash), \\n (newline or linefeed), \\t (tab) and \\0 (ASCII NULL)\r\nSELECT 0x49276D2061736C656570;\r\n-- Above select value return the hex value, because by default mysql 8.0 set --binary-as-hex is true.\r\n-- To view the atual result invoke the client program with --binary-as-hex = 0\r\n# Checking or changing string character set or collation\r\n",
+    "content": "USE COOKBOOK;\r\n# MySQL Strings divided into 2 types - Binary and Non-binary.\r\n-- Binary will store data like image, mp3, encrypted files.\r\n-- Non-binary will store date like Text with character set and collate.\r\n-- Data type for Binary strings are BINARY, VARBINARY, and BLOB. Data type of non-binary strings are \r\n-- CHAR, VARCHAR and TEXT each of which permit CHARACTER SET and COLLATE attribute.\r\n# CHARACTER SET\r\n-- To display all the character set for nonbinary strings use this statement\r\nSHOW CHARACTER SET;\r\nSET @s = CONVERT('abc' USING utf8mb4); -- All characters as stored as 1 to 4 bytes\r\nSELECT @s, LENGTH(@s), CHAR_LENGTH(@s);\r\nSET @s = CONVERT('abc' USING utf16); -- All characters stored as 2 bytes\r\nSELECT @s, LENGTH(@s), CHAR_LENGTH(@s);\r\n-- It store characters as single byte or multi byte based on the character set.\r\n# Collation\r\n-- To display all the collation use this statement\r\nSHOW COLLATION;\r\n-- Collation will take care of character searching and sorting operations.\r\n-- Examples of collation how it will effect the sorting order\r\nCREATE TABLE tmp_tbl_1 ( c CHAR(3) CHARACTER SET utf8mb4);\r\nINSERT INTO tmp_tbl_1 VALUES ('AAA'), ('bbb'), ('aaa'), ('BBB');\r\nSELECT c from tmp_tbl_1;\r\nSELECT c from tmp_tbl_1 ORDER BY c COLLATE utf8mb4_turkish_ci;\r\nSELECT c from tmp_tbl_1 ORDER BY c COLLATE utf8mb4_tr_0900_as_cs;\r\nSELECT c FROM tmp_tbl_1 ORDER BY c COLLATE utf8mb4_bin;\r\nCREATE TABLE tmp_spanish_tbl (c CHAR(2) CHARACTER SET utf8mb4);\r\nINSERT INTO tmp_spanish_tbl (c) VALUES ('cg'), ('ch'), ('ci'), ('lk'), ('ll'), ('lm');\r\nSELECT c FROM tmp_spanish_tbl ORDER BY c COLLATE utf8mb4_general_ci;\r\nSELECT c FROM tmp_spanish_tbl ORDER BY c COLLATE utf8mb4_spanish2_ci;\r\n# Choosing a string data type\r\nCREATE TABLE tmp_tbl_2 (c1 CHAR(10), c2 VARCHAR(10));\r\nINSERT INTO tmp_tbl_2 (c1, c2) VALUES ('abc       ','abc       ');\r\nSELECT c1, c2, CHAR_LENGTH(c1), CHAR_LENGTH(c2) FROM tmp_tbl_2;\r\nCREATE TABLE tmp_turkish_tbl (c CHAR(3) CHARACTER SET utf8mb4);\r\nINSERT INTO tmp_turkish_tbl VALUES('iii'), ('şşş'), ('ööö'), ('ççç');\r\nSELECT * FROM tmp_turkish_tbl;\r\n# String Literals\r\n-- Enclose the text of string with single quotes and dobule quotes, 'Hello, World!' or \"Hello, World!\"\r\n-- Use Hexadecimal notation x'61626364' is equalant to 'abcd'\r\n-- Use Introducer which means write the character set with underscore, _utf8mb4 'abcd' or _ucs2 'abcd'\r\n-- Use different quotes for example if you set variable to @s = 'I'm asleep'. This would through an error use opposite quotaion like this statement\r\nSELECT \"I'm asleep\", 'He said, \"Boo!\"';\r\n-- This will also work\r\nSELECT 'I''m asleep', 'I\\'m wide awake';\r\nSELECT \"He said, \"\"BOO!\"\"\", \"And I said, \\\"Yikes\\\"\";\r\n-- To write a literal blackslash within a string dobule it\r\nSELECT \"In windows to indentify the download path c:\\\\user\\\\downloads\" AS `double blackslash`;\r\n-- Some of escape sequences are \\', \\\", \\\\, \\b (backslash), \\n (newline or linefeed), \\t (tab) and \\0 (ASCII NULL)\r\nSELECT 0x49276D2061736C656570;\r\n-- Above select value return the hex value, because by default mysql 8.0 set --binary-as-hex is true.\r\n-- To view the atual result invoke the client program with --binary-as-hex = 0\r\n# Checking or changing string character set or collation\r\n-- To check the string character set or collation user CHARASET() or COLLATION() funcion.\r\n-- To change string from one character set to another use CONVERT(... USING ...) function to change collation use COLLATE operator.\r\nSELECT USER(), CHARSET(USER()), COLLATION(USER());\r\nSET NAMES 'utf8mb4';\r\nSELECT CHARSET('abc'), COLLATION('abc');\r\nSET NAMES 'utf8mb4' COLLATE 'utf8mb4_bin';\r\nSELECT CHARSET('abc'), COLLATION('abc');\r\nSET @s1 = _latin1 'my string', @s2 = CONVERT(@s1 USING utf8mb4);\r\nSELECT @s1, @s2, CHARSET(@s1), CHARSET(@s2);\r\nSET @s1 = _latin1 'my string', @s2 = @s1 COLLATE latin1_spanish_ci;\r\nSELECT @s1, @s2, COLLATION(@s1), COLLATION(@s2);\r\n-- New collation must be legal for the character set of the string. If it fails it through an error\r\nSELECT _latin1 'abc' COLLATE 'utf8mb4_bin';\r\nSET @s1 = _latin1 'my string';\r\nSET @s2 = CONVERT(@s1 USING utf8mb4) COLLATE utf8mb4_spanish_ci;\r\nSELECT @s1, CHARSET(@s1), COLLATION(@s1), @s2, CHARSET(@s2), COLLATION(@s2);\r\n-- CONVERT() function also convert binary string to nonbinary string and vice versa.\r\nSET @s1 = _latin1 'my string';\r\nSET @s2 = CONVERT(@s1 USING binary);\r\nSET @s3 = CONVERT(@s2 USING utf8mb4);\r\nSELECT @s1, CHARSET(@s1), @s2, CHARSET(@s2), @s3, CHARSET(@s3);\r\n-- I think binary-as-hex is enabled that's why the error presist.\r\nSELECT @s1, @s2, @s3;\r\nSELECT CHARSET(@s1), CHARSET(@s2), CHARSET(@s3);\r\nSELECT @s3;\r\nSET @s3 = CONVERT(@s2 USING utf8mb4);\r\nSELECT @s3;\r\nSELECT @s2;\r\n-- Another alternative method to convert nonbinary string to binary is CAST(... AS ...) function\r\nSET @s4 = CAST(@s1 AS binary);\r\nSELECT @s1, CHARSET(@s1), @s4, CHARSET(@s4);\r\n",
     "options": {},
     "viewState": {
         "cursorState": [
             {
                 "inSelectionMode": false,
                 "selectionStart": {
-                    "lineNumber": 53,
+                    "lineNumber": 84,
                     "column": 1
                 },
                 "position": {
-                    "lineNumber": 53,
+                    "lineNumber": 84,
                     "column": 1
                 }
             }
@@ -21,10 +21,10 @@
         "viewState": {
             "scrollLeft": 0,
             "firstPosition": {
-                "lineNumber": 45,
+                "lineNumber": 78,
                 "column": 1
             },
-            "firstPositionDeltaTop": 55
+            "firstPositionDeltaTop": 61
         },
         "contributionsState": {
             "editor.contrib.folding": {},
@@ -43,7 +43,7 @@
                         {
                             "type": 4,
                             "index": 0,
-                            "resultId": "a5b4a3cd-458b-405a-e51b-3f65c202f808",
+                            "resultId": "25da668a-c950-4b22-a798-1da6a15cb774",
                             "content": "OK, 0 records retrieved in 0s"
                         }
                     ]
@@ -72,7 +72,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "ab1fed5d-895a-4320-bf7b-4f98f83a059e"
+                        "807a897e-278f-47a4-b5fd-6f7832348280"
                     ]
                 },
                 "currentHeight": 36,
@@ -91,8 +91,8 @@
             },
             "data": [
                 {
-                    "tabId": "f97a9683-8c6b-49fc-c8ca-138c9add4e15",
-                    "resultId": "ab1fed5d-895a-4320-bf7b-4f98f83a059e",
+                    "tabId": "3cbdebd0-32a5-4df0-bc71-bca4dcc54be5",
+                    "resultId": "807a897e-278f-47a4-b5fd-6f7832348280",
                     "rows": [
                         {
                             "0": "armscii8",
@@ -478,7 +478,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "8d27fb4d-882f-403f-f3c4-903ce7038ef0"
+                        "46bb26a9-70ef-40ec-a243-45c001dda085"
                     ]
                 },
                 "currentHeight": 36,
@@ -497,8 +497,8 @@
             },
             "data": [
                 {
-                    "tabId": "f97a9683-8c6b-49fc-c8ca-138c9add4e15",
-                    "resultId": "8d27fb4d-882f-403f-f3c4-903ce7038ef0",
+                    "tabId": "3cbdebd0-32a5-4df0-bc71-bca4dcc54be5",
+                    "resultId": "46bb26a9-70ef-40ec-a243-45c001dda085",
                     "rows": [
                         {
                             "0": "abc",
@@ -628,7 +628,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "3ea4b67c-a7d0-4485-8f62-28e62c29fdc2"
+                        "59c6816b-0196-48e3-f329-5d83e6d10575"
                     ]
                 },
                 "currentHeight": 36,
@@ -647,8 +647,8 @@
             },
             "data": [
                 {
-                    "tabId": "f97a9683-8c6b-49fc-c8ca-138c9add4e15",
-                    "resultId": "3ea4b67c-a7d0-4485-8f62-28e62c29fdc2",
+                    "tabId": "3cbdebd0-32a5-4df0-bc71-bca4dcc54be5",
+                    "resultId": "59c6816b-0196-48e3-f329-5d83e6d10575",
                     "rows": [
                         {
                             "0": "abc",
@@ -737,7 +737,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "eb2f0322-d72e-4930-98ff-d88d07208f6f"
+                        "afd92bca-f2ac-4e2f-ba5a-2f5aff958ae3"
                     ]
                 },
                 "currentHeight": 36,
@@ -756,8 +756,8 @@
             },
             "data": [
                 {
-                    "tabId": "f97a9683-8c6b-49fc-c8ca-138c9add4e15",
-                    "resultId": "eb2f0322-d72e-4930-98ff-d88d07208f6f",
+                    "tabId": "3cbdebd0-32a5-4df0-bc71-bca4dcc54be5",
+                    "resultId": "afd92bca-f2ac-4e2f-ba5a-2f5aff958ae3",
                     "rows": [
                         {
                             "0": "armscii8_bin",
@@ -3543,7 +3543,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "5bfc1792-300f-4125-dec6-b83f16ceb40b"
+                        "41f06323-7825-4f89-e906-45d5850ecaef"
                     ]
                 },
                 "currentHeight": 36,
@@ -3562,8 +3562,8 @@
             },
             "data": [
                 {
-                    "tabId": "f97a9683-8c6b-49fc-c8ca-138c9add4e15",
-                    "resultId": "5bfc1792-300f-4125-dec6-b83f16ceb40b",
+                    "tabId": "3cbdebd0-32a5-4df0-bc71-bca4dcc54be5",
+                    "resultId": "41f06323-7825-4f89-e906-45d5850ecaef",
                     "rows": [
                         {
                             "0": "AAA"
@@ -3619,7 +3619,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "b00a3828-4f16-4b68-a25a-d6ece582aed6"
+                        "5a7092e1-42d1-4445-afd3-16181387b3af"
                     ]
                 },
                 "currentHeight": 206.5625,
@@ -3638,8 +3638,8 @@
             },
             "data": [
                 {
-                    "tabId": "f97a9683-8c6b-49fc-c8ca-138c9add4e15",
-                    "resultId": "b00a3828-4f16-4b68-a25a-d6ece582aed6",
+                    "tabId": "3cbdebd0-32a5-4df0-bc71-bca4dcc54be5",
+                    "resultId": "5a7092e1-42d1-4445-afd3-16181387b3af",
                     "rows": [
                         {
                             "0": "AAA"
@@ -3695,7 +3695,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "fbe22d1a-cfc7-48c1-deb1-63d74c418bae"
+                        "7ade320f-5177-4a26-8850-f0a635b76e4a"
                     ]
                 },
                 "currentHeight": 206.5625,
@@ -3714,8 +3714,8 @@
             },
             "data": [
                 {
-                    "tabId": "f97a9683-8c6b-49fc-c8ca-138c9add4e15",
-                    "resultId": "fbe22d1a-cfc7-48c1-deb1-63d74c418bae",
+                    "tabId": "3cbdebd0-32a5-4df0-bc71-bca4dcc54be5",
+                    "resultId": "7ade320f-5177-4a26-8850-f0a635b76e4a",
                     "rows": [
                         {
                             "0": "aaa"
@@ -3771,7 +3771,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "d13b49e7-04a3-4bad-b7dd-51127577f695"
+                        "b2be9167-28da-4a21-f563-cfa444bd6709"
                     ]
                 },
                 "currentHeight": 206.5625,
@@ -3790,8 +3790,8 @@
             },
             "data": [
                 {
-                    "tabId": "f97a9683-8c6b-49fc-c8ca-138c9add4e15",
-                    "resultId": "d13b49e7-04a3-4bad-b7dd-51127577f695",
+                    "tabId": "3cbdebd0-32a5-4df0-bc71-bca4dcc54be5",
+                    "resultId": "b2be9167-28da-4a21-f563-cfa444bd6709",
                     "rows": [
                         {
                             "0": "AAA"
@@ -3911,7 +3911,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "7fa10fcc-2627-4945-9eca-0bd3cc17bbfc"
+                        "a0ec0b2d-5c10-4ce1-85c1-025a64ac19ee"
                     ]
                 },
                 "currentHeight": 272.84375,
@@ -3930,8 +3930,8 @@
             },
             "data": [
                 {
-                    "tabId": "f97a9683-8c6b-49fc-c8ca-138c9add4e15",
-                    "resultId": "7fa10fcc-2627-4945-9eca-0bd3cc17bbfc",
+                    "tabId": "3cbdebd0-32a5-4df0-bc71-bca4dcc54be5",
+                    "resultId": "a0ec0b2d-5c10-4ce1-85c1-025a64ac19ee",
                     "rows": [
                         {
                             "0": "cg"
@@ -3993,7 +3993,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "adee90a3-0ed8-4b08-f48e-3950621fbf5e"
+                        "8080eec6-6360-430d-a7e1-cc28f386c4ca"
                     ]
                 },
                 "currentHeight": 272.84375,
@@ -4012,8 +4012,8 @@
             },
             "data": [
                 {
-                    "tabId": "f97a9683-8c6b-49fc-c8ca-138c9add4e15",
-                    "resultId": "adee90a3-0ed8-4b08-f48e-3950621fbf5e",
+                    "tabId": "3cbdebd0-32a5-4df0-bc71-bca4dcc54be5",
+                    "resultId": "8080eec6-6360-430d-a7e1-cc28f386c4ca",
                     "rows": [
                         {
                             "0": "cg"
@@ -4139,7 +4139,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "c6281fc8-a244-4659-8c1d-ff2e06228fc6"
+                        "bca90fcb-6cc9-4ed1-8d2b-abf9ed1bf169"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -4158,8 +4158,8 @@
             },
             "data": [
                 {
-                    "tabId": "f97a9683-8c6b-49fc-c8ca-138c9add4e15",
-                    "resultId": "c6281fc8-a244-4659-8c1d-ff2e06228fc6",
+                    "tabId": "3cbdebd0-32a5-4df0-bc71-bca4dcc54be5",
+                    "resultId": "bca90fcb-6cc9-4ed1-8d2b-abf9ed1bf169",
                     "rows": [
                         {
                             "0": "abc",
@@ -4331,7 +4331,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "78edaa8c-2f81-4651-8ddd-f8d0eef5666a"
+                        "c8b30186-affa-4207-8344-8f8b0faebe3f"
                     ]
                 },
                 "currentHeight": 206.5625,
@@ -4350,8 +4350,8 @@
             },
             "data": [
                 {
-                    "tabId": "f97a9683-8c6b-49fc-c8ca-138c9add4e15",
-                    "resultId": "78edaa8c-2f81-4651-8ddd-f8d0eef5666a",
+                    "tabId": "3cbdebd0-32a5-4df0-bc71-bca4dcc54be5",
+                    "resultId": "c8b30186-affa-4207-8344-8f8b0faebe3f",
                     "rows": [
                         {
                             "0": "iii"
@@ -4407,7 +4407,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "13f25a6d-b0a7-43dd-f4b2-160ad637b4ad"
+                        "08f66366-d41d-4bd9-e99a-4469c73eebf6"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -4435,8 +4435,8 @@
             },
             "data": [
                 {
-                    "tabId": "f97a9683-8c6b-49fc-c8ca-138c9add4e15",
-                    "resultId": "13f25a6d-b0a7-43dd-f4b2-160ad637b4ad",
+                    "tabId": "3cbdebd0-32a5-4df0-bc71-bca4dcc54be5",
+                    "resultId": "08f66366-d41d-4bd9-e99a-4469c73eebf6",
                     "rows": [
                         {
                             "0": "I'm asleep",
@@ -4501,7 +4501,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "126b84cf-268a-459e-ecdb-4d2fdd959f4a"
+                        "0f68563f-35c8-4c98-f5ae-4a6c07abd598"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -4520,8 +4520,8 @@
             },
             "data": [
                 {
-                    "tabId": "f97a9683-8c6b-49fc-c8ca-138c9add4e15",
-                    "resultId": "126b84cf-268a-459e-ecdb-4d2fdd959f4a",
+                    "tabId": "3cbdebd0-32a5-4df0-bc71-bca4dcc54be5",
+                    "resultId": "0f68563f-35c8-4c98-f5ae-4a6c07abd598",
                     "rows": [
                         {
                             "0": "I'm asleep",
@@ -4587,7 +4587,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "7ad57a0a-69ff-4872-f25b-0b2b504309ef"
+                        "df987c62-f5fc-4ad5-e15f-dc60cbdc7e28"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -4606,8 +4606,8 @@
             },
             "data": [
                 {
-                    "tabId": "f97a9683-8c6b-49fc-c8ca-138c9add4e15",
-                    "resultId": "7ad57a0a-69ff-4872-f25b-0b2b504309ef",
+                    "tabId": "3cbdebd0-32a5-4df0-bc71-bca4dcc54be5",
+                    "resultId": "df987c62-f5fc-4ad5-e15f-dc60cbdc7e28",
                     "rows": [
                         {
                             "0": "He said, \"BOO!\"",
@@ -4672,7 +4672,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "4c43e69b-0cca-430f-b917-28c9cec77402"
+                        "8a442c4c-bd39-4a12-cc60-6e79f0863da2"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -4691,8 +4691,8 @@
             },
             "data": [
                 {
-                    "tabId": "f97a9683-8c6b-49fc-c8ca-138c9add4e15",
-                    "resultId": "4c43e69b-0cca-430f-b917-28c9cec77402",
+                    "tabId": "3cbdebd0-32a5-4df0-bc71-bca4dcc54be5",
+                    "resultId": "8a442c4c-bd39-4a12-cc60-6e79f0863da2",
                     "rows": [
                         {
                             "0": "In windows to indentify the download path c:\\user\\downloads"
@@ -4738,7 +4738,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "a30bd1ef-c8b5-4d54-d8ba-b25f66cb20be"
+                        "7462f242-9d1b-464f-d477-56417781fdc7"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -4757,8 +4757,8 @@
             },
             "data": [
                 {
-                    "tabId": "f97a9683-8c6b-49fc-c8ca-138c9add4e15",
-                    "resultId": "a30bd1ef-c8b5-4d54-d8ba-b25f66cb20be",
+                    "tabId": "3cbdebd0-32a5-4df0-bc71-bca4dcc54be5",
+                    "resultId": "7462f242-9d1b-464f-d477-56417781fdc7",
                     "rows": [
                         {
                             "0": "SSdtIGFzbGVlcA=="
@@ -4792,7 +4792,1570 @@
         {
             "state": {
                 "start": 50,
-                "end": 53,
+                "end": 55,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "d92100e8-c089-42fa-d67b-aaab1ba78c84"
+                    ]
+                },
+                "currentHeight": 36,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 510
+                        },
+                        "contentStart": 460,
+                        "state": 3
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "3cbdebd0-32a5-4df0-bc71-bca4dcc54be5",
+                    "resultId": "d92100e8-c089-42fa-d67b-aaab1ba78c84",
+                    "rows": [
+                        {
+                            "0": "cbuser@localhost",
+                            "1": "utf8mb3",
+                            "2": "utf8mb3_general_ci"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "USER()",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "CHARSET(USER())",
+                            "field": "1",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "COLLATION(USER())",
+                            "field": "2",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 0s"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "-- Above select value return the hex value, because by default mysql 8.0 set --binary-as-hex is true.\n-- To view the atual result invoke the client program with --binary-as-hex = 0\n# Checking or changing string character set or collation\n-- To check the string character set or collation user CHARASET() or COLLATION() funcion.\n-- To change string from one character set to another use CONVERT() function to change collation use COLLATE operator.\nSELECT USER(), CHARSET(USER()), COLLATION(USER());",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 56,
+                "end": 56,
+                "language": "mysql",
+                "result": {
+                    "type": "text",
+                    "text": [
+                        {
+                            "type": 4,
+                            "index": 0,
+                            "resultId": "3fc6c166-6958-4b03-ad32-2419d489a6ee",
+                            "content": "OK, 0 records retrieved in 0s"
+                        }
+                    ]
+                },
+                "currentHeight": 28,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 20
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": []
+        },
+        {
+            "state": {
+                "start": 57,
+                "end": 57,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "8ab8dd59-477b-4364-92e7-3eb0675a9ec2"
+                    ]
+                },
+                "currentHeight": 36,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 40
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "3cbdebd0-32a5-4df0-bc71-bca4dcc54be5",
+                    "resultId": "8ab8dd59-477b-4364-92e7-3eb0675a9ec2",
+                    "rows": [
+                        {
+                            "0": "utf8mb4",
+                            "1": "utf8mb4_0900_ai_ci"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "CHARSET('abc')",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "COLLATION('abc')",
+                            "field": "1",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 0s"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT CHARSET('abc'), COLLATION('abc')",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 58,
+                "end": 58,
+                "language": "mysql",
+                "result": {
+                    "type": "text",
+                    "text": [
+                        {
+                            "type": 4,
+                            "index": 0,
+                            "resultId": "a2489822-71be-4d9a-d83e-2ce5d28be095",
+                            "content": "OK, 0 records retrieved in 1.227ms"
+                        }
+                    ]
+                },
+                "currentHeight": 28,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 42
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": []
+        },
+        {
+            "state": {
+                "start": 59,
+                "end": 59,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "762c7fee-ce51-45cf-ebdf-ccf2d582c641"
+                    ]
+                },
+                "currentHeight": 36,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 40
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "3cbdebd0-32a5-4df0-bc71-bca4dcc54be5",
+                    "resultId": "762c7fee-ce51-45cf-ebdf-ccf2d582c641",
+                    "rows": [
+                        {
+                            "0": "utf8mb4",
+                            "1": "utf8mb4_bin"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "CHARSET('abc')",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "COLLATION('abc')",
+                            "field": "1",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 0s"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT CHARSET('abc'), COLLATION('abc')",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 60,
+                "end": 60,
+                "language": "mysql",
+                "result": {
+                    "type": "text",
+                    "text": [
+                        {
+                            "type": 4,
+                            "index": 0,
+                            "resultId": "217704a4-87e8-416b-d12e-a70673cdff8a",
+                            "content": "OK, 0 records retrieved in 0s"
+                        }
+                    ]
+                },
+                "currentHeight": 28,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 64
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": []
+        },
+        {
+            "state": {
+                "start": 61,
+                "end": 61,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "6ef5f7e8-00e0-4b07-d6d0-334e446e7ff8"
+                    ]
+                },
+                "currentHeight": 107.140625,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 44
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "3cbdebd0-32a5-4df0-bc71-bca4dcc54be5",
+                    "resultId": "6ef5f7e8-00e0-4b07-d6d0-334e446e7ff8",
+                    "rows": [
+                        {
+                            "0": "my string",
+                            "1": null,
+                            "2": "latin1",
+                            "3": "utf8mb4"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "@s1",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "@s2",
+                            "field": "1",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "CHARSET(@s1)",
+                            "field": "2",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "CHARSET(@s2)",
+                            "field": "3",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 0s"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT @s1, @s2, CHARSET(@s1), CHARSET(@s2)",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 62,
+                "end": 62,
+                "language": "mysql",
+                "result": {
+                    "type": "text",
+                    "text": [
+                        {
+                            "type": 4,
+                            "index": 0,
+                            "resultId": "3fa79f1d-f2a9-48b8-bb22-6631b50de2c1",
+                            "content": "OK, 0 records retrieved in 3.38ms"
+                        }
+                    ]
+                },
+                "currentHeight": 28,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 67
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": []
+        },
+        {
+            "state": {
+                "start": 63,
+                "end": 63,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "9aacb55a-a62e-4070-b4e2-52e378dfa8ee"
+                    ]
+                },
+                "currentHeight": 107.140625,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 48
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "3cbdebd0-32a5-4df0-bc71-bca4dcc54be5",
+                    "resultId": "9aacb55a-a62e-4070-b4e2-52e378dfa8ee",
+                    "rows": [
+                        {
+                            "0": "my string",
+                            "1": "my string",
+                            "2": "latin1_swedish_ci",
+                            "3": "latin1_spanish_ci"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "@s1",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "@s2",
+                            "field": "1",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "COLLATION(@s1)",
+                            "field": "2",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "COLLATION(@s2)",
+                            "field": "3",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 6.886ms"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT @s1, @s2, COLLATION(@s1), COLLATION(@s2)",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 64,
+                "end": 65,
+                "language": "mysql",
+                "result": {
+                    "type": "text",
+                    "text": [
+                        {
+                            "type": 0,
+                            "index": 0,
+                            "content": "MySQL Error (1253): ClassicSession.run_sql: COLLATION 'utf8mb4_bin' is not valid for CHARACTER SET 'latin1'",
+                            "language": "ansi"
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": ""
+                    }
+                },
+                "currentHeight": 28,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 143
+                        },
+                        "contentStart": 100,
+                        "state": 3
+                    }
+                ]
+            },
+            "data": []
+        },
+        {
+            "state": {
+                "start": 66,
+                "end": 67,
+                "language": "mysql",
+                "result": {
+                    "type": "text",
+                    "text": [
+                        {
+                            "type": 4,
+                            "index": 0,
+                            "resultId": "66877ed6-d0c4-46b7-a402-3cdaa7b30679",
+                            "content": "OK, 0 records retrieved in 0s"
+                        },
+                        {
+                            "type": 4,
+                            "index": 1,
+                            "resultId": "9a9684e4-589e-4206-a6d6-7d63d4454c9c",
+                            "content": "OK, 0 records retrieved in 4.694ms"
+                        }
+                    ]
+                },
+                "currentHeight": 28,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 30
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    },
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 30,
+                            "length": 65
+                        },
+                        "contentStart": 31,
+                        "state": 3
+                    }
+                ]
+            },
+            "data": []
+        },
+        {
+            "state": {
+                "start": 68,
+                "end": 68,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "1455eb29-9ed5-477c-9822-94d0cfc3c186"
+                    ]
+                },
+                "currentHeight": 107.140625,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 76
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "3cbdebd0-32a5-4df0-bc71-bca4dcc54be5",
+                    "resultId": "1455eb29-9ed5-477c-9822-94d0cfc3c186",
+                    "rows": [
+                        {
+                            "0": "my string",
+                            "1": "latin1",
+                            "2": "latin1_swedish_ci",
+                            "3": "my string",
+                            "4": "utf8mb4",
+                            "5": "utf8mb4_spanish_ci"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "@s1",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "CHARSET(@s1)",
+                            "field": "1",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "COLLATION(@s1)",
+                            "field": "2",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "@s2",
+                            "field": "3",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "CHARSET(@s2)",
+                            "field": "4",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "COLLATION(@s2)",
+                            "field": "5",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 1.674ms"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT @s1, CHARSET(@s1), COLLATION(@s1), @s2, CHARSET(@s2), COLLATION(@s2)",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 69,
+                "end": 73,
+                "language": "mysql",
+                "result": {
+                    "type": "text",
+                    "text": [
+                        {
+                            "type": 4,
+                            "index": 0,
+                            "resultId": "3a1f477c-caee-46be-9717-98ac34181bc2",
+                            "content": "OK, 0 records retrieved in 0s"
+                        },
+                        {
+                            "type": 4,
+                            "index": 2,
+                            "resultId": "4e797ad0-160a-4351-fd1b-a376b83348b6",
+                            "content": "OK, 0 records retrieved in 0.988ms"
+                        },
+                        {
+                            "type": 0,
+                            "index": 4,
+                            "content": "MySQL Error (1064): ClassicSession.run_sql: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'ET @s3 = CONVERT(@s2 USING utf8mb4)' at line 1",
+                            "language": "ansi"
+                        },
+                        {
+                            "type": 0,
+                            "index": 6,
+                            "content": "MySQL Error (1064): ClassicSession.run_sql: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'LECT @s1, CHARSET(@s1), @s2, CHARSET(@s2), @s3, CHARSET(@s3)' at line 1",
+                            "language": "ansi"
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": ""
+                    }
+                },
+                "currentHeight": 28,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 115
+                        },
+                        "contentStart": 85,
+                        "state": 0
+                    },
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 115,
+                            "length": 1
+                        },
+                        "contentStart": 115,
+                        "state": 0
+                    },
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 116,
+                            "length": 37
+                        },
+                        "contentStart": 117,
+                        "state": 0
+                    },
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 153,
+                            "length": 1
+                        },
+                        "contentStart": 153,
+                        "state": 0
+                    },
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 154,
+                            "length": 38
+                        },
+                        "contentStart": 155,
+                        "state": 0
+                    },
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 192,
+                            "length": 1
+                        },
+                        "contentStart": 192,
+                        "state": 0
+                    },
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 193,
+                            "length": 61
+                        },
+                        "contentStart": 194,
+                        "state": 3
+                    }
+                ]
+            },
+            "data": []
+        },
+        {
+            "state": {
+                "start": 74,
+                "end": 75,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "75dd9d56-2bb8-4ebe-e1f7-45eeeacf003e"
+                    ]
+                },
+                "currentHeight": 36,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 87
+                        },
+                        "contentStart": 66,
+                        "state": 3
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "3cbdebd0-32a5-4df0-bc71-bca4dcc54be5",
+                    "resultId": "75dd9d56-2bb8-4ebe-e1f7-45eeeacf003e",
+                    "rows": [
+                        {
+                            "0": "my string",
+                            "1": {},
+                            "2": null
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "@s1",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "@s2",
+                            "field": "1",
+                            "dataType": {
+                                "type": 24
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "@s3",
+                            "field": "2",
+                            "dataType": {
+                                "type": 11
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 0.577ms"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "-- I think binary-as-hex is enabled that's why the error presist.\nSELECT @s1, @s2, @s3;",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 76,
+                "end": 76,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "a1036213-b1a9-42ed-f8d4-32238d641f4b"
+                    ]
+                },
+                "currentHeight": 36,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 48
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "3cbdebd0-32a5-4df0-bc71-bca4dcc54be5",
+                    "resultId": "a1036213-b1a9-42ed-f8d4-32238d641f4b",
+                    "rows": [
+                        {
+                            "0": "latin1",
+                            "1": "binary",
+                            "2": "binary"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "CHARSET(@s1)",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "CHARSET(@s2)",
+                            "field": "1",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "CHARSET(@s3)",
+                            "field": "2",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 0s"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT CHARSET(@s1), CHARSET(@s2), CHARSET(@s3)",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 77,
+                "end": 77,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "38fc84e9-9478-41db-e5a8-ed93c8672c35"
+                    ]
+                },
+                "currentHeight": 105.140625,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 11
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "3cbdebd0-32a5-4df0-bc71-bca4dcc54be5",
+                    "resultId": "38fc84e9-9478-41db-e5a8-ed93c8672c35",
+                    "rows": [
+                        {
+                            "0": null
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "@s3",
+                            "field": "0",
+                            "dataType": {
+                                "type": 11
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 0s"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT @s3",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 78,
+                "end": 78,
+                "language": "mysql",
+                "result": {
+                    "type": "text",
+                    "text": [
+                        {
+                            "type": 4,
+                            "index": 0,
+                            "resultId": "e037604b-72ab-40ad-e874-04ba42c8dd4a",
+                            "content": "OK, 0 records retrieved in 0s"
+                        }
+                    ]
+                },
+                "currentHeight": 34,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 37
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": []
+        },
+        {
+            "state": {
+                "start": 79,
+                "end": 79,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "80f44615-ef71-4631-b14b-a01374868846"
+                    ]
+                },
+                "currentHeight": 107.140625,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 11
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "3cbdebd0-32a5-4df0-bc71-bca4dcc54be5",
+                    "resultId": "80f44615-ef71-4631-b14b-a01374868846",
+                    "rows": [
+                        {
+                            "0": "my string"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "@s3",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 1.292ms"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT @s3",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 80,
+                "end": 80,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "06ec64e4-6ab7-4c78-eca9-af946af46506"
+                    ]
+                },
+                "currentHeight": 105.140625,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 11
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "3cbdebd0-32a5-4df0-bc71-bca4dcc54be5",
+                    "resultId": "06ec64e4-6ab7-4c78-eca9-af946af46506",
+                    "rows": [
+                        {
+                            "0": {}
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "@s2",
+                            "field": "0",
+                            "dataType": {
+                                "type": 24
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 0s"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT @s2",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 81,
+                "end": 82,
+                "language": "mysql",
+                "result": {
+                    "type": "text",
+                    "text": [
+                        {
+                            "type": 4,
+                            "index": 0,
+                            "resultId": "09c9bc03-c6bf-48dc-b3b9-73f3a9ab1888",
+                            "content": "OK, 0 records retrieved in 10.882ms"
+                        }
+                    ]
+                },
+                "currentHeight": 34,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 127
+                        },
+                        "contentStart": 97,
+                        "state": 3
+                    }
+                ]
+            },
+            "data": []
+        },
+        {
+            "state": {
+                "start": 83,
+                "end": 83,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "fbef51f0-a347-40a8-e35c-ff2caaeaff18"
+                    ]
+                },
+                "currentHeight": 107.140625,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 44
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "3cbdebd0-32a5-4df0-bc71-bca4dcc54be5",
+                    "resultId": "fbef51f0-a347-40a8-e35c-ff2caaeaff18",
+                    "rows": [
+                        {
+                            "0": "my string",
+                            "1": "latin1",
+                            "2": {},
+                            "3": "binary"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "@s1",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "CHARSET(@s1)",
+                            "field": "1",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "@s4",
+                            "field": "2",
+                            "dataType": {
+                                "type": 24
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "CHARSET(@s4)",
+                            "field": "3",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 0s"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT @s1, CHARSET(@s1), @s4, CHARSET(@s4)",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 84,
+                "end": 84,
                 "language": "mysql",
                 "currentSet": 1,
                 "statements": [
@@ -4800,10 +6363,10 @@
                         "delimiter": ";",
                         "span": {
                             "start": 0,
-                            "length": 238
+                            "length": 0
                         },
                         "contentStart": 0,
-                        "state": 1
+                        "state": 0
                     }
                 ]
             },
