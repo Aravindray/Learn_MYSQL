@@ -2,18 +2,18 @@
     "type": "MySQLNotebook",
     "version": "1.0",
     "caption": "Untitled",
-    "content": "USE COOKBOOK;\r\n# MySQL Strings divided into 2 types - Binary and Non-binary.\r\n-- Binary will store data like image, mp3, encrypted files.\r\n-- Non-binary will store date like Text with character set and collate.\r\n-- Data type for Binary strings are BINARY, VARBINARY, and BLOB. Data type of non-binary strings are \r\n-- CHAR, VARCHAR and TEXT each of which permit CHARACTER SET and COLLATE attribute.\r\n# CHARACTER SET\r\n-- To display all the character set for nonbinary strings use this statement\r\nSHOW CHARACTER SET;\r\nSET @s = CONVERT('abc' USING utf8mb4); -- All characters as stored as 1 to 4 bytes\r\nSELECT @s, LENGTH(@s), CHAR_LENGTH(@s);\r\nSET @s = CONVERT('abc' USING utf16); -- All characters stored as 2 bytes\r\nSELECT @s, LENGTH(@s), CHAR_LENGTH(@s);\r\n-- It store characters as single byte or multi byte based on the character set.\r\n# Collation\r\n-- To display all the collation use this statement\r\nSHOW COLLATION;\r\n-- Collation will take care of character searching and sorting operations.\r\n-- Examples of collation how it will effect the sorting order\r\nCREATE TABLE tmp_tbl_1 ( c CHAR(3) CHARACTER SET utf8mb4);\r\nINSERT INTO tmp_tbl_1 VALUES ('AAA'), ('bbb'), ('aaa'), ('BBB');\r\nSELECT c from tmp_tbl_1;\r\nSELECT c from tmp_tbl_1 ORDER BY c COLLATE utf8mb4_turkish_ci;\r\nSELECT c from tmp_tbl_1 ORDER BY c COLLATE utf8mb4_tr_0900_as_cs;\r\nSELECT c FROM tmp_tbl_1 ORDER BY c COLLATE utf8mb4_bin;\r\nCREATE TABLE tmp_spanish_tbl (c CHAR(2) CHARACTER SET utf8mb4);\r\nINSERT INTO tmp_spanish_tbl (c) VALUES ('cg'), ('ch'), ('ci'), ('lk'), ('ll'), ('lm');\r\nSELECT c FROM tmp_spanish_tbl ORDER BY c COLLATE utf8mb4_general_ci;\r\nSELECT c FROM tmp_spanish_tbl ORDER BY c COLLATE utf8mb4_spanish2_ci;\r\n# Choosing a string data type\r\nCREATE TABLE tmp_tbl_2 (c1 CHAR(10), c2 VARCHAR(10));\r\nINSERT INTO tmp_tbl_2 (c1, c2) VALUES ('abc       ','abc       ');\r\nSELECT c1, c2, CHAR_LENGTH(c1), CHAR_LENGTH(c2) FROM tmp_tbl_2;\r\nCREATE TABLE tmp_turkish_tbl (c CHAR(3) CHARACTER SET utf8mb4);\r\nINSERT INTO tmp_turkish_tbl VALUES('iii'), ('şşş'), ('ööö'), ('ççç');\r\nSELECT * FROM tmp_turkish_tbl;\r\n# String Literals\r\n-- Enclose the text of string with single quotes and dobule quotes, 'Hello, World!' or \"Hello, World!\"\r\n-- Use Hexadecimal notation x'61626364' is equalant to 'abcd'\r\n-- Use Introducer which means write the character set with underscore, _utf8mb4 'abcd' or _ucs2 'abcd'\r\n-- Use different quotes for example if you set variable to @s = 'I'm asleep'. This would through an error use opposite quotaion like this statement\r\nSELECT \"I'm asleep\", 'He said, \"Boo!\"';\r\n-- This will also work\r\nSELECT 'I''m asleep', 'I\\'m wide awake';\r\nSELECT \"He said, \"\"BOO!\"\"\", \"And I said, \\\"Yikes\\\"\";\r\n-- To write a literal blackslash within a string dobule it\r\nSELECT \"In windows to indentify the download path c:\\\\user\\\\downloads\" AS `double blackslash`;\r\n-- Some of escape sequences are \\', \\\", \\\\, \\b (backslash), \\n (newline or linefeed), \\t (tab) and \\0 (ASCII NULL)\r\nSELECT 0x49276D2061736C656570;\r\n-- Above select value return the hex value, because by default mysql 8.0 set --binary-as-hex is true.\r\n-- To view the atual result invoke the client program with --binary-as-hex = 0\r\n# Checking or changing string character set or collation\r\n-- To check the string character set or collation user CHARASET() or COLLATION() funcion.\r\n-- To change string from one character set to another use CONVERT(... USING ...) function to change collation use COLLATE operator.\r\nSELECT USER(), CHARSET(USER()), COLLATION(USER());\r\nSET NAMES 'utf8mb4';\r\nSELECT CHARSET('abc'), COLLATION('abc');\r\nSET NAMES 'utf8mb4' COLLATE 'utf8mb4_bin';\r\nSELECT CHARSET('abc'), COLLATION('abc');\r\nSET @s1 = _latin1 'my string', @s2 = CONVERT(@s1 USING utf8mb4);\r\nSELECT @s1, @s2, CHARSET(@s1), CHARSET(@s2);\r\nSET @s1 = _latin1 'my string', @s2 = @s1 COLLATE latin1_spanish_ci;\r\nSELECT @s1, @s2, COLLATION(@s1), COLLATION(@s2);\r\n-- New collation must be legal for the character set of the string. If it fails it through an error\r\nSELECT _latin1 'abc' COLLATE 'utf8mb4_bin';\r\nSET @s1 = _latin1 'my string';\r\nSET @s2 = CONVERT(@s1 USING utf8mb4) COLLATE utf8mb4_spanish_ci;\r\nSELECT @s1, CHARSET(@s1), COLLATION(@s1), @s2, CHARSET(@s2), COLLATION(@s2);\r\n-- CONVERT() function also convert binary string to nonbinary string and vice versa.\r\nSET @s1 = _latin1 'my string';\r\nSET @s2 = CONVERT(@s1 USING binary);\r\nSET @s3 = CONVERT(@s2 USING utf8mb4);\r\nSELECT @s1, CHARSET(@s1), @s2, CHARSET(@s2), @s3, CHARSET(@s3);\r\n-- I think binary-as-hex is enabled that's why the error presist.\r\nSELECT @s1, @s2, @s3;\r\nSELECT CHARSET(@s1), CHARSET(@s2), CHARSET(@s3);\r\nSELECT @s3;\r\nSET @s3 = CONVERT(@s2 USING utf8mb4);\r\nSELECT @s3;\r\nSELECT @s2;\r\n-- Another alternative method to convert nonbinary string to binary is CAST(... AS ...) function\r\nSET @s4 = CAST(@s1 AS binary);\r\nSELECT @s1, CHARSET(@s1), @s4, CHARSET(@s4);\r\n# Convert letter cases\r\n-- To convert a string to upper or lower user UPPER() or LOWER() function. If it not working properly\r\n-- the string is in binary data data type, convert it to proper nonbinary string data type with character set and collation.\r\nSELECT thing, UPPER(thing), LOWER(thing) FROM limbs;\r\n-- We can not able to change the letter case for binary string\r\nCREATE TABLE tmp_tbl_3 (c VARBINARY(10)) SELECT 'aBcD' as c;\r\nSELECT c, UPPER(c), LOWER(c) FROM tmp_tbl_3;\r\n-- To view the actual result open the session with binary-as-hex=0\r\n-- If you want to convert the letter case for binary string convert it to nonbinary string first with proper character set and collate\r\nSELECT c, UPPER(CONVERT(c USING utf8mb4)) as upper, LOWER(CONVERT(c USING utf8mb4)) AS lower FROM tmp_tbl_3;\r\nSELECT CHARSET(c) FROM tmp_tbl_3;\r\n-- If you want to convert nonbinary string first letter only upper case use this method\r\n-- CONCAT(UPPER(LEFT(c1, 1)), MID(c1,2)) FROM tbl; It is not clever to write the method everytime so create a function\r\nCREATE FUNCTION initial_cap (s VARCHAR(255))\r\nRETURNS VARCHAR(255) DETERMINISTIC\r\nRETURN CONCAT(UPPER(LEFT(s,1)),MID(s,2));\r\n-- Above function need to root user privilege\r\n# Comparing String Values\r\nSELECT \r\n ",
+    "content": "USE COOKBOOK;\r\n# MySQL Strings divided into 2 types - Binary and Non-binary.\r\n-- Binary will store data like image, mp3, encrypted files.\r\n-- Non-binary will store date like Text with character set and collate.\r\n-- Data type for Binary strings are BINARY, VARBINARY, and BLOB. Data type of non-binary strings are \r\n-- CHAR, VARCHAR and TEXT each of which permit CHARACTER SET and COLLATE attribute.\r\n# CHARACTER SET\r\n-- To display all the character set for nonbinary strings use this statement\r\nSHOW CHARACTER SET;\r\nSET @s = CONVERT('abc' USING utf8mb4); -- All characters as stored as 1 to 4 bytes\r\nSELECT @s, LENGTH(@s), CHAR_LENGTH(@s);\r\nSET @s = CONVERT('abc' USING utf16); -- All characters stored as 2 bytes\r\nSELECT @s, LENGTH(@s), CHAR_LENGTH(@s);\r\n-- It store characters as single byte or multi byte based on the character set.\r\n# Collation\r\n-- To display all the collation use this statement\r\nSHOW COLLATION;\r\n-- Collation will take care of character searching and sorting operations.\r\n-- Examples of collation how it will effect the sorting order\r\nCREATE TABLE tmp_tbl_1 ( c CHAR(3) CHARACTER SET utf8mb4);\r\nINSERT INTO tmp_tbl_1 VALUES ('AAA'), ('bbb'), ('aaa'), ('BBB');\r\nSELECT c from tmp_tbl_1;\r\nSELECT c from tmp_tbl_1 ORDER BY c COLLATE utf8mb4_turkish_ci;\r\nSELECT c from tmp_tbl_1 ORDER BY c COLLATE utf8mb4_tr_0900_as_cs;\r\nSELECT c FROM tmp_tbl_1 ORDER BY c COLLATE utf8mb4_bin;\r\nCREATE TABLE tmp_spanish_tbl (c CHAR(2) CHARACTER SET utf8mb4);\r\nINSERT INTO tmp_spanish_tbl (c) VALUES ('cg'), ('ch'), ('ci'), ('lk'), ('ll'), ('lm');\r\nSELECT c FROM tmp_spanish_tbl ORDER BY c COLLATE utf8mb4_general_ci;\r\nSELECT c FROM tmp_spanish_tbl ORDER BY c COLLATE utf8mb4_spanish2_ci;\r\n# Choosing a string data type\r\nCREATE TABLE tmp_tbl_2 (c1 CHAR(10), c2 VARCHAR(10));\r\nINSERT INTO tmp_tbl_2 (c1, c2) VALUES ('abc       ','abc       ');\r\nSELECT c1, c2, CHAR_LENGTH(c1), CHAR_LENGTH(c2) FROM tmp_tbl_2;\r\nCREATE TABLE tmp_turkish_tbl (c CHAR(3) CHARACTER SET utf8mb4);\r\nINSERT INTO tmp_turkish_tbl VALUES('iii'), ('şşş'), ('ööö'), ('ççç');\r\nSELECT * FROM tmp_turkish_tbl;\r\n# String Literals\r\n-- Enclose the text of string with single quotes and dobule quotes, 'Hello, World!' or \"Hello, World!\"\r\n-- Use Hexadecimal notation x'61626364' is equalant to 'abcd'\r\n-- Use Introducer which means write the character set with underscore, _utf8mb4 'abcd' or _ucs2 'abcd'\r\n-- Use different quotes for example if you set variable to @s = 'I'm asleep'. This would through an error use opposite quotaion like this statement\r\nSELECT \"I'm asleep\", 'He said, \"Boo!\"';\r\n-- This will also work\r\nSELECT 'I''m asleep', 'I\\'m wide awake';\r\nSELECT \"He said, \"\"BOO!\"\"\", \"And I said, \\\"Yikes\\\"\";\r\n-- To write a literal blackslash within a string dobule it\r\nSELECT \"In windows to indentify the download path c:\\\\user\\\\downloads\" AS `double blackslash`;\r\n-- Some of escape sequences are \\', \\\", \\\\, \\b (backslash), \\n (newline or linefeed), \\t (tab) and \\0 (ASCII NULL)\r\nSELECT 0x49276D2061736C656570;\r\n-- Above select value return the hex value, because by default mysql 8.0 set --binary-as-hex is true.\r\n-- To view the atual result invoke the client program with --binary-as-hex = 0\r\n# Checking or changing string character set or collation\r\n-- To check the string character set or collation user CHARASET() or COLLATION() funcion.\r\n-- To change string from one character set to another use CONVERT(... USING ...) function to change collation use COLLATE operator.\r\nSELECT USER(), CHARSET(USER()), COLLATION(USER());\r\nSET NAMES 'utf8mb4';\r\nSELECT CHARSET('abc'), COLLATION('abc');\r\nSET NAMES 'utf8mb4' COLLATE 'utf8mb4_bin';\r\nSELECT CHARSET('abc'), COLLATION('abc');\r\nSET @s1 = _latin1 'my string', @s2 = CONVERT(@s1 USING utf8mb4);\r\nSELECT @s1, @s2, CHARSET(@s1), CHARSET(@s2);\r\nSET @s1 = _latin1 'my string', @s2 = @s1 COLLATE latin1_spanish_ci;\r\nSELECT @s1, @s2, COLLATION(@s1), COLLATION(@s2);\r\n-- New collation must be legal for the character set of the string. If it fails it through an error\r\nSELECT _latin1 'abc' COLLATE 'utf8mb4_bin';\r\nSET @s1 = _latin1 'my string';\r\nSET @s2 = CONVERT(@s1 USING utf8mb4) COLLATE utf8mb4_spanish_ci;\r\nSELECT @s1, CHARSET(@s1), COLLATION(@s1), @s2, CHARSET(@s2), COLLATION(@s2);\r\n-- CONVERT() function also convert binary string to nonbinary string and vice versa.\r\nSET @s1 = _latin1 'my string';\r\nSET @s2 = CONVERT(@s1 USING binary);\r\nSET @s3 = CONVERT(@s2 USING utf8mb4);\r\nSELECT @s1, CHARSET(@s1), @s2, CHARSET(@s2), @s3, CHARSET(@s3);\r\n-- I think binary-as-hex is enabled that's why the error presist.\r\nSELECT @s1, @s2, @s3;\r\nSELECT CHARSET(@s1), CHARSET(@s2), CHARSET(@s3);\r\nSELECT @s3;\r\nSET @s3 = CONVERT(@s2 USING utf8mb4);\r\nSELECT @s3;\r\nSELECT @s2;\r\n-- Another alternative method to convert nonbinary string to binary is CAST(... AS ...) function\r\nSET @s4 = CAST(@s1 AS binary);\r\nSELECT @s1, CHARSET(@s1), @s4, CHARSET(@s4);\r\n# Convert letter cases\r\n-- To convert a string to upper or lower user UPPER() or LOWER() function. If it not working properly\r\n-- the string is in binary data data type, convert it to proper nonbinary string data type with character set and collation.\r\nSELECT thing, UPPER(thing), LOWER(thing) FROM limbs;\r\n-- We can not able to change the letter case for binary string\r\nCREATE TABLE tmp_tbl_3 (c VARBINARY(10)) SELECT 'aBcD' as c;\r\nSELECT c, UPPER(c), LOWER(c) FROM tmp_tbl_3;\r\n-- To view the actual result open the session with binary-as-hex=0\r\n-- If you want to convert the letter case for binary string convert it to nonbinary string first with proper character set and collate\r\nSELECT c, UPPER(CONVERT(c USING utf8mb4)) as upper, LOWER(CONVERT(c USING utf8mb4)) AS lower FROM tmp_tbl_3;\r\nSELECT CHARSET(c) FROM tmp_tbl_3;\r\n-- If you want to convert nonbinary string first letter only upper case use this method\r\n-- CONCAT(UPPER(LEFT(c1, 1)), MID(c1,2)) FROM tbl; It is not clever to write the method everytime so create a function\r\nCREATE FUNCTION initial_cap (s VARCHAR(255))\r\nRETURNS VARCHAR(255) DETERMINISTIC\r\nRETURN CONCAT(UPPER(LEFT(s,1)),MID(s,2));\r\n-- Above function need to root user privilege\r\n# Comparing String Values\r\nSELECT 'cat' = 'cat', 'cat' = 'dog', 'cat' <> 'cat', 'cat' <> 'dog';\r\nSELECT 'cat' < 'auk', 'cat' < 'dog', 'cat' BETWEEN 'auk' AND 'eel';\r\nSET @s1 = CAST('cat' AS BINARY), @s2 = CAST('CAT' AS BINARY);\r\nSELECT @s1 = @s2;\r\nSET @s1 = CONVERT(@s1 USING utf8mb4);\r\nSET @s2 = CONVERT(@s2 USING utf8mb4);\r\nSELECT @s1 = @s2;\r\nSET @s1 = _latin1 'cat', @s2 = _latin1 'CAT';\r\nSELECT @s1 = @s2;\r\nSELECT @s1 COLLATE latin1_general_cs = @s2 COLLATE latin1_general_cs AS `@s1 = @s2`;\r\n-- If you compare a nonbinary string with binary string, the comparison treat both strings as binary\r\nSELECT _latin1 'cat' = CAST('CAT' AS BINARY);\r\n-- Thus to compare two nonbinary string as binary convert any one of them as binary\r\nSET @s1 = _latin1 'cat', @s2 = _latin1 'CAT';\r\nSELECT @s1 = @s2, CAST(@s1 AS BINARY) = @s2, @s1 = CAST(@s2 AS BINARY);\r\n# Converting between decimal(base 10), octal(base 8), and Hexadecimal(base 16) format\r\n-- To conver from one base to another user CONV() function\r\n",
     "options": {},
     "viewState": {
         "cursorState": [
             {
                 "inSelectionMode": false,
                 "selectionStart": {
-                    "lineNumber": 1,
+                    "lineNumber": 119,
                     "column": 1
                 },
                 "position": {
-                    "lineNumber": 1,
+                    "lineNumber": 119,
                     "column": 1
                 }
             }
@@ -21,10 +21,10 @@
         "viewState": {
             "scrollLeft": 0,
             "firstPosition": {
-                "lineNumber": 1,
+                "lineNumber": 111,
                 "column": 1
             },
-            "firstPositionDeltaTop": 0
+            "firstPositionDeltaTop": 52
         },
         "contributionsState": {
             "editor.contrib.folding": {},
@@ -43,12 +43,12 @@
                         {
                             "type": 4,
                             "index": 0,
-                            "resultId": "5a0ecf9d-827c-42df-a03c-695333f4a64b",
+                            "resultId": "ac267351-d31f-4ec2-c64f-6419defe4713",
                             "content": "OK, 0 records retrieved in 0s"
                         }
                     ]
                 },
-                "currentHeight": 34,
+                "currentHeight": 28,
                 "currentSet": 1,
                 "statements": [
                     {
@@ -72,7 +72,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "15518455-3ef6-47f7-a62d-4cb1b248af4e"
+                        "73cdf919-cf65-4b22-cbe4-f2fd38fa8058"
                     ]
                 },
                 "currentHeight": 36,
@@ -91,8 +91,8 @@
             },
             "data": [
                 {
-                    "tabId": "3849d3dc-89be-422e-8f9e-b1c8bcb917da",
-                    "resultId": "15518455-3ef6-47f7-a62d-4cb1b248af4e",
+                    "tabId": "1c746e77-05b3-4091-c6d5-3863d34d1c92",
+                    "resultId": "73cdf919-cf65-4b22-cbe4-f2fd38fa8058",
                     "rows": [
                         {
                             "0": "armscii8",
@@ -445,7 +445,7 @@
                         }
                     ]
                 },
-                "currentHeight": 34,
+                "currentHeight": 28,
                 "currentSet": 1,
                 "statements": [
                     {
@@ -478,7 +478,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "c1ed5b0e-cf24-4472-c8f2-6e7fe03a17c7"
+                        "1cb6b998-984f-4a4c-983d-ab6b37984a35"
                     ]
                 },
                 "currentHeight": 36,
@@ -497,8 +497,8 @@
             },
             "data": [
                 {
-                    "tabId": "3849d3dc-89be-422e-8f9e-b1c8bcb917da",
-                    "resultId": "c1ed5b0e-cf24-4472-c8f2-6e7fe03a17c7",
+                    "tabId": "1c746e77-05b3-4091-c6d5-3863d34d1c92",
+                    "resultId": "1cb6b998-984f-4a4c-983d-ab6b37984a35",
                     "rows": [
                         {
                             "0": "abc",
@@ -595,7 +595,7 @@
                         }
                     ]
                 },
-                "currentHeight": 34,
+                "currentHeight": 28,
                 "currentSet": 1,
                 "statements": [
                     {
@@ -628,7 +628,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "71542e4d-c95d-4972-da8d-6babcbee2c35"
+                        "3a57bf50-c316-418a-a767-29edc679c0aa"
                     ]
                 },
                 "currentHeight": 36,
@@ -647,8 +647,8 @@
             },
             "data": [
                 {
-                    "tabId": "3849d3dc-89be-422e-8f9e-b1c8bcb917da",
-                    "resultId": "71542e4d-c95d-4972-da8d-6babcbee2c35",
+                    "tabId": "1c746e77-05b3-4091-c6d5-3863d34d1c92",
+                    "resultId": "3a57bf50-c316-418a-a767-29edc679c0aa",
                     "rows": [
                         {
                             "0": "abc",
@@ -737,7 +737,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "e5516866-85d3-4667-f0d5-426b99fd4867"
+                        "9acac552-ac8e-4803-88cf-23c293b38b6a"
                     ]
                 },
                 "currentHeight": 36,
@@ -756,8 +756,8 @@
             },
             "data": [
                 {
-                    "tabId": "3849d3dc-89be-422e-8f9e-b1c8bcb917da",
-                    "resultId": "e5516866-85d3-4667-f0d5-426b99fd4867",
+                    "tabId": "1c746e77-05b3-4091-c6d5-3863d34d1c92",
+                    "resultId": "9acac552-ac8e-4803-88cf-23c293b38b6a",
                     "rows": [
                         {
                             "0": "armscii8_bin",
@@ -3543,7 +3543,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "a45b4624-0fa6-4a66-d3d4-2abf5cbb40cb"
+                        "629a1437-1271-4de4-d426-801b6bf59168"
                     ]
                 },
                 "currentHeight": 36,
@@ -3562,8 +3562,8 @@
             },
             "data": [
                 {
-                    "tabId": "3849d3dc-89be-422e-8f9e-b1c8bcb917da",
-                    "resultId": "a45b4624-0fa6-4a66-d3d4-2abf5cbb40cb",
+                    "tabId": "1c746e77-05b3-4091-c6d5-3863d34d1c92",
+                    "resultId": "629a1437-1271-4de4-d426-801b6bf59168",
                     "rows": [
                         {
                             "0": "AAA"
@@ -3619,7 +3619,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "0ef62854-65ff-4e84-da1c-5da472212ee5"
+                        "1ac08f9e-7248-4287-8a82-1ae83dfee6ae"
                     ]
                 },
                 "currentHeight": 206.5625,
@@ -3638,8 +3638,8 @@
             },
             "data": [
                 {
-                    "tabId": "3849d3dc-89be-422e-8f9e-b1c8bcb917da",
-                    "resultId": "0ef62854-65ff-4e84-da1c-5da472212ee5",
+                    "tabId": "1c746e77-05b3-4091-c6d5-3863d34d1c92",
+                    "resultId": "1ac08f9e-7248-4287-8a82-1ae83dfee6ae",
                     "rows": [
                         {
                             "0": "AAA"
@@ -3695,7 +3695,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "7a4a5764-fde2-4ca6-abca-fe99fa90fe8d"
+                        "fe38694c-a6da-48bc-ee6d-6d77fb1f271a"
                     ]
                 },
                 "currentHeight": 206.5625,
@@ -3714,8 +3714,8 @@
             },
             "data": [
                 {
-                    "tabId": "3849d3dc-89be-422e-8f9e-b1c8bcb917da",
-                    "resultId": "7a4a5764-fde2-4ca6-abca-fe99fa90fe8d",
+                    "tabId": "1c746e77-05b3-4091-c6d5-3863d34d1c92",
+                    "resultId": "fe38694c-a6da-48bc-ee6d-6d77fb1f271a",
                     "rows": [
                         {
                             "0": "aaa"
@@ -3771,7 +3771,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "4aabb4bb-ada9-4e21-bcd7-dcfc82349726"
+                        "45e9908c-817a-45a7-ebde-c525558021b1"
                     ]
                 },
                 "currentHeight": 206.5625,
@@ -3790,8 +3790,8 @@
             },
             "data": [
                 {
-                    "tabId": "3849d3dc-89be-422e-8f9e-b1c8bcb917da",
-                    "resultId": "4aabb4bb-ada9-4e21-bcd7-dcfc82349726",
+                    "tabId": "1c746e77-05b3-4091-c6d5-3863d34d1c92",
+                    "resultId": "45e9908c-817a-45a7-ebde-c525558021b1",
                     "rows": [
                         {
                             "0": "AAA"
@@ -3911,7 +3911,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "88e0b78c-56bd-4b8c-ef4d-6cd5bd6315d8"
+                        "dc46e62c-7fe2-4e4c-c2e5-7e26547abb8e"
                     ]
                 },
                 "currentHeight": 272.84375,
@@ -3930,8 +3930,8 @@
             },
             "data": [
                 {
-                    "tabId": "3849d3dc-89be-422e-8f9e-b1c8bcb917da",
-                    "resultId": "88e0b78c-56bd-4b8c-ef4d-6cd5bd6315d8",
+                    "tabId": "1c746e77-05b3-4091-c6d5-3863d34d1c92",
+                    "resultId": "dc46e62c-7fe2-4e4c-c2e5-7e26547abb8e",
                     "rows": [
                         {
                             "0": "cg"
@@ -3993,7 +3993,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "ae033f20-9fa1-474e-aaad-f67851612c19"
+                        "b921bb42-239b-4bfd-e33d-ab3506dd240d"
                     ]
                 },
                 "currentHeight": 272.84375,
@@ -4012,8 +4012,8 @@
             },
             "data": [
                 {
-                    "tabId": "3849d3dc-89be-422e-8f9e-b1c8bcb917da",
-                    "resultId": "ae033f20-9fa1-474e-aaad-f67851612c19",
+                    "tabId": "1c746e77-05b3-4091-c6d5-3863d34d1c92",
+                    "resultId": "b921bb42-239b-4bfd-e33d-ab3506dd240d",
                     "rows": [
                         {
                             "0": "cg"
@@ -4139,7 +4139,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "b08fbd77-144d-4e68-e7dc-34962e0105a6"
+                        "016cc8f4-2c95-4513-d9f4-a2e53677af5f"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -4158,8 +4158,8 @@
             },
             "data": [
                 {
-                    "tabId": "3849d3dc-89be-422e-8f9e-b1c8bcb917da",
-                    "resultId": "b08fbd77-144d-4e68-e7dc-34962e0105a6",
+                    "tabId": "1c746e77-05b3-4091-c6d5-3863d34d1c92",
+                    "resultId": "016cc8f4-2c95-4513-d9f4-a2e53677af5f",
                     "rows": [
                         {
                             "0": "abc",
@@ -4331,7 +4331,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "3c76aa5c-a340-40ee-ab8e-a77a281b8ca6"
+                        "ce11e25e-e5f7-435d-8dcc-6e4d03b57fcd"
                     ]
                 },
                 "currentHeight": 206.5625,
@@ -4350,8 +4350,8 @@
             },
             "data": [
                 {
-                    "tabId": "3849d3dc-89be-422e-8f9e-b1c8bcb917da",
-                    "resultId": "3c76aa5c-a340-40ee-ab8e-a77a281b8ca6",
+                    "tabId": "1c746e77-05b3-4091-c6d5-3863d34d1c92",
+                    "resultId": "ce11e25e-e5f7-435d-8dcc-6e4d03b57fcd",
                     "rows": [
                         {
                             "0": "iii"
@@ -4407,7 +4407,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "4fb6afdf-10e4-45bc-9026-70cb1ce51a62"
+                        "fface53b-2bf8-44cb-cd62-36ebfe203cc6"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -4435,8 +4435,8 @@
             },
             "data": [
                 {
-                    "tabId": "3849d3dc-89be-422e-8f9e-b1c8bcb917da",
-                    "resultId": "4fb6afdf-10e4-45bc-9026-70cb1ce51a62",
+                    "tabId": "1c746e77-05b3-4091-c6d5-3863d34d1c92",
+                    "resultId": "fface53b-2bf8-44cb-cd62-36ebfe203cc6",
                     "rows": [
                         {
                             "0": "I'm asleep",
@@ -4501,7 +4501,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "e0b778d0-32c9-4438-bd5b-52ebcebfb6fa"
+                        "694c25f1-1667-4631-c537-8a78103519a4"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -4520,8 +4520,8 @@
             },
             "data": [
                 {
-                    "tabId": "3849d3dc-89be-422e-8f9e-b1c8bcb917da",
-                    "resultId": "e0b778d0-32c9-4438-bd5b-52ebcebfb6fa",
+                    "tabId": "1c746e77-05b3-4091-c6d5-3863d34d1c92",
+                    "resultId": "694c25f1-1667-4631-c537-8a78103519a4",
                     "rows": [
                         {
                             "0": "I'm asleep",
@@ -4587,7 +4587,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "e4a9405f-a5fa-4de4-adb9-d86598a39627"
+                        "99af8012-26a3-4f41-b4cb-8fc1ad5b693a"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -4606,8 +4606,8 @@
             },
             "data": [
                 {
-                    "tabId": "3849d3dc-89be-422e-8f9e-b1c8bcb917da",
-                    "resultId": "e4a9405f-a5fa-4de4-adb9-d86598a39627",
+                    "tabId": "1c746e77-05b3-4091-c6d5-3863d34d1c92",
+                    "resultId": "99af8012-26a3-4f41-b4cb-8fc1ad5b693a",
                     "rows": [
                         {
                             "0": "He said, \"BOO!\"",
@@ -4672,7 +4672,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "c77160ef-63fd-49c1-e894-de5502cbc90b"
+                        "5e341b11-044b-4329-e9d9-87862cbe34e9"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -4691,8 +4691,8 @@
             },
             "data": [
                 {
-                    "tabId": "3849d3dc-89be-422e-8f9e-b1c8bcb917da",
-                    "resultId": "c77160ef-63fd-49c1-e894-de5502cbc90b",
+                    "tabId": "1c746e77-05b3-4091-c6d5-3863d34d1c92",
+                    "resultId": "5e341b11-044b-4329-e9d9-87862cbe34e9",
                     "rows": [
                         {
                             "0": "In windows to indentify the download path c:\\user\\downloads"
@@ -4738,7 +4738,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "b2e6ff13-426c-49bb-ed1f-3a3a2e1faa98"
+                        "b8c72afe-16df-47af-a9d5-aea8d5d2152e"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -4757,8 +4757,8 @@
             },
             "data": [
                 {
-                    "tabId": "3849d3dc-89be-422e-8f9e-b1c8bcb917da",
-                    "resultId": "b2e6ff13-426c-49bb-ed1f-3a3a2e1faa98",
+                    "tabId": "1c746e77-05b3-4091-c6d5-3863d34d1c92",
+                    "resultId": "b8c72afe-16df-47af-a9d5-aea8d5d2152e",
                     "rows": [
                         {
                             "0": "SSdtIGFzbGVlcA=="
@@ -4797,7 +4797,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "826b7c3f-ee46-4a38-866b-ce02f419e4cf"
+                        "86cf57fe-ed0e-4032-cecd-bb0028d32588"
                     ]
                 },
                 "currentHeight": 36,
@@ -4816,8 +4816,8 @@
             },
             "data": [
                 {
-                    "tabId": "3849d3dc-89be-422e-8f9e-b1c8bcb917da",
-                    "resultId": "826b7c3f-ee46-4a38-866b-ce02f419e4cf",
+                    "tabId": "1c746e77-05b3-4091-c6d5-3863d34d1c92",
+                    "resultId": "86cf57fe-ed0e-4032-cecd-bb0028d32588",
                     "rows": [
                         {
                             "0": "cbuser@localhost",
@@ -4934,7 +4934,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "29f3ed25-00e3-45fc-cb2c-0fdcc2eaab11"
+                        "148f1049-6986-4e63-fd37-055e1c1a58c3"
                     ]
                 },
                 "currentHeight": 36,
@@ -4953,8 +4953,8 @@
             },
             "data": [
                 {
-                    "tabId": "3849d3dc-89be-422e-8f9e-b1c8bcb917da",
-                    "resultId": "29f3ed25-00e3-45fc-cb2c-0fdcc2eaab11",
+                    "tabId": "1c746e77-05b3-4091-c6d5-3863d34d1c92",
+                    "resultId": "148f1049-6986-4e63-fd37-055e1c1a58c3",
                     "rows": [
                         {
                             "0": "utf8mb4",
@@ -5052,7 +5052,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "4e0a8033-675d-46de-de40-b2378d40770b"
+                        "b37e684c-4c7d-4304-d795-abb88b44be10"
                     ]
                 },
                 "currentHeight": 36,
@@ -5071,8 +5071,8 @@
             },
             "data": [
                 {
-                    "tabId": "3849d3dc-89be-422e-8f9e-b1c8bcb917da",
-                    "resultId": "4e0a8033-675d-46de-de40-b2378d40770b",
+                    "tabId": "1c746e77-05b3-4091-c6d5-3863d34d1c92",
+                    "resultId": "b37e684c-4c7d-4304-d795-abb88b44be10",
                     "rows": [
                         {
                             "0": "utf8mb4",
@@ -5170,7 +5170,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "4096b59a-e5a6-4de6-e596-9d2d16089809"
+                        "1eb5d962-0167-43b5-f537-c404c2468aa4"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -5189,8 +5189,8 @@
             },
             "data": [
                 {
-                    "tabId": "3849d3dc-89be-422e-8f9e-b1c8bcb917da",
-                    "resultId": "4096b59a-e5a6-4de6-e596-9d2d16089809",
+                    "tabId": "1c746e77-05b3-4091-c6d5-3863d34d1c92",
+                    "resultId": "1eb5d962-0167-43b5-f537-c404c2468aa4",
                     "rows": [
                         {
                             "0": "my string",
@@ -5326,7 +5326,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "ba8ecafa-1056-4dd8-80f1-244c21bfbaa2"
+                        "7c0b2b06-7b53-4522-d875-e17835a72179"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -5345,8 +5345,8 @@
             },
             "data": [
                 {
-                    "tabId": "3849d3dc-89be-422e-8f9e-b1c8bcb917da",
-                    "resultId": "ba8ecafa-1056-4dd8-80f1-244c21bfbaa2",
+                    "tabId": "1c746e77-05b3-4091-c6d5-3863d34d1c92",
+                    "resultId": "7c0b2b06-7b53-4522-d875-e17835a72179",
                     "rows": [
                         {
                             "0": "my string",
@@ -5532,7 +5532,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "5d2f5a62-9fa4-42f9-a385-fbff44326838"
+                        "0f22b361-60ff-4d06-b984-357bf23c889a"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -5551,8 +5551,8 @@
             },
             "data": [
                 {
-                    "tabId": "3849d3dc-89be-422e-8f9e-b1c8bcb917da",
-                    "resultId": "5d2f5a62-9fa4-42f9-a385-fbff44326838",
+                    "tabId": "1c746e77-05b3-4091-c6d5-3863d34d1c92",
+                    "resultId": "0f22b361-60ff-4d06-b984-357bf23c889a",
                     "rows": [
                         {
                             "0": "my string",
@@ -5801,7 +5801,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "3885c8e4-7f9a-479f-e5f1-f2bfcb15d734"
+                        "c85cc56a-d882-403b-db51-5d8c7dd2ab17"
                     ]
                 },
                 "currentHeight": 36,
@@ -5820,8 +5820,8 @@
             },
             "data": [
                 {
-                    "tabId": "3849d3dc-89be-422e-8f9e-b1c8bcb917da",
-                    "resultId": "3885c8e4-7f9a-479f-e5f1-f2bfcb15d734",
+                    "tabId": "1c746e77-05b3-4091-c6d5-3863d34d1c92",
+                    "resultId": "c85cc56a-d882-403b-db51-5d8c7dd2ab17",
                     "rows": [
                         {
                             "0": "my string",
@@ -5890,7 +5890,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "4eb86659-9788-442c-b80a-85d3f78a1268"
+                        "b3aae09b-6f49-42d4-d9c1-37dc7d2bcefe"
                     ]
                 },
                 "currentHeight": 36,
@@ -5909,8 +5909,8 @@
             },
             "data": [
                 {
-                    "tabId": "3849d3dc-89be-422e-8f9e-b1c8bcb917da",
-                    "resultId": "4eb86659-9788-442c-b80a-85d3f78a1268",
+                    "tabId": "1c746e77-05b3-4091-c6d5-3863d34d1c92",
+                    "resultId": "b3aae09b-6f49-42d4-d9c1-37dc7d2bcefe",
                     "rows": [
                         {
                             "0": "latin1",
@@ -5995,7 +5995,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "9bb597d5-73e0-4d06-8f5e-439e98822de3"
+                        "38fd3eaa-86c5-4af0-f52e-e49f13c872cd"
                     ]
                 },
                 "currentHeight": 105.140625,
@@ -6014,8 +6014,8 @@
             },
             "data": [
                 {
-                    "tabId": "3849d3dc-89be-422e-8f9e-b1c8bcb917da",
-                    "resultId": "9bb597d5-73e0-4d06-8f5e-439e98822de3",
+                    "tabId": "1c746e77-05b3-4091-c6d5-3863d34d1c92",
+                    "resultId": "38fd3eaa-86c5-4af0-f52e-e49f13c872cd",
                     "rows": [
                         {
                             "0": null
@@ -6086,7 +6086,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "be84e865-c5fd-419f-b76a-a67c58923950"
+                        "44e3ce63-6a68-40ef-cfa7-c3bbc365b2cd"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -6105,8 +6105,8 @@
             },
             "data": [
                 {
-                    "tabId": "3849d3dc-89be-422e-8f9e-b1c8bcb917da",
-                    "resultId": "be84e865-c5fd-419f-b76a-a67c58923950",
+                    "tabId": "1c746e77-05b3-4091-c6d5-3863d34d1c92",
+                    "resultId": "44e3ce63-6a68-40ef-cfa7-c3bbc365b2cd",
                     "rows": [
                         {
                             "0": "my string"
@@ -6153,7 +6153,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "b331be62-70e7-45ff-f39a-f4d7ed458e8d"
+                        "3d112198-47b8-4916-82bf-78f1ee8b9997"
                     ]
                 },
                 "currentHeight": 105.140625,
@@ -6172,8 +6172,8 @@
             },
             "data": [
                 {
-                    "tabId": "3849d3dc-89be-422e-8f9e-b1c8bcb917da",
-                    "resultId": "b331be62-70e7-45ff-f39a-f4d7ed458e8d",
+                    "tabId": "1c746e77-05b3-4091-c6d5-3863d34d1c92",
+                    "resultId": "3d112198-47b8-4916-82bf-78f1ee8b9997",
                     "rows": [
                         {
                             "0": {}
@@ -6244,7 +6244,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "bc5d71b1-38ff-4142-b71d-b275c48cb083"
+                        "d3a99d9b-970d-4cff-f872-a036be2db582"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -6263,8 +6263,8 @@
             },
             "data": [
                 {
-                    "tabId": "3849d3dc-89be-422e-8f9e-b1c8bcb917da",
-                    "resultId": "bc5d71b1-38ff-4142-b71d-b275c48cb083",
+                    "tabId": "1c746e77-05b3-4091-c6d5-3863d34d1c92",
+                    "resultId": "d3a99d9b-970d-4cff-f872-a036be2db582",
                     "rows": [
                         {
                             "0": "my string",
@@ -6360,7 +6360,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "53631cfa-2f17-4d8b-d585-3807d4413695"
+                        "7ce7f0a8-4344-4319-e8f4-17d6b3312965"
                     ]
                 },
                 "currentHeight": 352,
@@ -6379,8 +6379,8 @@
             },
             "data": [
                 {
-                    "tabId": "3849d3dc-89be-422e-8f9e-b1c8bcb917da",
-                    "resultId": "53631cfa-2f17-4d8b-d585-3807d4413695",
+                    "tabId": "1c746e77-05b3-4091-c6d5-3863d34d1c92",
+                    "resultId": "7ce7f0a8-4344-4319-e8f4-17d6b3312965",
                     "rows": [
                         {
                             "0": "armchair",
@@ -6547,7 +6547,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "ece3fc95-76f8-43c7-a479-600ea5ed5301"
+                        "c0853117-f219-4793-ee5c-3e6934f6bd5c"
                     ]
                 },
                 "currentHeight": 36,
@@ -6566,8 +6566,8 @@
             },
             "data": [
                 {
-                    "tabId": "3849d3dc-89be-422e-8f9e-b1c8bcb917da",
-                    "resultId": "ece3fc95-76f8-43c7-a479-600ea5ed5301",
+                    "tabId": "1c746e77-05b3-4091-c6d5-3863d34d1c92",
+                    "resultId": "c0853117-f219-4793-ee5c-3e6934f6bd5c",
                     "rows": [
                         {
                             "0": "YUJjRA==",
@@ -6628,7 +6628,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "7dc75ad5-0f42-4776-b7de-51e271c5e8dd"
+                        "e742102e-a475-4b17-d4d5-b9a02c425996"
                     ]
                 },
                 "currentHeight": 36,
@@ -6647,8 +6647,8 @@
             },
             "data": [
                 {
-                    "tabId": "3849d3dc-89be-422e-8f9e-b1c8bcb917da",
-                    "resultId": "7dc75ad5-0f42-4776-b7de-51e271c5e8dd",
+                    "tabId": "1c746e77-05b3-4091-c6d5-3863d34d1c92",
+                    "resultId": "e742102e-a475-4b17-d4d5-b9a02c425996",
                     "rows": [
                         {
                             "0": "YUJjRA==",
@@ -6725,7 +6725,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "ab349568-e52e-4c5d-f12c-1c44ac7d7e9b"
+                        "80cd99b2-c655-4fec-c4a8-a69bdb054d00"
                     ]
                 },
                 "currentHeight": 36,
@@ -6744,8 +6744,8 @@
             },
             "data": [
                 {
-                    "tabId": "3849d3dc-89be-422e-8f9e-b1c8bcb917da",
-                    "resultId": "ab349568-e52e-4c5d-f12c-1c44ac7d7e9b",
+                    "tabId": "1c746e77-05b3-4091-c6d5-3863d34d1c92",
+                    "resultId": "80cd99b2-c655-4fec-c4a8-a69bdb054d00",
                     "rows": [
                         {
                             "0": "binary"
@@ -6825,18 +6825,258 @@
                 "end": 102,
                 "language": "mysql",
                 "result": {
-                    "type": "text",
-                    "text": [
+                    "type": "resultIds",
+                    "list": [
+                        "5ff86673-66d6-486a-f3b5-66f518ff73e1"
+                    ]
+                },
+                "currentHeight": 36,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 140
+                        },
+                        "contentStart": 72,
+                        "state": 2
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "1c746e77-05b3-4091-c6d5-3863d34d1c92",
+                    "resultId": "5ff86673-66d6-486a-f3b5-66f518ff73e1",
+                    "rows": [
                         {
-                            "type": 0,
-                            "index": 0,
-                            "content": "MySQL Error (1305): ClassicSession.run_sql: FUNCTION cookbook.initial_cap does not exist",
-                            "language": "ansi"
+                            "0": 1,
+                            "1": 0,
+                            "2": 0,
+                            "3": 1
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "'cat' = 'cat'",
+                            "field": "0",
+                            "dataType": {
+                                "type": 42,
+                                "flags": [
+                                    "SIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 10,
+                                "parameterFormatType": "OneOrZero",
+                                "synonyms": [
+                                    "INTEGER",
+                                    "INT4"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "'cat' = 'dog'",
+                            "field": "1",
+                            "dataType": {
+                                "type": 42,
+                                "flags": [
+                                    "SIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 10,
+                                "parameterFormatType": "OneOrZero",
+                                "synonyms": [
+                                    "INTEGER",
+                                    "INT4"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "'cat' <> 'cat'",
+                            "field": "2",
+                            "dataType": {
+                                "type": 42,
+                                "flags": [
+                                    "SIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 10,
+                                "parameterFormatType": "OneOrZero",
+                                "synonyms": [
+                                    "INTEGER",
+                                    "INT4"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "'cat' <> 'dog'",
+                            "field": "3",
+                            "dataType": {
+                                "type": 42,
+                                "flags": [
+                                    "SIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 10,
+                                "parameterFormatType": "OneOrZero",
+                                "synonyms": [
+                                    "INTEGER",
+                                    "INT4"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
                         }
                     ],
                     "executionInfo": {
-                        "text": ""
+                        "text": "OK, 1 record retrieved in 0s"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "-- Above function need to root user privilege\n# Comparing String Values\nSELECT 'cat' = 'cat', 'cat' = 'dog', 'cat' <> 'cat', 'cat' <> 'dog';",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 103,
+                "end": 103,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "626119c6-9c03-435f-8394-3080a5072934"
+                    ]
+                },
+                "currentHeight": 36,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 67
+                        },
+                        "contentStart": 0,
+                        "state": 0
                     }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "1c746e77-05b3-4091-c6d5-3863d34d1c92",
+                    "resultId": "626119c6-9c03-435f-8394-3080a5072934",
+                    "rows": [
+                        {
+                            "0": 0,
+                            "1": 1,
+                            "2": 1
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "'cat' < 'auk'",
+                            "field": "0",
+                            "dataType": {
+                                "type": 42,
+                                "flags": [
+                                    "SIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 10,
+                                "parameterFormatType": "OneOrZero",
+                                "synonyms": [
+                                    "INTEGER",
+                                    "INT4"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "'cat' < 'dog'",
+                            "field": "1",
+                            "dataType": {
+                                "type": 42,
+                                "flags": [
+                                    "SIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 10,
+                                "parameterFormatType": "OneOrZero",
+                                "synonyms": [
+                                    "INTEGER",
+                                    "INT4"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "'cat' BETWEEN 'auk' AND 'eel'",
+                            "field": "2",
+                            "dataType": {
+                                "type": 42,
+                                "flags": [
+                                    "SIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 10,
+                                "parameterFormatType": "OneOrZero",
+                                "synonyms": [
+                                    "INTEGER",
+                                    "INT4"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 0s"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT 'cat' < 'auk', 'cat' < 'dog', 'cat' BETWEEN 'auk' AND 'eel'",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 104,
+                "end": 104,
+                "language": "mysql",
+                "result": {
+                    "type": "text",
+                    "text": [
+                        {
+                            "type": 4,
+                            "index": 0,
+                            "resultId": "c2bf36db-901c-4929-c98e-2a2eabfedda5",
+                            "content": "OK, 0 records retrieved in 5.074ms"
+                        }
+                    ]
                 },
                 "currentHeight": 28,
                 "currentSet": 1,
@@ -6845,9 +7085,125 @@
                         "delimiter": ";",
                         "span": {
                             "start": 0,
-                            "length": 79
+                            "length": 61
                         },
-                        "contentStart": 72,
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": []
+        },
+        {
+            "state": {
+                "start": 105,
+                "end": 105,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "d5a86727-72ea-4f2e-df23-7c44117aff53"
+                    ]
+                },
+                "currentHeight": 107.140625,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 17
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "1c746e77-05b3-4091-c6d5-3863d34d1c92",
+                    "resultId": "d5a86727-72ea-4f2e-df23-7c44117aff53",
+                    "rows": [
+                        {
+                            "0": 0
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "@s1 = @s2",
+                            "field": "0",
+                            "dataType": {
+                                "type": 42,
+                                "flags": [
+                                    "SIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 10,
+                                "parameterFormatType": "OneOrZero",
+                                "synonyms": [
+                                    "INTEGER",
+                                    "INT4"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 0s"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT @s1 = @s2",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 106,
+                "end": 107,
+                "language": "mysql",
+                "result": {
+                    "type": "text",
+                    "text": [
+                        {
+                            "type": 4,
+                            "index": 0,
+                            "resultId": "3f9ac0ec-370b-4e1d-a83b-b456aa04530c",
+                            "content": "OK, 0 records retrieved in 0s"
+                        },
+                        {
+                            "type": 4,
+                            "index": 1,
+                            "resultId": "4c32ad88-483d-45cf-cca5-0bbe5504f2ee",
+                            "content": "OK, 0 records retrieved in 0s"
+                        }
+                    ]
+                },
+                "currentHeight": 28,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 37
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    },
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 37,
+                            "length": 38
+                        },
+                        "contentStart": 38,
                         "state": 3
                     }
                 ]
@@ -6856,8 +7212,461 @@
         },
         {
             "state": {
-                "start": 103,
-                "end": 103,
+                "start": 108,
+                "end": 108,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "3c7aa87e-d26f-4059-a059-e8ea0a2a275c"
+                    ]
+                },
+                "currentHeight": 107.140625,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 17
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "1c746e77-05b3-4091-c6d5-3863d34d1c92",
+                    "resultId": "3c7aa87e-d26f-4059-a059-e8ea0a2a275c",
+                    "rows": [
+                        {
+                            "0": 1
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "@s1 = @s2",
+                            "field": "0",
+                            "dataType": {
+                                "type": 42,
+                                "flags": [
+                                    "SIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 10,
+                                "parameterFormatType": "OneOrZero",
+                                "synonyms": [
+                                    "INTEGER",
+                                    "INT4"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 0s"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT @s1 = @s2",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 109,
+                "end": 109,
+                "language": "mysql",
+                "result": {
+                    "type": "text",
+                    "text": [
+                        {
+                            "type": 4,
+                            "index": 0,
+                            "resultId": "08190580-5584-47b3-e486-c251b7fa92bb",
+                            "content": "OK, 0 records retrieved in 0s"
+                        }
+                    ]
+                },
+                "currentHeight": 28,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 45
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": []
+        },
+        {
+            "state": {
+                "start": 110,
+                "end": 110,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "a1140d05-8ca8-43cb-ecb8-33714c0e9c5f"
+                    ]
+                },
+                "currentHeight": 107.140625,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 17
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "1c746e77-05b3-4091-c6d5-3863d34d1c92",
+                    "resultId": "a1140d05-8ca8-43cb-ecb8-33714c0e9c5f",
+                    "rows": [
+                        {
+                            "0": 1
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "@s1 = @s2",
+                            "field": "0",
+                            "dataType": {
+                                "type": 42,
+                                "flags": [
+                                    "SIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 10,
+                                "parameterFormatType": "OneOrZero",
+                                "synonyms": [
+                                    "INTEGER",
+                                    "INT4"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 0s"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT @s1 = @s2",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 111,
+                "end": 111,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "b92412d8-83e0-4da1-d359-e46425bd8106"
+                    ]
+                },
+                "currentHeight": 107.140625,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 84
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "1c746e77-05b3-4091-c6d5-3863d34d1c92",
+                    "resultId": "b92412d8-83e0-4da1-d359-e46425bd8106",
+                    "rows": [
+                        {
+                            "0": 0
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "@s1 = @s2",
+                            "field": "0",
+                            "dataType": {
+                                "type": 42,
+                                "flags": [
+                                    "SIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 10,
+                                "parameterFormatType": "OneOrZero",
+                                "synonyms": [
+                                    "INTEGER",
+                                    "INT4"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 0s"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT @s1 COLLATE latin1_general_cs = @s2 COLLATE latin1_general_cs AS `@s1 = @s2`",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 112,
+                "end": 113,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "baa3a30a-bf36-47a0-ee0c-1976892eb5dd"
+                    ]
+                },
+                "currentHeight": 107.140625,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 146
+                        },
+                        "contentStart": 101,
+                        "state": 3
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "1c746e77-05b3-4091-c6d5-3863d34d1c92",
+                    "resultId": "baa3a30a-bf36-47a0-ee0c-1976892eb5dd",
+                    "rows": [
+                        {
+                            "0": 0
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "_latin1 'cat' = CAST('CAT' AS BINARY)",
+                            "field": "0",
+                            "dataType": {
+                                "type": 42,
+                                "flags": [
+                                    "SIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 10,
+                                "parameterFormatType": "OneOrZero",
+                                "synonyms": [
+                                    "INTEGER",
+                                    "INT4"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 0s"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "-- If you compare a nonbinary string with binary string, the comparison treat both strings as binary\nSELECT _latin1 'cat' = CAST('CAT' AS BINARY);",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 114,
+                "end": 116,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "5f525360-4a79-4a83-bc0e-a90c8baadaf1",
+                        "ad752d07-3045-4571-b547-3a58cc9e5f26"
+                    ]
+                },
+                "currentHeight": 134.140625,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 129
+                        },
+                        "contentStart": 84,
+                        "state": 0
+                    },
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 129,
+                            "length": 1
+                        },
+                        "contentStart": 129,
+                        "state": 0
+                    },
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 130,
+                            "length": 71
+                        },
+                        "contentStart": 131,
+                        "state": 3
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "1c746e77-05b3-4091-c6d5-3863d34d1c92",
+                    "resultId": "5f525360-4a79-4a83-bc0e-a90c8baadaf1",
+                    "rows": [
+                        {
+                            "0": 1,
+                            "1": 0,
+                            "2": 0
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "@s1 = @s2",
+                            "field": "0",
+                            "dataType": {
+                                "type": 42,
+                                "flags": [
+                                    "SIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 10,
+                                "parameterFormatType": "OneOrZero",
+                                "synonyms": [
+                                    "INTEGER",
+                                    "INT4"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "CAST(@s1 AS BINARY) = @s2",
+                            "field": "1",
+                            "dataType": {
+                                "type": 42,
+                                "flags": [
+                                    "SIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 10,
+                                "parameterFormatType": "OneOrZero",
+                                "synonyms": [
+                                    "INTEGER",
+                                    "INT4"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "@s1 = CAST(@s2 AS BINARY)",
+                            "field": "2",
+                            "dataType": {
+                                "type": 42,
+                                "flags": [
+                                    "SIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 10,
+                                "parameterFormatType": "OneOrZero",
+                                "synonyms": [
+                                    "INTEGER",
+                                    "INT4"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 2.146ms"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 2,
+                    "sql": "SELECT @s1 = @s2, CAST(@s1 AS BINARY) = @s2, @s1 = CAST(@s2 AS BINARY);",
+                    "updatable": false,
+                    "fullTableName": ""
+                },
+                {
+                    "tabId": "1c746e77-05b3-4091-c6d5-3863d34d1c92",
+                    "resultId": "ad752d07-3045-4571-b547-3a58cc9e5f26",
+                    "rows": [],
+                    "executionInfo": {
+                        "text": "OK, 0 records retrieved in 0s",
+                        "type": 4
+                    },
+                    "totalRowCount": 0,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "-- Thus to compare two nonbinary string as binary convert any one of them as binary\nSET @s1 = _latin1 'cat', @s2 = _latin1 'CAT'",
+                    "updatable": false
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 117,
+                "end": 119,
                 "language": "mysql",
                 "currentSet": 1,
                 "statements": [
@@ -6865,10 +7674,10 @@
                         "delimiter": ";",
                         "span": {
                             "start": 0,
-                            "length": 1
+                            "length": 145
                         },
-                        "contentStart": -1,
-                        "state": 3
+                        "contentStart": 0,
+                        "state": 1
                     }
                 ]
             },
