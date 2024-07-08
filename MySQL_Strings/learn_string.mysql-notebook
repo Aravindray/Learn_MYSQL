@@ -2,29 +2,29 @@
     "type": "MySQLNotebook",
     "version": "1.0",
     "caption": "Untitled",
-    "content": "USE COOKBOOK;\r\n# MySQL Strings divided into 2 types - Binary and Non-binary.\r\n-- Binary will store data like image, mp3, encrypted files.\r\n-- Non-binary will store date like Text with character set and collate.\r\n-- Data type for Binary strings are BINARY, VARBINARY, and BLOB. Data type of non-binary strings are \r\n-- CHAR, VARCHAR and TEXT each of which permit CHARACTER SET and COLLATE attribute.\r\n# CHARACTER SET\r\n-- To display all the character set for nonbinary strings use this statement\r\nSHOW CHARACTER SET;\r\nSET @s = CONVERT('abc' USING utf8mb4); -- All characters as stored as 1 to 4 bytes\r\nSELECT @s, LENGTH(@s), CHAR_LENGTH(@s);\r\nSET @s = CONVERT('abc' USING utf16); -- All characters stored as 2 bytes\r\nSELECT @s, LENGTH(@s), CHAR_LENGTH(@s);\r\n-- It store characters as single byte or multi byte based on the character set.\r\n# Collation\r\n-- To display all the collation use this statement\r\nSHOW COLLATION;\r\n-- Collation will take care of character searching and sorting operations.\r\n-- Examples of collation how it will effect the sorting order\r\nCREATE TABLE tmp_tbl_1 ( c CHAR(3) CHARACTER SET utf8mb4);\r\nINSERT INTO tmp_tbl_1 VALUES ('AAA'), ('bbb'), ('aaa'), ('BBB');\r\nSELECT c from tmp_tbl_1;\r\nSELECT c from tmp_tbl_1 ORDER BY c COLLATE utf8mb4_turkish_ci;\r\nSELECT c from tmp_tbl_1 ORDER BY c COLLATE utf8mb4_tr_0900_as_cs;\r\nSELECT c FROM tmp_tbl_1 ORDER BY c COLLATE utf8mb4_bin;\r\nCREATE TABLE tmp_spanish_tbl (c CHAR(2) CHARACTER SET utf8mb4);\r\nINSERT INTO tmp_spanish_tbl (c) VALUES ('cg'), ('ch'), ('ci'), ('lk'), ('ll'), ('lm');\r\nSELECT c FROM tmp_spanish_tbl ORDER BY c COLLATE utf8mb4_general_ci;\r\nSELECT c FROM tmp_spanish_tbl ORDER BY c COLLATE utf8mb4_spanish2_ci;\r\n# Choosing a string data type\r\nCREATE TABLE tmp_tbl_2 (c1 CHAR(10), c2 VARCHAR(10));\r\nINSERT INTO tmp_tbl_2 (c1, c2) VALUES ('abc       ','abc       ');\r\nSELECT c1, c2, CHAR_LENGTH(c1), CHAR_LENGTH(c2) FROM tmp_tbl_2;\r\nCREATE TABLE tmp_turkish_tbl (c CHAR(3) CHARACTER SET utf8mb4);\r\nINSERT INTO tmp_turkish_tbl VALUES('iii'), ('şşş'), ('ööö'), ('ççç');\r\nSELECT * FROM tmp_turkish_tbl;\r\n# String Literals\r\n-- Enclose the text of string with single quotes and dobule quotes, 'Hello, World!' or \"Hello, World!\"\r\n-- Use Hexadecimal notation x'61626364' is equalant to 'abcd'\r\n-- Use Introducer which means write the character set with underscore, _utf8mb4 'abcd' or _ucs2 'abcd'\r\n-- Use different quotes for example if you set variable to @s = 'I'm asleep'. This would through an error use opposite quotaion like this statement\r\nSELECT \"I'm asleep\", 'He said, \"Boo!\"';\r\n-- This will also work\r\nSELECT 'I''m asleep', 'I\\'m wide awake';\r\nSELECT \"He said, \"\"BOO!\"\"\", \"And I said, \\\"Yikes\\\"\";\r\n-- To write a literal blackslash within a string dobule it\r\nSELECT \"In windows to indentify the download path c:\\\\user\\\\downloads\" AS `double blackslash`;\r\n-- Some of escape sequences are \\', \\\", \\\\, \\b (backslash), \\n (newline or linefeed), \\t (tab) and \\0 (ASCII NULL)\r\nSELECT 0x49276D2061736C656570;\r\n-- Above select value return the hex value, because by default mysql 8.0 set --binary-as-hex is true.\r\n-- To view the atual result invoke the client program with --binary-as-hex = 0\r\n# Checking or changing string character set or collation\r\n-- To check the string character set or collation user CHARASET() or COLLATION() funcion.\r\n-- To change string from one character set to another use CONVERT(... USING ...) function to change collation use COLLATE operator.\r\nSELECT USER(), CHARSET(USER()), COLLATION(USER());\r\nSET NAMES 'utf8mb4';\r\nSELECT CHARSET('abc'), COLLATION('abc');\r\nSET NAMES 'utf8mb4' COLLATE 'utf8mb4_bin';\r\nSELECT CHARSET('abc'), COLLATION('abc');\r\nSET @s1 = _latin1 'my string', @s2 = CONVERT(@s1 USING utf8mb4);\r\nSELECT @s1, @s2, CHARSET(@s1), CHARSET(@s2);\r\nSET @s1 = _latin1 'my string', @s2 = @s1 COLLATE latin1_spanish_ci;\r\nSELECT @s1, @s2, COLLATION(@s1), COLLATION(@s2);\r\n-- New collation must be legal for the character set of the string. If it fails it through an error\r\nSELECT _latin1 'abc' COLLATE 'utf8mb4_bin';\r\nSET @s1 = _latin1 'my string';\r\nSET @s2 = CONVERT(@s1 USING utf8mb4) COLLATE utf8mb4_spanish_ci;\r\nSELECT @s1, CHARSET(@s1), COLLATION(@s1), @s2, CHARSET(@s2), COLLATION(@s2);\r\n-- CONVERT() function also convert binary string to nonbinary string and vice versa.\r\nSET @s1 = _latin1 'my string';\r\nSET @s2 = CONVERT(@s1 USING binary);\r\nSET @s3 = CONVERT(@s2 USING utf8mb4);\r\nSELECT @s1, CHARSET(@s1), @s2, CHARSET(@s2), @s3, CHARSET(@s3);\r\n-- I think binary-as-hex is enabled that's why the error presist.\r\nSELECT @s1, @s2, @s3;\r\nSELECT CHARSET(@s1), CHARSET(@s2), CHARSET(@s3);\r\nSELECT @s3;\r\nSET @s3 = CONVERT(@s2 USING utf8mb4);\r\nSELECT @s3;\r\nSELECT @s2;\r\n-- Another alternative method to convert nonbinary string to binary is CAST(... AS ...) function\r\nSET @s4 = CAST(@s1 AS binary);\r\nSELECT @s1, CHARSET(@s1), @s4, CHARSET(@s4);\r\n# Convert letter cases\r\n-- To convert a string to upper or lower user UPPER() or LOWER() function. If it not working properly\r\n-- the string is in binary data data type, convert it to proper nonbinary string data type with character set and collation.\r\nSELECT thing, UPPER(thing), LOWER(thing) FROM limbs;\r\n-- We can not able to change the letter case for binary string\r\nCREATE TABLE tmp_tbl_3 (c VARBINARY(10)) SELECT 'aBcD' as c;\r\nSELECT c, UPPER(c), LOWER(c) FROM tmp_tbl_3;\r\n-- To view the actual result open the session with binary-as-hex=0\r\n-- If you want to convert the letter case for binary string convert it to nonbinary string first with proper character set and collate\r\nSELECT c, UPPER(CONVERT(c USING utf8mb4)) as upper, LOWER(CONVERT(c USING utf8mb4)) AS lower FROM tmp_tbl_3;\r\nSELECT CHARSET(c) FROM tmp_tbl_3;\r\n-- If you want to convert nonbinary string first letter only upper case use this method\r\n-- CONCAT(UPPER(LEFT(c1, 1)), MID(c1,2)) FROM tbl; It is not clever to write the method everytime so create a function\r\nCREATE FUNCTION initial_cap (s VARCHAR(255))\r\nRETURNS VARCHAR(255) DETERMINISTIC\r\nRETURN CONCAT(UPPER(LEFT(s,1)),MID(s,2));\r\n-- Above function need to root user privilege\r\n# Comparing String Values\r\nSELECT 'cat' = 'cat', 'cat' = 'dog', 'cat' <> 'cat', 'cat' <> 'dog';\r\nSELECT 'cat' < 'auk', 'cat' < 'dog', 'cat' BETWEEN 'auk' AND 'eel';\r\nSET @s1 = CAST('cat' AS BINARY), @s2 = CAST('CAT' AS BINARY);\r\nSELECT @s1 = @s2;\r\nSET @s1 = CONVERT(@s1 USING utf8mb4);\r\nSET @s2 = CONVERT(@s2 USING utf8mb4);\r\nSELECT @s1 = @s2;\r\nSET @s1 = _latin1 'cat', @s2 = _latin1 'CAT';\r\nSELECT @s1 = @s2;\r\nSELECT @s1 COLLATE latin1_general_cs = @s2 COLLATE latin1_general_cs AS `@s1 = @s2`;\r\n-- If you compare a nonbinary string with binary string, the comparison treat both strings as binary\r\nSELECT _latin1 'cat' = CAST('CAT' AS BINARY);\r\n-- Thus to compare two nonbinary string as binary convert any one of them as binary\r\nSET @s1 = _latin1 'cat', @s2 = _latin1 'CAT';\r\nSELECT @s1 = @s2, CAST(@s1 AS BINARY) = @s2, @s1 = CAST(@s2 AS BINARY);\r\n# Converting between decimal(base 10), octal(base 8), and Hexadecimal(base 16) format\r\n-- To conver from one base to another user CONV() function\r\n-- You can convert decimal to BIN(), OCT() and HEX() function but what if we do reverse process\r\n-- Syntax CONV(number, from_base, to_base)\r\nSELECT CONV(8, 10, 2) AS DECtoBIN;\r\nSELECT BIN(8);\r\nSELECT CONV('F',16, 10);\r\n# Converting between ASCII, BIT, Hexadecimal\r\n-- Use ASCII() function\r\nSELECT ASCII('Lara');\r\n-- ASCII character return only left most character\r\nSELECT ASCII('L');\r\nSELECT CONV(ASCII('Lara'),10,16);\r\nSELECT DISTINCT CONV(ASCII(last_name),10,16) FROM name;\r\nSELECT UUID();\r\nSELECT UUID_TO_BIN(UUID());\r\n-- BIT_COUNT() This function returns active bit values\r\n-- SELECT ... INTO ... method will store the select result in a variable\r\n-- SELECT UUID_TO_BIN(UUID()) INTO @uuid_bin;\r\nSELECT BIT_COUNT(@uuid_bin);\r\nSELECT @uuid_bin, BIT_COUNT(@uuid_bin); -- Check the result with cmd prompt\r\nSELECT BIT_COUNT(18);\r\nSELECT 1 << 7;\r\nSELECT BIT_OR(1 << 7);\r\n-- Check book page no 304 about BIR_OR() function\r\n-- IPv6 and IPv4 address represented as string data type, To return the binary value we can use\r\n-- INET_ATON() function. This function convert dotted IPv4 address to numberic value.\r\nSELECT INET_ATON('10.0.2.1');\r\nSELECT HEX(INET_ATON('10.0.2.1')); -- Hex representation of IP address\r\nSELECT HEX(INET6_ATON('10.0.2.1'));\r\n# Pattern Matching with SQL Patterns\r\n-- Syntax for SQL Pattern is SELECT ... [NOT] LIKE 'pattern';\r\nSELECT * FROM metal;\r\n-- SQL Pattern contain 2 special metachatacters _ (exactly one chatacter) and % (zero or more characters)\r\n-- Metacharacters are the character that represent other than itself.\r\nSELECT name FROM metal WHERE name LIKE 'me%'; -- Starts with\r\nSELECT name FROM metal WHERE name LIKE '%d'; -- Ends with\r\nSELECT name FROM metal WHERE name LIKE '%in%'; -- Any Popsition\r\nSELECT name FROM metal WHERE name LIKE '__at%'; -- Specific position\r\n-- Pattern match with NOT LIKE operator\r\nSELECT name FROM metal WHERE name NOT LIKE '%i%';\r\n-- SQL Pattern does not match NULL, it is true for both LIKE and NOT LIKE\r\nSELECT NULL LIKE '', NULL NOT LIKE '';\r\n-- In some cases SQL Pattern are equivalent to sub string comparison\r\nSELECT \"str LIKE 'abc%'\" AS `Pattern Match`, \"LEFT(str, 3) = 'abc'\" AS `substring comparison`;\r\nSELECT \"str LIKE '%abc'\" AS `Pattern Match`, \"RIGHT(str, 3) = 'abc'\" AS `substring comparison`;\r\n-- But comparing to sub string comparison SQL Pattern is more efficient and fast.\r\nCREATE TABLE tmp_tbl_4 \r\n(\r\n    `Function value test` VARCHAR(100),\r\n    `Pattern match test` VARCHAR(100)\r\n);\r\nINSERT INTO tmp_tbl_4 VALUES (\"YEAR(d) = 1975\", \"d LIKE '1975-%'\"), (\"MONTH(d) = 6\", \"d LIKE '%-06-%'\"), (\"DAYOFMONTH(d) = 21\", \"d LIKE '%-21%'\");\r\nSELECT * FROM tmp_tbl_4;\r\n# Pattern matching with regular expression\r\n-- Syntax SELECT ... REGEXP 'pattern';\r\nSELECT name FROM metal WHERE name REGEXP '^me';\r\nSELECT name FROM metal WHERE name REGEXP 'd$';\r\nSELECT name FROM metal WHERE name REGEXP 'in';\r\nSELECT name FROM metal WHERE name REGEXP '^..at';\r\nselect name, name REGEXP '[[:xdigit:]]' from metal;\r\nSELECT name FROM metal WHERE name REGEXP '^[aeiou]|d$';\r\nSELECT '0m' REGEXP '^[[:digit:]]+|[[:alpha:]]+$';\r\nSELECT '0m' REGEXP '^([[:digit:]]+|[[:alpha:]]+)$';\r\nSELECT 'abc' REGEXP 'b';\r\nSELECT 'abc' REGEXP '^.*b.*$';\r\nSELECT NULL REGEXP '.*', NULL NOT REGEXP '.*';\r\n-- Regular expression vs sub string comparison\r\nSELECT \"srt REGEXP '^abc'\" AS Pattern match, \"left(str,3) = 'abc'\" AS substring comparison;\r\nSELECT \"srt REGEXP 'abc$'\" AS Pattern match, \"right(str,3) = 'abc'\" AS substring comparison;\r\n",
+    "content": "USE COOKBOOK;\r\n# MySQL Strings divided into 2 types - Binary and Non-binary.\r\n-- Binary will store data like image, mp3, encrypted files.\r\n-- Non-binary will store date like Text with character set and collate.\r\n-- Data type for Binary strings are BINARY, VARBINARY, and BLOB. Data type of non-binary strings are \r\n-- CHAR, VARCHAR and TEXT each of which permit CHARACTER SET and COLLATE attribute.\r\n# CHARACTER SET\r\n-- To display all the character set for nonbinary strings use this statement\r\nSHOW CHARACTER SET;\r\nSET @s = CONVERT('abc' USING utf8mb4); -- All characters as stored as 1 to 4 bytes\r\nSELECT @s, LENGTH(@s), CHAR_LENGTH(@s);\r\nSET @s = CONVERT('abc' USING utf16); -- All characters stored as 2 bytes\r\nSELECT @s, LENGTH(@s), CHAR_LENGTH(@s);\r\n-- It store characters as single byte or multi byte based on the character set.\r\n# Collation\r\n-- To display all the collation use this statement\r\nSHOW COLLATION;\r\n-- Collation will take care of character searching and sorting operations.\r\n-- Examples of collation how it will effect the sorting order\r\nCREATE TABLE tmp_tbl_1 ( c CHAR(3) CHARACTER SET utf8mb4);\r\nINSERT INTO tmp_tbl_1 VALUES ('AAA'), ('bbb'), ('aaa'), ('BBB');\r\nSELECT c from tmp_tbl_1;\r\nSELECT c from tmp_tbl_1 ORDER BY c COLLATE utf8mb4_turkish_ci;\r\nSELECT c from tmp_tbl_1 ORDER BY c COLLATE utf8mb4_tr_0900_as_cs;\r\nSELECT c FROM tmp_tbl_1 ORDER BY c COLLATE utf8mb4_bin;\r\nCREATE TABLE tmp_spanish_tbl (c CHAR(2) CHARACTER SET utf8mb4);\r\nINSERT INTO tmp_spanish_tbl (c) VALUES ('cg'), ('ch'), ('ci'), ('lk'), ('ll'), ('lm');\r\nSELECT c FROM tmp_spanish_tbl ORDER BY c COLLATE utf8mb4_general_ci;\r\nSELECT c FROM tmp_spanish_tbl ORDER BY c COLLATE utf8mb4_spanish2_ci;\r\n# Choosing a string data type\r\nCREATE TABLE tmp_tbl_2 (c1 CHAR(10), c2 VARCHAR(10));\r\nINSERT INTO tmp_tbl_2 (c1, c2) VALUES ('abc       ','abc       ');\r\nSELECT c1, c2, CHAR_LENGTH(c1), CHAR_LENGTH(c2) FROM tmp_tbl_2;\r\nCREATE TABLE tmp_turkish_tbl (c CHAR(3) CHARACTER SET utf8mb4);\r\nINSERT INTO tmp_turkish_tbl VALUES('iii'), ('şşş'), ('ööö'), ('ççç');\r\nSELECT * FROM tmp_turkish_tbl;\r\n# String Literals\r\n-- Enclose the text of string with single quotes and dobule quotes, 'Hello, World!' or \"Hello, World!\"\r\n-- Use Hexadecimal notation x'61626364' is equalant to 'abcd'\r\n-- Use Introducer which means write the character set with underscore, _utf8mb4 'abcd' or _ucs2 'abcd'\r\n-- Use different quotes for example if you set variable to @s = 'I'm asleep'. This would through an error use opposite quotaion like this statement\r\nSELECT \"I'm asleep\", 'He said, \"Boo!\"';\r\n-- This will also work\r\nSELECT 'I''m asleep', 'I\\'m wide awake';\r\nSELECT \"He said, \"\"BOO!\"\"\", \"And I said, \\\"Yikes\\\"\";\r\n-- To write a literal blackslash within a string dobule it\r\nSELECT \"In windows to indentify the download path c:\\\\user\\\\downloads\" AS `double blackslash`;\r\n-- Some of escape sequences are \\', \\\", \\\\, \\b (backslash), \\n (newline or linefeed), \\t (tab) and \\0 (ASCII NULL)\r\nSELECT 0x49276D2061736C656570;\r\n-- Above select value return the hex value, because by default mysql 8.0 set --binary-as-hex is true.\r\n-- To view the atual result invoke the client program with --binary-as-hex = 0\r\n# Checking or changing string character set or collation\r\n-- To check the string character set or collation user CHARASET() or COLLATION() funcion.\r\n-- To change string from one character set to another use CONVERT(... USING ...) function to change collation use COLLATE operator.\r\nSELECT USER(), CHARSET(USER()), COLLATION(USER());\r\nSET NAMES 'utf8mb4';\r\nSELECT CHARSET('abc'), COLLATION('abc');\r\nSET NAMES 'utf8mb4' COLLATE 'utf8mb4_bin';\r\nSELECT CHARSET('abc'), COLLATION('abc');\r\nSET @s1 = _latin1 'my string', @s2 = CONVERT(@s1 USING utf8mb4);\r\nSELECT @s1, @s2, CHARSET(@s1), CHARSET(@s2);\r\nSET @s1 = _latin1 'my string', @s2 = @s1 COLLATE latin1_spanish_ci;\r\nSELECT @s1, @s2, COLLATION(@s1), COLLATION(@s2);\r\n-- New collation must be legal for the character set of the string. If it fails it through an error\r\nSELECT _latin1 'abc' COLLATE 'utf8mb4_bin';\r\nSET @s1 = _latin1 'my string';\r\nSET @s2 = CONVERT(@s1 USING utf8mb4) COLLATE utf8mb4_spanish_ci;\r\nSELECT @s1, CHARSET(@s1), COLLATION(@s1), @s2, CHARSET(@s2), COLLATION(@s2);\r\n-- CONVERT() function also convert binary string to nonbinary string and vice versa.\r\nSET @s1 = _latin1 'my string';\r\nSET @s2 = CONVERT(@s1 USING binary);\r\nSET @s3 = CONVERT(@s2 USING utf8mb4);\r\nSELECT @s1, CHARSET(@s1), @s2, CHARSET(@s2), @s3, CHARSET(@s3);\r\n-- I think binary-as-hex is enabled that's why the error presist.\r\nSELECT @s1, @s2, @s3;\r\nSELECT CHARSET(@s1), CHARSET(@s2), CHARSET(@s3);\r\nSELECT @s3;\r\nSET @s3 = CONVERT(@s2 USING utf8mb4);\r\nSELECT @s3;\r\nSELECT @s2;\r\n-- Another alternative method to convert nonbinary string to binary is CAST(... AS ...) function\r\nSET @s4 = CAST(@s1 AS binary);\r\nSELECT @s1, CHARSET(@s1), @s4, CHARSET(@s4);\r\n# Convert letter cases\r\n-- To convert a string to upper or lower user UPPER() or LOWER() function. If it not working properly\r\n-- the string is in binary data data type, convert it to proper nonbinary string data type with character set and collation.\r\nSELECT thing, UPPER(thing), LOWER(thing) FROM limbs;\r\n-- We can not able to change the letter case for binary string\r\nCREATE TABLE tmp_tbl_3 (c VARBINARY(10)) SELECT 'aBcD' as c;\r\nSELECT c, UPPER(c), LOWER(c) FROM tmp_tbl_3;\r\n-- To view the actual result open the session with binary-as-hex=0\r\n-- If you want to convert the letter case for binary string convert it to nonbinary string first with proper character set and collate\r\nSELECT c, UPPER(CONVERT(c USING utf8mb4)) as upper, LOWER(CONVERT(c USING utf8mb4)) AS lower FROM tmp_tbl_3;\r\nSELECT CHARSET(c) FROM tmp_tbl_3;\r\n-- If you want to convert nonbinary string first letter only upper case use this method\r\n-- CONCAT(UPPER(LEFT(c1, 1)), MID(c1,2)) FROM tbl; It is not clever to write the method everytime so create a function\r\nCREATE FUNCTION initial_cap (s VARCHAR(255))\r\nRETURNS VARCHAR(255) DETERMINISTIC\r\nRETURN CONCAT(UPPER(LEFT(s,1)),MID(s,2));\r\n-- Above function need to root user privilege\r\n# Comparing String Values\r\nSELECT 'cat' = 'cat', 'cat' = 'dog', 'cat' <> 'cat', 'cat' <> 'dog';\r\nSELECT 'cat' < 'auk', 'cat' < 'dog', 'cat' BETWEEN 'auk' AND 'eel';\r\nSET @s1 = CAST('cat' AS BINARY), @s2 = CAST('CAT' AS BINARY);\r\nSELECT @s1 = @s2;\r\nSET @s1 = CONVERT(@s1 USING utf8mb4);\r\nSET @s2 = CONVERT(@s2 USING utf8mb4);\r\nSELECT @s1 = @s2;\r\nSET @s1 = _latin1 'cat', @s2 = _latin1 'CAT';\r\nSELECT @s1 = @s2;\r\nSELECT @s1 COLLATE latin1_general_cs = @s2 COLLATE latin1_general_cs AS `@s1 = @s2`;\r\n-- If you compare a nonbinary string with binary string, the comparison treat both strings as binary\r\nSELECT _latin1 'cat' = CAST('CAT' AS BINARY);\r\n-- Thus to compare two nonbinary string as binary convert any one of them as binary\r\nSET @s1 = _latin1 'cat', @s2 = _latin1 'CAT';\r\nSELECT @s1 = @s2, CAST(@s1 AS BINARY) = @s2, @s1 = CAST(@s2 AS BINARY);\r\n# Converting between decimal(base 10), octal(base 8), and Hexadecimal(base 16) format\r\n-- To conver from one base to another user CONV() function\r\n-- You can convert decimal to BIN(), OCT() and HEX() function but what if we do reverse process\r\n-- Syntax CONV(number, from_base, to_base)\r\nSELECT CONV(8, 10, 2) AS DECtoBIN;\r\nSELECT BIN(8);\r\nSELECT CONV('F',16, 10);\r\n# Converting between ASCII, BIT, Hexadecimal\r\n-- Use ASCII() function\r\nSELECT ASCII('Lara');\r\n-- ASCII character return only left most character\r\nSELECT ASCII('L');\r\nSELECT CONV(ASCII('Lara'),10,16);\r\nSELECT DISTINCT CONV(ASCII(last_name),10,16) FROM name;\r\nSELECT UUID();\r\nSELECT UUID_TO_BIN(UUID());\r\n-- BIT_COUNT() This function returns active bit values\r\n-- SELECT ... INTO ... method will store the select result in a variable\r\n-- SELECT UUID_TO_BIN(UUID()) INTO @uuid_bin;\r\nSELECT BIT_COUNT(@uuid_bin);\r\nSELECT @uuid_bin, BIT_COUNT(@uuid_bin); -- Check the result with cmd prompt\r\nSELECT BIT_COUNT(18);\r\nSELECT 1 << 7;\r\nSELECT BIT_OR(1 << 7);\r\n-- Check book page no 304 about BIR_OR() function\r\n-- IPv6 and IPv4 address represented as string data type, To return the binary value we can use\r\n-- INET_ATON() function. This function convert dotted IPv4 address to numberic value.\r\nSELECT INET_ATON('10.0.2.1');\r\nSELECT HEX(INET_ATON('10.0.2.1')); -- Hex representation of IP address\r\nSELECT HEX(INET6_ATON('10.0.2.1'));\r\n# Pattern Matching with SQL Patterns\r\n-- Syntax for SQL Pattern is SELECT ... [NOT] LIKE 'pattern';\r\nSELECT * FROM metal;\r\n-- SQL Pattern contain 2 special metachatacters _ (exactly one chatacter) and % (zero or more characters)\r\n-- Metacharacters are the character that represent other than itself.\r\nSELECT name FROM metal WHERE name LIKE 'me%'; -- Starts with\r\nSELECT name FROM metal WHERE name LIKE '%d'; -- Ends with\r\nSELECT name FROM metal WHERE name LIKE '%in%'; -- Any Popsition\r\nSELECT name FROM metal WHERE name LIKE '__at%'; -- Specific position\r\n-- Pattern match with NOT LIKE operator\r\nSELECT name FROM metal WHERE name NOT LIKE '%i%';\r\n-- SQL Pattern does not match NULL, it is true for both LIKE and NOT LIKE\r\nSELECT NULL LIKE '', NULL NOT LIKE '';\r\n-- In some cases SQL Pattern are equivalent to sub string comparison\r\nSELECT \"str LIKE 'abc%'\" AS `Pattern Match`, \"LEFT(str, 3) = 'abc'\" AS `substring comparison`;\r\nSELECT \"str LIKE '%abc'\" AS `Pattern Match`, \"RIGHT(str, 3) = 'abc'\" AS `substring comparison`;\r\n-- But comparing to sub string comparison SQL Pattern is more efficient and fast.\r\nCREATE TABLE tmp_tbl_4 \r\n(\r\n    `Function value test` VARCHAR(100),\r\n    `Pattern match test` VARCHAR(100)\r\n);\r\nINSERT INTO tmp_tbl_4 VALUES (\"YEAR(d) = 1975\", \"d LIKE '1975-%'\"), (\"MONTH(d) = 6\", \"d LIKE '%-06-%'\"), (\"DAYOFMONTH(d) = 21\", \"d LIKE '%-21%'\");\r\nSELECT * FROM tmp_tbl_4;\r\n# Pattern matching with regular expression\r\n-- Syntax SELECT ... REGEXP 'pattern';\r\nSELECT name FROM metal WHERE name REGEXP '^me';\r\nSELECT name FROM metal WHERE name REGEXP 'd$';\r\nSELECT name FROM metal WHERE name REGEXP 'in';\r\nSELECT name FROM metal WHERE name REGEXP '^..at';\r\nselect name, name REGEXP '[[:xdigit:]]' from metal;\r\nSELECT name FROM metal WHERE name REGEXP '^[aeiou]|d$';\r\nSELECT '0m' REGEXP '^[[:digit:]]+|[[:alpha:]]+$';\r\nSELECT '0m' REGEXP '^([[:digit:]]+|[[:alpha:]]+)$';\r\nSELECT 'abc' REGEXP 'b';\r\nSELECT 'abc' REGEXP '^.*b.*$';\r\nSELECT NULL REGEXP '.*', NULL NOT REGEXP '.*';\r\n-- Regular expression vs sub string comparison\r\nSELECT \"srt REGEXP '^abc'\" AS `Pattern match`, \"left(str,3) = 'abc'\" AS `substring comparison`;\r\nSELECT \"srt REGEXP 'abc$'\" AS `Pattern match`, \"right(str,3) = 'abc'\" AS `substring comparison`;\r\n# Reversing a string content\r\n-- Syntax, REVERSE(expression)\r\nSELECT REVERSE('SPORTS FLOW');\r\nSELECT REVERSE(0123456789);\r\nSELECT REVERSE('0123456789');\r\nSELECT REVERSE(001122334455);\r\n-- Reversing an palindrom string always return us same value\r\nSELECT REVERSE(\"STEP ON NO PETS\");\r\nSELECT COUNT(*) FROM top_names WHERE REVERSE(top_name) = top_name;\r\nSELECT top_name FROM top_names WHERE REVERSE(top_name) = top_name AND top_name LIKE 'U%';\r\n# Searching for substring\r\n-- To find whether the given string occurs in another string user LOCATE() function which returns the index number\r\n-- Syntax: LOCATE('sub_str',actual_str,[position])\r\nSELECT name, LOCATE('in',name), LOCATE('in',name,3) FROM metal;\r\n# Breaking apart and Combining string\r\n-- To break apart use LEFT(), RIGHT(), MID() functions\r\n-- To combine use CONCAT() function\r\n-- Syntax: LEFT(str, no_of_characters), RIGHT(str, no_of_characters), MID(str,position, no_of_characters)\r\nSET @date = '2015-07-21';\r\nSELECT @date, LEFT(@date,4), MID(@date,6,2), RIGHT(@date,2);\r\n-- Equivalent function for MID() is SUBSTRING()\r\n-- Syntax: SUBSTRING(str, position) and it return everyting from the position\r\nSELECT SUBSTRING(@date,6);\r\nSELECT @date, SUBSTRING(@date,6), MID(@date,6);\r\n-- Another similar function is SUBSTRING_INDEX() which return left or right characters based on search\r\n-- Syntax: SUBSTRING_INDEX(str, c, n) if n is positive it returns from left, if negative it returns right\r\nSET @email = 'postmaster@example.com';\r\nSELECT @email, SUBSTRING_INDEX(@email,'@',1) as user, SUBSTRING_INDEX(@email,'@',-1) as host;\r\nSELECT name from metal WHERE LEFT(name,1) >= 'n';\r\n-- Syntax: CONCAT(variable, 'str', 'integer', 'and', 'so on');\r\nSELECT CONCAT(name, ' ends in d: ', IF(name LIKE '%d','YES','NO')) AS `name ends in d?` FROM metal;\r\nUPDATE metal SET name = CONCAT(name,'ide');\r\nSELECT name FROM metal;\r\n-- To undo the operation strip the last 3 chatacters with help of CHAR_LENGTH() function\r\nUPDATE metal SET name = LEFT(name,CHAR_LENGTH(name)-3);\r\nSELECT name FROM metal;\r\n-- With CONCAT() we can also modify the ENUM or SET Values\r\n-- UPDATE tbl_name SET set_cal = IF(set_cal IS NULL, val, CONCAT(set_cal, ',', val));\r\n# Skipped the full text search need to learn more about it...",
     "options": {},
     "viewState": {
         "cursorState": [
             {
                 "inSelectionMode": false,
                 "selectionStart": {
-                    "lineNumber": 187,
-                    "column": 1
+                    "lineNumber": 225,
+                    "column": 62
                 },
                 "position": {
-                    "lineNumber": 187,
-                    "column": 1
+                    "lineNumber": 225,
+                    "column": 62
                 }
             }
         ],
         "viewState": {
             "scrollLeft": 0,
             "firstPosition": {
-                "lineNumber": 180,
+                "lineNumber": 220,
                 "column": 1
             },
-            "firstPositionDeltaTop": -2
+            "firstPositionDeltaTop": 166
         },
         "contributionsState": {
             "editor.contrib.folding": {},
@@ -43,8 +43,8 @@
                         {
                             "type": 4,
                             "index": 0,
-                            "resultId": "9347beb1-acf4-4576-d726-66562cdadeae",
-                            "content": "OK, 0 records retrieved in 9.286ms"
+                            "resultId": "8f0c9d00-4ce6-4ce2-c2d2-1c099b28aff4",
+                            "content": "OK, 0 records retrieved in 0s"
                         }
                     ]
                 },
@@ -72,7 +72,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "54797c9d-b03c-46aa-8be1-43cb29acc6f1"
+                        "08411921-8d51-4951-bad0-9c296526fbcb"
                     ]
                 },
                 "currentHeight": 36,
@@ -91,8 +91,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "54797c9d-b03c-46aa-8be1-43cb29acc6f1",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "08411921-8d51-4951-bad0-9c296526fbcb",
                     "rows": [
                         {
                             "0": "armscii8",
@@ -478,7 +478,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "9110c2e0-4f58-46e6-861c-e1773101452e"
+                        "3d3a7619-3517-41e1-cc61-0ddf97684bf8"
                     ]
                 },
                 "currentHeight": 36,
@@ -497,8 +497,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "9110c2e0-4f58-46e6-861c-e1773101452e",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "3d3a7619-3517-41e1-cc61-0ddf97684bf8",
                     "rows": [
                         {
                             "0": "abc",
@@ -628,7 +628,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "2a0f3788-d1f8-430a-aed7-410f40eb572c"
+                        "e986addc-10d7-4f9c-f065-af54f8430f2f"
                     ]
                 },
                 "currentHeight": 36,
@@ -647,8 +647,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "2a0f3788-d1f8-430a-aed7-410f40eb572c",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "e986addc-10d7-4f9c-f065-af54f8430f2f",
                     "rows": [
                         {
                             "0": "abc",
@@ -737,7 +737,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "632bbc12-7902-42a6-bb3f-5997d0083a22"
+                        "e166c7e7-b54b-4dd3-828f-96ca973661a4"
                     ]
                 },
                 "currentHeight": 36,
@@ -756,8 +756,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "632bbc12-7902-42a6-bb3f-5997d0083a22",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "e166c7e7-b54b-4dd3-828f-96ca973661a4",
                     "rows": [
                         {
                             "0": "armscii8_bin",
@@ -3543,7 +3543,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "b1cde699-73d2-4d7b-92f2-d53b528ace47"
+                        "9063e732-0532-46f4-dbd4-4902748eb3a8"
                     ]
                 },
                 "currentHeight": 36,
@@ -3562,8 +3562,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "b1cde699-73d2-4d7b-92f2-d53b528ace47",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "9063e732-0532-46f4-dbd4-4902748eb3a8",
                     "rows": [
                         {
                             "0": "AAA"
@@ -3619,7 +3619,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "5d4e0b6c-0ac4-45eb-b94a-cb0a79de9b8f"
+                        "7522b682-b9f3-4648-d352-c73a3f5acd7f"
                     ]
                 },
                 "currentHeight": 206.5625,
@@ -3638,8 +3638,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "5d4e0b6c-0ac4-45eb-b94a-cb0a79de9b8f",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "7522b682-b9f3-4648-d352-c73a3f5acd7f",
                     "rows": [
                         {
                             "0": "AAA"
@@ -3695,7 +3695,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "55255c0a-fee3-4176-9933-ce13b5e2dda8"
+                        "4d65f680-0a93-4147-d7c1-db56a5c55d2f"
                     ]
                 },
                 "currentHeight": 206.5625,
@@ -3714,8 +3714,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "55255c0a-fee3-4176-9933-ce13b5e2dda8",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "4d65f680-0a93-4147-d7c1-db56a5c55d2f",
                     "rows": [
                         {
                             "0": "aaa"
@@ -3771,7 +3771,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "1297377a-a6a8-4fbc-e032-2effab15f52a"
+                        "a5f22acc-41da-4367-a46f-e09a1b217ab0"
                     ]
                 },
                 "currentHeight": 206.5625,
@@ -3790,8 +3790,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "1297377a-a6a8-4fbc-e032-2effab15f52a",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "a5f22acc-41da-4367-a46f-e09a1b217ab0",
                     "rows": [
                         {
                             "0": "AAA"
@@ -3911,7 +3911,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "0e8936eb-e65d-425f-b4ec-77946cfa2728"
+                        "f0188366-50be-4a0e-fff6-909d2cfd6c0f"
                     ]
                 },
                 "currentHeight": 272.84375,
@@ -3930,8 +3930,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "0e8936eb-e65d-425f-b4ec-77946cfa2728",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "f0188366-50be-4a0e-fff6-909d2cfd6c0f",
                     "rows": [
                         {
                             "0": "cg"
@@ -3993,7 +3993,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "8388bf20-62be-44af-f387-0245884f2545"
+                        "4a88e0df-da11-4d53-93f0-9d319e60837d"
                     ]
                 },
                 "currentHeight": 272.84375,
@@ -4012,8 +4012,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "8388bf20-62be-44af-f387-0245884f2545",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "4a88e0df-da11-4d53-93f0-9d319e60837d",
                     "rows": [
                         {
                             "0": "cg"
@@ -4139,7 +4139,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "310ed074-c240-47ea-ee3e-36c06604484b"
+                        "0250bddc-4ae4-4c27-9b34-6c6c8102f017"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -4158,8 +4158,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "310ed074-c240-47ea-ee3e-36c06604484b",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "0250bddc-4ae4-4c27-9b34-6c6c8102f017",
                     "rows": [
                         {
                             "0": "abc",
@@ -4331,7 +4331,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "9e951fcd-f727-4f9b-865e-f02480273a04"
+                        "3a415cb1-013b-45b7-abb5-7c40d6e6826a"
                     ]
                 },
                 "currentHeight": 206.5625,
@@ -4350,8 +4350,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "9e951fcd-f727-4f9b-865e-f02480273a04",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "3a415cb1-013b-45b7-abb5-7c40d6e6826a",
                     "rows": [
                         {
                             "0": "iii"
@@ -4407,7 +4407,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "62259c87-653e-4573-af68-d73887247b2f"
+                        "61b1cb9e-313c-4f47-b735-c1aaed769aef"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -4435,8 +4435,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "62259c87-653e-4573-af68-d73887247b2f",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "61b1cb9e-313c-4f47-b735-c1aaed769aef",
                     "rows": [
                         {
                             "0": "I'm asleep",
@@ -4501,7 +4501,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "381af0cf-2755-4d2c-f7f0-547155649cfa"
+                        "23ad84f6-8bb9-4492-f5d4-f0a2b5e7bc79"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -4520,8 +4520,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "381af0cf-2755-4d2c-f7f0-547155649cfa",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "23ad84f6-8bb9-4492-f5d4-f0a2b5e7bc79",
                     "rows": [
                         {
                             "0": "I'm asleep",
@@ -4587,7 +4587,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "e8d068dc-f6f0-4f6f-8c81-ccef3b30d164"
+                        "2fd32535-fcbb-4f22-973e-e494cdaef99d"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -4606,8 +4606,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "e8d068dc-f6f0-4f6f-8c81-ccef3b30d164",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "2fd32535-fcbb-4f22-973e-e494cdaef99d",
                     "rows": [
                         {
                             "0": "He said, \"BOO!\"",
@@ -4672,7 +4672,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "3f9179b9-92dd-4a3c-a514-a784ce0ed110"
+                        "f9080fe6-67a5-4d1a-93fb-7232089992d9"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -4691,8 +4691,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "3f9179b9-92dd-4a3c-a514-a784ce0ed110",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "f9080fe6-67a5-4d1a-93fb-7232089992d9",
                     "rows": [
                         {
                             "0": "In windows to indentify the download path c:\\user\\downloads"
@@ -4738,7 +4738,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "76deaac1-9804-482c-cc87-aa106899acf6"
+                        "76e8b03c-07ef-4b9c-9de2-4469826e8b0d"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -4757,8 +4757,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "76deaac1-9804-482c-cc87-aa106899acf6",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "76e8b03c-07ef-4b9c-9de2-4469826e8b0d",
                     "rows": [
                         {
                             "0": "SSdtIGFzbGVlcA=="
@@ -4797,7 +4797,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "761b84d7-1b0e-44a9-9ab8-7a984b0d090b"
+                        "14444ec1-c587-4979-fafa-066386000a88"
                     ]
                 },
                 "currentHeight": 36,
@@ -4816,8 +4816,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "761b84d7-1b0e-44a9-9ab8-7a984b0d090b",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "14444ec1-c587-4979-fafa-066386000a88",
                     "rows": [
                         {
                             "0": "cbuser@localhost",
@@ -4934,7 +4934,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "45de3624-afec-4325-e434-65f8e1e02d08"
+                        "ae8417c6-3e3f-4c71-a068-1485fb699ef6"
                     ]
                 },
                 "currentHeight": 36,
@@ -4953,8 +4953,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "45de3624-afec-4325-e434-65f8e1e02d08",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "ae8417c6-3e3f-4c71-a068-1485fb699ef6",
                     "rows": [
                         {
                             "0": "utf8mb4",
@@ -5052,7 +5052,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "061ecd51-2568-41a1-a465-b8e8ec3e4e6c"
+                        "30789358-05a2-4a63-eba7-c03026a522d5"
                     ]
                 },
                 "currentHeight": 36,
@@ -5071,8 +5071,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "061ecd51-2568-41a1-a465-b8e8ec3e4e6c",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "30789358-05a2-4a63-eba7-c03026a522d5",
                     "rows": [
                         {
                             "0": "utf8mb4",
@@ -5170,7 +5170,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "e77a08af-5058-402c-bdc9-4b386c569c97"
+                        "ab6baa25-e53e-4c05-91bd-29f6e146f18e"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -5189,8 +5189,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "e77a08af-5058-402c-bdc9-4b386c569c97",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "ab6baa25-e53e-4c05-91bd-29f6e146f18e",
                     "rows": [
                         {
                             "0": "my string",
@@ -5326,7 +5326,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "4a0cd52f-efc8-44b4-bd73-390f812bcde0"
+                        "f67158b6-1cea-4f66-c18c-8f7387a1067c"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -5345,8 +5345,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "4a0cd52f-efc8-44b4-bd73-390f812bcde0",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "f67158b6-1cea-4f66-c18c-8f7387a1067c",
                     "rows": [
                         {
                             "0": "my string",
@@ -5532,7 +5532,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "068f7169-141b-46da-cc9e-dc3d12043068"
+                        "a95c6b84-5701-4ec4-deba-2a585dba597c"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -5551,8 +5551,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "068f7169-141b-46da-cc9e-dc3d12043068",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "a95c6b84-5701-4ec4-deba-2a585dba597c",
                     "rows": [
                         {
                             "0": "my string",
@@ -5801,7 +5801,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "b7d13d9f-5ba5-4df3-93f4-784cbec8e4d1"
+                        "1d165d62-16ca-4577-cdd7-a756c36d951f"
                     ]
                 },
                 "currentHeight": 36,
@@ -5820,8 +5820,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "b7d13d9f-5ba5-4df3-93f4-784cbec8e4d1",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "1d165d62-16ca-4577-cdd7-a756c36d951f",
                     "rows": [
                         {
                             "0": "my string",
@@ -5890,7 +5890,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "da8ac175-f0e2-42f3-b747-194b0293338a"
+                        "c8feee8a-f021-4652-f7bc-27c5fd01af3c"
                     ]
                 },
                 "currentHeight": 36,
@@ -5909,8 +5909,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "da8ac175-f0e2-42f3-b747-194b0293338a",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "c8feee8a-f021-4652-f7bc-27c5fd01af3c",
                     "rows": [
                         {
                             "0": "latin1",
@@ -5995,7 +5995,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "ba61ebbb-6b4d-47f7-effa-c8f2f177666e"
+                        "102f7088-9202-47b5-fedb-e38d99144045"
                     ]
                 },
                 "currentHeight": 105.140625,
@@ -6014,8 +6014,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "ba61ebbb-6b4d-47f7-effa-c8f2f177666e",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "102f7088-9202-47b5-fedb-e38d99144045",
                     "rows": [
                         {
                             "0": null
@@ -6086,7 +6086,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "13851d59-c17b-4666-8795-37264fd5112a"
+                        "49a482da-3bd9-48e9-f88d-513666333e65"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -6105,8 +6105,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "13851d59-c17b-4666-8795-37264fd5112a",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "49a482da-3bd9-48e9-f88d-513666333e65",
                     "rows": [
                         {
                             "0": "my string"
@@ -6153,7 +6153,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "f3f2636f-775e-4471-e281-141fd165798d"
+                        "012b97b4-e76f-404b-f237-40b228143199"
                     ]
                 },
                 "currentHeight": 105.140625,
@@ -6172,8 +6172,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "f3f2636f-775e-4471-e281-141fd165798d",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "012b97b4-e76f-404b-f237-40b228143199",
                     "rows": [
                         {
                             "0": {}
@@ -6244,7 +6244,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "f574c7c2-eaf6-4a2b-bc5c-b5a5eeb3edfb"
+                        "cafd3e15-9720-4b4e-d1de-f3ecf8a2ca18"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -6263,8 +6263,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "f574c7c2-eaf6-4a2b-bc5c-b5a5eeb3edfb",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "cafd3e15-9720-4b4e-d1de-f3ecf8a2ca18",
                     "rows": [
                         {
                             "0": "my string",
@@ -6360,7 +6360,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "f6971373-d995-44b3-9d0b-1222af32af92"
+                        "eda9fff5-00c9-42a5-c620-076c447987d8"
                     ]
                 },
                 "currentHeight": 352,
@@ -6379,8 +6379,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "f6971373-d995-44b3-9d0b-1222af32af92",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "eda9fff5-00c9-42a5-c620-076c447987d8",
                     "rows": [
                         {
                             "0": "armchair",
@@ -6547,7 +6547,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "b9b6898d-fd59-417c-eda7-bdee2245a515"
+                        "5c08f941-66f0-4d77-ece4-d4bef0249ccb"
                     ]
                 },
                 "currentHeight": 36,
@@ -6566,8 +6566,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "b9b6898d-fd59-417c-eda7-bdee2245a515",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "5c08f941-66f0-4d77-ece4-d4bef0249ccb",
                     "rows": [
                         {
                             "0": "YUJjRA==",
@@ -6628,7 +6628,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "9d258763-c8a4-4181-931e-7432a57f1521"
+                        "198822bf-f9a6-4e35-c02d-961f1996a7d0"
                     ]
                 },
                 "currentHeight": 36,
@@ -6647,8 +6647,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "9d258763-c8a4-4181-931e-7432a57f1521",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "198822bf-f9a6-4e35-c02d-961f1996a7d0",
                     "rows": [
                         {
                             "0": "YUJjRA==",
@@ -6725,7 +6725,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "86c5fedd-cfe6-4ab6-fd05-2cb5058c7178"
+                        "3da8061e-d801-475c-c60f-7667d774b45f"
                     ]
                 },
                 "currentHeight": 36,
@@ -6744,8 +6744,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "86c5fedd-cfe6-4ab6-fd05-2cb5058c7178",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "3da8061e-d801-475c-c60f-7667d774b45f",
                     "rows": [
                         {
                             "0": "binary"
@@ -6827,7 +6827,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "435f5987-ce5d-43c1-8b82-7368ec67a54c"
+                        "a8051341-7e78-4431-ebad-089e1dbf0739"
                     ]
                 },
                 "currentHeight": 36,
@@ -6846,8 +6846,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "435f5987-ce5d-43c1-8b82-7368ec67a54c",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "a8051341-7e78-4431-ebad-089e1dbf0739",
                     "rows": [
                         {
                             "0": 1,
@@ -6959,7 +6959,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "82ed3767-9b1c-469a-f7b8-19973980be63"
+                        "28a5c0a4-0601-46b0-aa26-18d7771931b1"
                     ]
                 },
                 "currentHeight": 36,
@@ -6978,8 +6978,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "82ed3767-9b1c-469a-f7b8-19973980be63",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "28a5c0a4-0601-46b0-aa26-18d7771931b1",
                     "rows": [
                         {
                             "0": 0,
@@ -7102,7 +7102,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "fdf79e5d-9794-4b14-b71f-ef74174d6265"
+                        "21cbf63e-350e-481e-97f4-1e131a8ec6b6"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -7121,8 +7121,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "fdf79e5d-9794-4b14-b71f-ef74174d6265",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "21cbf63e-350e-481e-97f4-1e131a8ec6b6",
                     "rows": [
                         {
                             "0": 0
@@ -7218,7 +7218,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "e0708069-d012-4c6c-a9fb-2243c4d653d5"
+                        "d461a45b-566b-497c-d328-7e9ad940211b"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -7237,8 +7237,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "e0708069-d012-4c6c-a9fb-2243c4d653d5",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "d461a45b-566b-497c-d328-7e9ad940211b",
                     "rows": [
                         {
                             "0": 1
@@ -7319,7 +7319,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "9333d119-72d8-4166-bee7-137d22c302a5"
+                        "b84772a0-57e4-4db4-d834-d30398c0a923"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -7338,8 +7338,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "9333d119-72d8-4166-bee7-137d22c302a5",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "b84772a0-57e4-4db4-d834-d30398c0a923",
                     "rows": [
                         {
                             "0": 1
@@ -7388,7 +7388,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "84142fc2-e364-4e52-db5b-bbc8d3963f1a"
+                        "c147461d-71fc-47c2-fdeb-93e3b3ed0eb7"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -7407,8 +7407,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "84142fc2-e364-4e52-db5b-bbc8d3963f1a",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "c147461d-71fc-47c2-fdeb-93e3b3ed0eb7",
                     "rows": [
                         {
                             "0": 0
@@ -7457,7 +7457,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "609b0355-b593-41d8-cfcc-2157874c8c44"
+                        "1ad156d4-0345-4e41-d342-be464278da84"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -7476,8 +7476,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "609b0355-b593-41d8-cfcc-2157874c8c44",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "1ad156d4-0345-4e41-d342-be464278da84",
                     "rows": [
                         {
                             "0": 0
@@ -7526,8 +7526,8 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "c5322d8c-172a-406f-f56d-ffdba14785da",
-                        "f8449661-3fa0-4434-83a3-81327efbfa5b"
+                        "a43c6b6b-961c-46a3-a73e-f6e889ab2bd9",
+                        "cc62e734-4c28-42a2-9ec8-9c583b096e7f"
                     ]
                 },
                 "currentHeight": 134.140625,
@@ -7564,8 +7564,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "c5322d8c-172a-406f-f56d-ffdba14785da",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "a43c6b6b-961c-46a3-a73e-f6e889ab2bd9",
                     "rows": [
                         {
                             "0": 1,
@@ -7647,8 +7647,8 @@
                     "fullTableName": ""
                 },
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "f8449661-3fa0-4434-83a3-81327efbfa5b",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "cc62e734-4c28-42a2-9ec8-9c583b096e7f",
                     "rows": [],
                     "executionInfo": {
                         "text": "OK, 0 records retrieved in 0s",
@@ -7671,7 +7671,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "053bd336-98d2-4559-cbde-60e0606c020a"
+                        "64ae2ae4-a715-4090-9c6e-021ded0c46a9"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -7690,8 +7690,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "053bd336-98d2-4559-cbde-60e0606c020a",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "64ae2ae4-a715-4090-9c6e-021ded0c46a9",
                     "rows": [
                         {
                             "0": "1000"
@@ -7738,7 +7738,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "8ddb3f19-10cf-4286-c8b7-e598b4441a9c"
+                        "5062415f-eaf6-4302-91e2-a99d6b513417"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -7757,8 +7757,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "8ddb3f19-10cf-4286-c8b7-e598b4441a9c",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "5062415f-eaf6-4302-91e2-a99d6b513417",
                     "rows": [
                         {
                             "0": "1000"
@@ -7805,7 +7805,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "29bedfd4-2d4d-4831-8838-6f18aefe9bb1"
+                        "055cf1f0-1faa-4d25-cfe1-afb0795b5105"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -7824,8 +7824,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "29bedfd4-2d4d-4831-8838-6f18aefe9bb1",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "055cf1f0-1faa-4d25-cfe1-afb0795b5105",
                     "rows": [
                         {
                             "0": "15"
@@ -7872,7 +7872,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "6176d6a7-b407-4206-e7d2-1c56ee6fae06"
+                        "3edfd459-6a2c-471c-fd4d-3eb053f31ff7"
                     ]
                 },
                 "currentHeight": 36,
@@ -7891,8 +7891,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "6176d6a7-b407-4206-e7d2-1c56ee6fae06",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "3edfd459-6a2c-471c-fd4d-3eb053f31ff7",
                     "rows": [
                         {
                             "0": 76
@@ -7942,7 +7942,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "94e71448-2ec9-41e1-af70-ca5ce57f3b4c"
+                        "74360fb6-6d52-4d98-f621-e7053bf74261"
                     ]
                 },
                 "currentHeight": 36,
@@ -7961,8 +7961,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "94e71448-2ec9-41e1-af70-ca5ce57f3b4c",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "74360fb6-6d52-4d98-f621-e7053bf74261",
                     "rows": [
                         {
                             "0": 76
@@ -8012,7 +8012,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "ba6c7c54-265f-46f0-d7b8-cf379ed675a6"
+                        "d7ca4b1d-4bac-41de-d5f0-75e358029050"
                     ]
                 },
                 "currentHeight": 36,
@@ -8031,8 +8031,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "ba6c7c54-265f-46f0-d7b8-cf379ed675a6",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "d7ca4b1d-4bac-41de-d5f0-75e358029050",
                     "rows": [
                         {
                             "0": "4C"
@@ -8079,7 +8079,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "248f37f1-def8-494d-8357-173666fa5feb"
+                        "1513e614-0219-437a-ccea-b758575c1ddb"
                     ]
                 },
                 "currentHeight": 36,
@@ -8098,8 +8098,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "248f37f1-def8-494d-8357-173666fa5feb",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "1513e614-0219-437a-ccea-b758575c1ddb",
                     "rows": [
                         {
                             "0": "42"
@@ -8152,7 +8152,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "f1fc06c3-0210-4a17-9c07-90038dd6fe73"
+                        "904d33a0-d6c4-47ba-b2ce-3fe1463c513c"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -8171,8 +8171,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "f1fc06c3-0210-4a17-9c07-90038dd6fe73",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "904d33a0-d6c4-47ba-b2ce-3fe1463c513c",
                     "rows": [
                         {
                             "0": "0a2b3b6f-3aed-11ef-b202-e86a642cec41"
@@ -8219,7 +8219,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "6a41f6bd-02e4-41c7-f2c1-4e2fd6126a6f"
+                        "61ec95a9-3b87-4595-f6d9-042cff8f0521"
                     ]
                 },
                 "currentHeight": 36,
@@ -8238,8 +8238,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "6a41f6bd-02e4-41c7-f2c1-4e2fd6126a6f",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "61ec95a9-3b87-4595-f6d9-042cff8f0521",
                     "rows": [
                         {
                             "0": "EnmEnjrtEe+yAuhqZCzsQQ=="
@@ -8310,7 +8310,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "bbd79e0f-94e1-4ba5-8bde-0063f5145989"
+                        "49f419d3-f054-4956-cc26-3181e40037ea"
                     ]
                 },
                 "currentHeight": 36,
@@ -8329,8 +8329,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "bbd79e0f-94e1-4ba5-8bde-0063f5145989",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "49f419d3-f054-4956-cc26-3181e40037ea",
                     "rows": [
                         {
                             "0": null
@@ -8379,7 +8379,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "38077c37-00d2-4b57-c5a1-594a2a10a6ce"
+                        "0ca7db13-a317-44c6-fa8b-2cc51591e0f2"
                     ]
                 },
                 "currentHeight": 36,
@@ -8407,8 +8407,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "38077c37-00d2-4b57-c5a1-594a2a10a6ce",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "0ca7db13-a317-44c6-fa8b-2cc51591e0f2",
                     "rows": [
                         {
                             "0": null,
@@ -8468,7 +8468,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "6a6e3d8f-4593-444e-81e1-02e322b3cb22"
+                        "00ebf6b8-1dea-4628-def2-acc1e9b69ce8"
                     ]
                 },
                 "currentHeight": 36,
@@ -8487,8 +8487,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "6a6e3d8f-4593-444e-81e1-02e322b3cb22",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "00ebf6b8-1dea-4628-def2-acc1e9b69ce8",
                     "rows": [
                         {
                             "0": 2
@@ -8537,7 +8537,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "4c4a7a07-21e3-4455-8788-1d47cc4f069c"
+                        "c1338ef9-16cd-4856-c5ee-4a69db69a8b5"
                     ]
                 },
                 "currentHeight": 36,
@@ -8556,8 +8556,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "4c4a7a07-21e3-4455-8788-1d47cc4f069c",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "c1338ef9-16cd-4856-c5ee-4a69db69a8b5",
                     "rows": [
                         {
                             "0": 128
@@ -8606,7 +8606,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "f65b1d44-3245-47a6-b070-8feeac24b0e8"
+                        "43edfc19-9e83-4921-a4ee-271f058a914a"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -8625,8 +8625,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "f65b1d44-3245-47a6-b070-8feeac24b0e8",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "43edfc19-9e83-4921-a4ee-271f058a914a",
                     "rows": [
                         {
                             "0": 128
@@ -8675,7 +8675,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "65b71c3c-3835-4192-b1db-6301b58b5ec6"
+                        "0c15ed41-ac79-4606-cc42-d37aadc43ea9"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -8694,8 +8694,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "65b71c3c-3835-4192-b1db-6301b58b5ec6",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "0c15ed41-ac79-4606-cc42-d37aadc43ea9",
                     "rows": [
                         {
                             "0": 167772673
@@ -8744,8 +8744,8 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "9301c2d7-6b07-49ca-8532-63f26f227a17",
-                        "64af3e48-e5fa-4f79-d8a7-8314227a3c3e"
+                        "a395a3f4-9093-4af1-f8cd-2708bc9e8565",
+                        "4426d4b9-32e4-43f3-dd6f-e3a262b2741b"
                     ]
                 },
                 "currentHeight": 134.140625,
@@ -8773,8 +8773,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "9301c2d7-6b07-49ca-8532-63f26f227a17",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "a395a3f4-9093-4af1-f8cd-2708bc9e8565",
                     "rows": [
                         {
                             "0": "A000201"
@@ -8812,8 +8812,8 @@
                     "fullTableName": ""
                 },
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "64af3e48-e5fa-4f79-d8a7-8314227a3c3e",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "4426d4b9-32e4-43f3-dd6f-e3a262b2741b",
                     "rows": [],
                     "executionInfo": {
                         "text": "OK, 0 records retrieved in 0s",
@@ -8836,7 +8836,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "779a0d30-57be-465b-ac8b-0258671f3f91"
+                        "88a08f05-7af2-4a4d-9460-7722a08db92e"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -8855,8 +8855,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "779a0d30-57be-465b-ac8b-0258671f3f91",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "88a08f05-7af2-4a4d-9460-7722a08db92e",
                     "rows": [
                         {
                             "0": "0A000201"
@@ -8903,7 +8903,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "795b333e-f724-48a7-a993-41c47113c575"
+                        "30bd23f2-474a-4460-8602-dcb4f05f6e2a"
                     ]
                 },
                 "currentHeight": 36,
@@ -8922,8 +8922,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "795b333e-f724-48a7-a993-41c47113c575",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "30bd23f2-474a-4460-8602-dcb4f05f6e2a",
                     "rows": [
                         {
                             "0": "gold"
@@ -8985,7 +8985,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "27107930-80f9-42f3-c77c-8718b4133d42"
+                        "7091c1ae-348f-4319-aaf8-efb19b717b55"
                     ]
                 },
                 "currentHeight": 36,
@@ -9013,8 +9013,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "27107930-80f9-42f3-c77c-8718b4133d42",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "7091c1ae-348f-4319-aaf8-efb19b717b55",
                     "rows": [
                         {
                             "0": "mercury"
@@ -9061,7 +9061,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "199d4a2d-9a02-4fb6-dabd-2f5e7f202742"
+                        "d282a922-56db-4f59-96fc-f839c2a3beed"
                     ]
                 },
                 "currentHeight": 36,
@@ -9089,8 +9089,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "199d4a2d-9a02-4fb6-dabd-2f5e7f202742",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "d282a922-56db-4f59-96fc-f839c2a3beed",
                     "rows": [
                         {
                             "0": "gold"
@@ -9140,8 +9140,8 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "952c80f6-ec9e-40df-af4c-b5aa5c86977e",
-                        "a71160c0-90c5-44f9-bfaf-36df873a2f99"
+                        "05e6e460-db3c-44ba-b600-9e1d7632aab6",
+                        "84895f06-1c02-496a-aac3-a57125b7ac37"
                     ]
                 },
                 "currentHeight": 36,
@@ -9169,8 +9169,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "952c80f6-ec9e-40df-af4c-b5aa5c86977e",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "05e6e460-db3c-44ba-b600-9e1d7632aab6",
                     "rows": [
                         {
                             "0": "platinum"
@@ -9211,8 +9211,8 @@
                     "fullTableName": "metal"
                 },
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "a71160c0-90c5-44f9-bfaf-36df873a2f99",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "84895f06-1c02-496a-aac3-a57125b7ac37",
                     "rows": [],
                     "executionInfo": {
                         "text": "OK, 0 records retrieved in 0s",
@@ -9235,8 +9235,8 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "2bfaf666-2bc9-4047-9d58-90adf9b2b1b2",
-                        "0e57f4fb-4ead-484e-c0bc-6f8123921675"
+                        "356e514e-6e90-4287-e408-d83548864664",
+                        "bc41ef8f-f333-4964-a79d-bdf3db7a6a0d"
                     ]
                 },
                 "currentHeight": 134.140625,
@@ -9264,8 +9264,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "2bfaf666-2bc9-4047-9d58-90adf9b2b1b2",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "356e514e-6e90-4287-e408-d83548864664",
                     "rows": [
                         {
                             "0": "platinum"
@@ -9303,8 +9303,8 @@
                     "fullTableName": "metal"
                 },
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "0e57f4fb-4ead-484e-c0bc-6f8123921675",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "bc41ef8f-f333-4964-a79d-bdf3db7a6a0d",
                     "rows": [],
                     "executionInfo": {
                         "text": "OK, 0 records retrieved in 0s",
@@ -9327,7 +9327,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "6dfe499e-4ae2-4101-c526-b4d37b211c97"
+                        "48f04574-2c27-408d-9ded-1d04ccd989e8"
                     ]
                 },
                 "currentHeight": 173.421875,
@@ -9346,8 +9346,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "6dfe499e-4ae2-4101-c526-b4d37b211c97",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "48f04574-2c27-408d-9ded-1d04ccd989e8",
                     "rows": [
                         {
                             "0": "gold"
@@ -9400,7 +9400,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "f79624d2-7389-4396-a0d6-2d6d6b0a641c"
+                        "d565ffae-8095-453b-8b99-c97cc6916f0d"
                     ]
                 },
                 "currentHeight": 105.140625,
@@ -9419,8 +9419,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "f79624d2-7389-4396-a0d6-2d6d6b0a641c",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "d565ffae-8095-453b-8b99-c97cc6916f0d",
                     "rows": [
                         {
                             "0": null,
@@ -9490,8 +9490,8 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "70e7fa9f-3a7d-4fe7-f6fb-d25e13e7df7d",
-                        "f2258d8e-b080-49bf-94a8-108bd320ffbc"
+                        "2c9f7c6e-c314-40f1-97a1-8335556dd0a8",
+                        "fadc7c23-cbff-4d99-f9d4-da3a45b49a19"
                     ]
                 },
                 "currentHeight": 134.140625,
@@ -9528,8 +9528,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "70e7fa9f-3a7d-4fe7-f6fb-d25e13e7df7d",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "2c9f7c6e-c314-40f1-97a1-8335556dd0a8",
                     "rows": [
                         {
                             "0": "str LIKE 'abc%'",
@@ -9585,8 +9585,8 @@
                     "updatable": false
                 },
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "f2258d8e-b080-49bf-94a8-108bd320ffbc",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "fadc7c23-cbff-4d99-f9d4-da3a45b49a19",
                     "rows": [
                         {
                             "0": "str LIKE '%abc'",
@@ -9715,7 +9715,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "8bc5d53c-8fb9-4505-862a-8e0987ccf1c1"
+                        "6b330d14-da59-44be-f0c9-ec3acb2a12ed"
                     ]
                 },
                 "currentHeight": 36,
@@ -9734,8 +9734,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "8bc5d53c-8fb9-4505-862a-8e0987ccf1c1",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "6b330d14-da59-44be-f0c9-ec3acb2a12ed",
                     "rows": [
                         {
                             "0": "YEAR(d) = 1975",
@@ -9809,7 +9809,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "68d657ea-d7f7-425f-ccc6-87b59efd85bb"
+                        "e719eac6-0009-4ccf-e071-ad7e704c3137"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -9828,8 +9828,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "68d657ea-d7f7-425f-ccc6-87b59efd85bb",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "e719eac6-0009-4ccf-e071-ad7e704c3137",
                     "rows": [
                         {
                             "0": "mercury"
@@ -9876,7 +9876,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "2d434675-7b67-4f8e-d79e-a7271a700c5f"
+                        "e01bf72c-8752-4155-946e-b13dd4a334bf"
                     ]
                 },
                 "currentHeight": 140.28125,
@@ -9895,8 +9895,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "2d434675-7b67-4f8e-d79e-a7271a700c5f",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "e01bf72c-8752-4155-946e-b13dd4a334bf",
                     "rows": [
                         {
                             "0": "gold"
@@ -9946,7 +9946,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "5a23ec8b-9349-458c-da47-d03ef0aa9779"
+                        "a3c08968-c642-431e-8063-5d1934a738f5"
                     ]
                 },
                 "currentHeight": 140.28125,
@@ -9965,8 +9965,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "5a23ec8b-9349-458c-da47-d03ef0aa9779",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "a3c08968-c642-431e-8063-5d1934a738f5",
                     "rows": [
                         {
                             "0": "platinum"
@@ -10016,7 +10016,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "e4c504e7-9777-405a-b27c-2023e809062a"
+                        "4431bc5b-00e0-4e18-8c57-6ca6436e6405"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -10035,8 +10035,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "e4c504e7-9777-405a-b27c-2023e809062a",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "4431bc5b-00e0-4e18-8c57-6ca6436e6405",
                     "rows": [
                         {
                             "0": "platinum"
@@ -10083,7 +10083,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "5bc0f7ae-e0b6-4490-89df-f7f37695fdb9"
+                        "bbce0c41-078c-4fe6-cacd-125c13e4836d"
                     ]
                 },
                 "currentHeight": 36,
@@ -10102,8 +10102,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "5bc0f7ae-e0b6-4490-89df-f7f37695fdb9",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "bbce0c41-078c-4fe6-cacd-125c13e4836d",
                     "rows": [
                         {
                             "0": "gold",
@@ -10191,7 +10191,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "0e55e7bc-baa6-4c87-f5e7-3b07ae4caf6e"
+                        "59307f6f-f373-4c2d-c4a6-714598e045f6"
                     ]
                 },
                 "currentHeight": 36,
@@ -10210,8 +10210,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "0e55e7bc-baa6-4c87-f5e7-3b07ae4caf6e",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "59307f6f-f373-4c2d-c4a6-714598e045f6",
                     "rows": [
                         {
                             "0": "gold"
@@ -10264,7 +10264,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "346571c6-253f-4590-e433-5ec0f6d02111"
+                        "59008869-967c-441c-a7e7-e4ffa5e9ff08"
                     ]
                 },
                 "currentHeight": 36,
@@ -10283,8 +10283,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "346571c6-253f-4590-e433-5ec0f6d02111",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "59008869-967c-441c-a7e7-e4ffa5e9ff08",
                     "rows": [
                         {
                             "0": 1
@@ -10333,7 +10333,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "3f5ed950-09d8-4535-c3d8-8b2f57187630"
+                        "1226f0d8-1f22-4224-fb78-dcd076c58b0d"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -10352,8 +10352,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "3f5ed950-09d8-4535-c3d8-8b2f57187630",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "1226f0d8-1f22-4224-fb78-dcd076c58b0d",
                     "rows": [
                         {
                             "0": 0
@@ -10402,7 +10402,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "bd8bdf05-b401-476e-d476-56136647b52b"
+                        "76c4f975-10c4-41fa-809a-15269866d558"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -10421,8 +10421,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "bd8bdf05-b401-476e-d476-56136647b52b",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "76c4f975-10c4-41fa-809a-15269866d558",
                     "rows": [
                         {
                             "0": 1
@@ -10471,7 +10471,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "968d4bf3-6248-4565-acfa-6db12598e814"
+                        "ccecc707-769e-4b6c-e689-f8b4f7fe118d"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -10490,8 +10490,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "968d4bf3-6248-4565-acfa-6db12598e814",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "ccecc707-769e-4b6c-e689-f8b4f7fe118d",
                     "rows": [
                         {
                             "0": 1
@@ -10540,7 +10540,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "0cd7233f-557f-40eb-f8d8-06fa1f17b34d"
+                        "ec1afa30-5b29-4a05-de53-737fa0d475d0"
                     ]
                 },
                 "currentHeight": 105.140625,
@@ -10559,8 +10559,8 @@
             },
             "data": [
                 {
-                    "tabId": "121d59d5-4057-4ad5-d168-f17598b9a13b",
-                    "resultId": "0cd7233f-557f-40eb-f8d8-06fa1f17b34d",
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "ec1afa30-5b29-4a05-de53-737fa0d475d0",
                     "rows": [
                         {
                             "0": null,
@@ -10627,15 +10627,1526 @@
                 "start": 184,
                 "end": 186,
                 "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "25948d42-f673-4017-c748-0a2d0fee62e0",
+                        "04db2c02-abe4-4dc0-ae78-bb4ac37c13bf"
+                    ]
+                },
+                "currentHeight": 134.140625,
                 "currentSet": 1,
                 "statements": [
                     {
                         "delimiter": ";",
                         "span": {
                             "start": 0,
-                            "length": 231
+                            "length": 142
                         },
                         "contentStart": 47,
+                        "state": 0
+                    },
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 142,
+                            "length": 1
+                        },
+                        "contentStart": 142,
+                        "state": 0
+                    },
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 143,
+                            "length": 95
+                        },
+                        "contentStart": 144,
+                        "state": 2
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "25948d42-f673-4017-c748-0a2d0fee62e0",
+                    "rows": [
+                        {
+                            "0": "srt REGEXP '^abc'",
+                            "1": "left(str,3) = 'abc'"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "Pattern match",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "substring comparison",
+                            "field": "1",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 0s"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "-- Regular expression vs sub string comparison\nSELECT \"srt REGEXP '^abc'\" AS `Pattern match`, \"left(str,3) = 'abc'\" AS `substring comparison`",
+                    "updatable": false
+                },
+                {
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "04db2c02-abe4-4dc0-ae78-bb4ac37c13bf",
+                    "rows": [
+                        {
+                            "0": "srt REGEXP 'abc$'",
+                            "1": "right(str,3) = 'abc'"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "Pattern match",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "substring comparison",
+                            "field": "1",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 0s"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 2,
+                    "sql": "SELECT \"srt REGEXP 'abc$'\" AS `Pattern match`, \"right(str,3) = 'abc'\" AS `substring comparison`",
+                    "updatable": false
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 187,
+                "end": 189,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "42a8589e-c3c3-4bfa-a8b0-4186f236a26d"
+                    ]
+                },
+                "currentHeight": 107.140625,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 90
+                        },
+                        "contentStart": 60,
+                        "state": 3
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "42a8589e-c3c3-4bfa-a8b0-4186f236a26d",
+                    "rows": [
+                        {
+                            "0": "WOLF STROPS"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "REVERSE('SPORTS FLOW')",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 0s"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "# Reversing a string content\n-- Syntax, REVERSE(expression)\nSELECT REVERSE('SPORTS FLOW');",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 190,
+                "end": 190,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "a2efbc66-aaf0-4a81-dc78-0eea541bf9fd"
+                    ]
+                },
+                "currentHeight": 107.140625,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 27
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "a2efbc66-aaf0-4a81-dc78-0eea541bf9fd",
+                    "rows": [
+                        {
+                            "0": "987654321"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "REVERSE(0123456789)",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 0s"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT REVERSE(0123456789)",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 191,
+                "end": 191,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "cf6dda02-e69e-4f5a-a47a-94bc63000e8d"
+                    ]
+                },
+                "currentHeight": 107.140625,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 29
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "cf6dda02-e69e-4f5a-a47a-94bc63000e8d",
+                    "rows": [
+                        {
+                            "0": "9876543210"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "REVERSE('0123456789')",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 0s"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT REVERSE('0123456789')",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 192,
+                "end": 192,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "f83783a3-5e96-4bb5-ad74-53bbe6a5a490"
+                    ]
+                },
+                "currentHeight": 107.140625,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 29
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "f83783a3-5e96-4bb5-ad74-53bbe6a5a490",
+                    "rows": [
+                        {
+                            "0": "5544332211"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "REVERSE(001122334455)",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 0s"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT REVERSE(001122334455)",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 193,
+                "end": 194,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "70bd9838-d7a3-40ad-c2ba-71e81e43efa9"
+                    ]
+                },
+                "currentHeight": 107.140625,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 95
+                        },
+                        "contentStart": 61,
+                        "state": 3
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "70bd9838-d7a3-40ad-c2ba-71e81e43efa9",
+                    "rows": [
+                        {
+                            "0": "STEP ON NO PETS"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "REVERSE(\"STEP ON NO PETS\")",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 0s"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "-- Reversing an palindrom string always return us same value\nSELECT REVERSE(\"STEP ON NO PETS\");",
+                    "updatable": false
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 195,
+                "end": 195,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "8aaf961c-7cc8-4484-827a-5d22bcf1d2c7"
+                    ]
+                },
+                "currentHeight": 107.140625,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 66
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "8aaf961c-7cc8-4484-827a-5d22bcf1d2c7",
+                    "rows": [
+                        {
+                            "0": 234
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "COUNT(*)",
+                            "field": "0",
+                            "dataType": {
+                                "type": 4,
+                                "flags": [
+                                    "SIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 10,
+                                "parameterFormatType": "OneOrZero",
+                                "synonyms": [
+                                    "INTEGER",
+                                    "INT4"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 111.135ms"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT COUNT(*) FROM top_names WHERE REVERSE(top_name) = top_name",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 196,
+                "end": 196,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "b11c4f62-b2bb-458b-9d79-03a8d16875a7"
+                    ]
+                },
+                "currentHeight": 36,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 89
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "b11c4f62-b2bb-458b-9d79-03a8d16875a7",
+                    "rows": [
+                        {
+                            "0": "ULU"
+                        },
+                        {
+                            "0": "UTU"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "top_name",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": true,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 2 records retrieved in 7.911ms"
+                    },
+                    "totalRowCount": 2,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT top_name FROM top_names WHERE REVERSE(top_name) = top_name AND top_name LIKE 'U%'",
+                    "updatable": true,
+                    "fullTableName": "top_names"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 197,
+                "end": 200,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "54b15345-a207-4078-9e4f-1f70c7118906"
+                    ]
+                },
+                "currentHeight": 36,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 255
+                        },
+                        "contentStart": 192,
+                        "state": 3
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "54b15345-a207-4078-9e4f-1f70c7118906",
+                    "rows": [
+                        {
+                            "0": "gold",
+                            "1": 0,
+                            "2": 0
+                        },
+                        {
+                            "0": "iron",
+                            "1": 0,
+                            "2": 0
+                        },
+                        {
+                            "0": "lead",
+                            "1": 0,
+                            "2": 0
+                        },
+                        {
+                            "0": "mercury",
+                            "1": 0,
+                            "2": 0
+                        },
+                        {
+                            "0": "platinum",
+                            "1": 5,
+                            "2": 5
+                        },
+                        {
+                            "0": "tin",
+                            "1": 2,
+                            "2": 0
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "name",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "LOCATE('in',name)",
+                            "field": "1",
+                            "dataType": {
+                                "type": 4,
+                                "flags": [
+                                    "SIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 10,
+                                "parameterFormatType": "OneOrZero",
+                                "synonyms": [
+                                    "INTEGER",
+                                    "INT4"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "LOCATE('in',name,3)",
+                            "field": "2",
+                            "dataType": {
+                                "type": 4,
+                                "flags": [
+                                    "SIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 10,
+                                "parameterFormatType": "OneOrZero",
+                                "synonyms": [
+                                    "INTEGER",
+                                    "INT4"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 6 records retrieved in 0s"
+                    },
+                    "totalRowCount": 6,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "# Searching for substring\n-- To find whether the given string occurs in another string user LOCATE() function which returns the index number\n-- Syntax: LOCATE('sub_str',actual_str,[position])\nSELECT name, LOCATE('in',name), LOCATE('in',name,3) FROM metal;",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 201,
+                "end": 205,
+                "language": "mysql",
+                "result": {
+                    "type": "text",
+                    "text": [
+                        {
+                            "type": 4,
+                            "index": 0,
+                            "resultId": "709af547-7887-4d5c-ed5b-c30eae0e70f5",
+                            "content": "OK, 0 records retrieved in 0s"
+                        }
+                    ]
+                },
+                "currentHeight": 28,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 260
+                        },
+                        "contentStart": 235,
+                        "state": 2
+                    }
+                ]
+            },
+            "data": []
+        },
+        {
+            "state": {
+                "start": 206,
+                "end": 206,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "373ec59b-a0ef-42d5-ae12-b0bb7c7de138"
+                    ]
+                },
+                "currentHeight": 36,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 60
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "373ec59b-a0ef-42d5-ae12-b0bb7c7de138",
+                    "rows": [
+                        {
+                            "0": "2015-07-21",
+                            "1": "2015",
+                            "2": "07",
+                            "3": "21"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "@date",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "LEFT(@date,4)",
+                            "field": "1",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "MID(@date,6,2)",
+                            "field": "2",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "RIGHT(@date,2)",
+                            "field": "3",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 0s"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT @date, LEFT(@date,4), MID(@date,6,2), RIGHT(@date,2)",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 207,
+                "end": 209,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "852c3118-0b07-46b9-de15-715023091cfc"
+                    ]
+                },
+                "currentHeight": 36,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 152
+                        },
+                        "contentStart": 126,
+                        "state": 3
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "852c3118-0b07-46b9-de15-715023091cfc",
+                    "rows": [
+                        {
+                            "0": "07-21"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "SUBSTRING(@date,6)",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 0s"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "-- Equivalent function for MID() is SUBSTRING()\n-- Syntax: SUBSTRING(str, position) and it return everyting from the position\nSELECT SUBSTRING(@date,6);",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 210,
+                "end": 210,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "59fc91ab-08a2-4535-eefb-4912a086262d"
+                    ]
+                },
+                "currentHeight": 36,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 47
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "59fc91ab-08a2-4535-eefb-4912a086262d",
+                    "rows": [
+                        {
+                            "0": "2015-07-21",
+                            "1": "07-21",
+                            "2": "07-21"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "@date",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "SUBSTRING(@date,6)",
+                            "field": "1",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "MID(@date,6)",
+                            "field": "2",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 0s"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT @date, SUBSTRING(@date,6), MID(@date,6)",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 211,
+                "end": 213,
+                "language": "mysql",
+                "result": {
+                    "type": "text",
+                    "text": [
+                        {
+                            "type": 4,
+                            "index": 0,
+                            "resultId": "22f4eb0f-10ba-468a-cd5d-26f1f3f018c2",
+                            "content": "OK, 0 records retrieved in 0s"
+                        }
+                    ]
+                },
+                "currentHeight": 28,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 247
+                        },
+                        "contentStart": 209,
+                        "state": 2
+                    }
+                ]
+            },
+            "data": []
+        },
+        {
+            "state": {
+                "start": 214,
+                "end": 214,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "ea1a286c-1006-4976-ca64-c1c12aba5716"
+                    ]
+                },
+                "currentHeight": 36,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 93
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "ea1a286c-1006-4976-ca64-c1c12aba5716",
+                    "rows": [
+                        {
+                            "0": "postmaster@example.com",
+                            "1": "postmaster",
+                            "2": "example.com"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "@email",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "user",
+                            "field": "1",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "host",
+                            "field": "2",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 0s"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT @email, SUBSTRING_INDEX(@email,'@',1) as user, SUBSTRING_INDEX(@email,'@',-1) as host",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 215,
+                "end": 215,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "c01e8f0d-96e8-4486-8892-edb70a31db1b"
+                    ]
+                },
+                "currentHeight": 36,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 49
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "c01e8f0d-96e8-4486-8892-edb70a31db1b",
+                    "rows": [
+                        {
+                            "0": "platinum"
+                        },
+                        {
+                            "0": "tin"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "name",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": true,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 2 records retrieved in 0s"
+                    },
+                    "totalRowCount": 2,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT name from metal WHERE LEFT(name,1) >= 'n'",
+                    "updatable": true,
+                    "fullTableName": "metal"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 216,
+                "end": 217,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "78ec3bd7-d777-486c-c2fc-39611a0bfa4b"
+                    ]
+                },
+                "currentHeight": 36,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 162
+                        },
+                        "contentStart": 63,
+                        "state": 3
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "78ec3bd7-d777-486c-c2fc-39611a0bfa4b",
+                    "rows": [
+                        {
+                            "0": "gold ends in d: YES"
+                        },
+                        {
+                            "0": "iron ends in d: NO"
+                        },
+                        {
+                            "0": "lead ends in d: YES"
+                        },
+                        {
+                            "0": "mercury ends in d: NO"
+                        },
+                        {
+                            "0": "platinum ends in d: NO"
+                        },
+                        {
+                            "0": "tin ends in d: NO"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "name ends in d?",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 6 records retrieved in 0s"
+                    },
+                    "totalRowCount": 6,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "-- Syntax: CONCAT(variable, 'str', 'integer', 'and', 'so on');\nSELECT CONCAT(name, ' ends in d: ', IF(name LIKE '%d','YES','NO')) AS `name ends in d?` FROM metal;",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 218,
+                "end": 218,
+                "language": "mysql",
+                "result": {
+                    "type": "text",
+                    "text": [
+                        {
+                            "type": 4,
+                            "index": 0,
+                            "resultId": "2401544c-5ceb-48f5-fd37-8264c1926bc5",
+                            "content": "OK, 6 rows affected in 17.717ms"
+                        }
+                    ]
+                },
+                "currentHeight": 28,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 43
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": []
+        },
+        {
+            "state": {
+                "start": 219,
+                "end": 219,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "08f757f6-55ad-474d-e1b3-d59b2e99deec"
+                    ]
+                },
+                "currentHeight": 272.84375,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 23
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "08f757f6-55ad-474d-e1b3-d59b2e99deec",
+                    "rows": [
+                        {
+                            "0": "goldide"
+                        },
+                        {
+                            "0": "ironide"
+                        },
+                        {
+                            "0": "leadide"
+                        },
+                        {
+                            "0": "mercuryide"
+                        },
+                        {
+                            "0": "platinumide"
+                        },
+                        {
+                            "0": "tinide"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "name",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": true,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 6 records retrieved in 0s"
+                    },
+                    "totalRowCount": 6,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT name FROM metal",
+                    "updatable": true,
+                    "fullTableName": "metal"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 220,
+                "end": 221,
+                "language": "mysql",
+                "result": {
+                    "type": "text",
+                    "text": [
+                        {
+                            "type": 4,
+                            "index": 0,
+                            "resultId": "a5f29f5b-b981-4f99-97aa-44bb1daa4848",
+                            "content": "OK, 6 rows affected in 14.931ms"
+                        }
+                    ]
+                },
+                "currentHeight": 34,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 144
+                        },
+                        "contentStart": 89,
                         "state": 3
                     }
                 ]
@@ -10644,8 +12155,90 @@
         },
         {
             "state": {
-                "start": 187,
-                "end": 187,
+                "start": 222,
+                "end": 222,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "20e1c7fa-3e84-4249-9fd5-f2d131aa5119"
+                    ]
+                },
+                "currentHeight": 272.84375,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 23
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "0b8e616e-9346-404b-95f7-71c6dcc8a16c",
+                    "resultId": "20e1c7fa-3e84-4249-9fd5-f2d131aa5119",
+                    "rows": [
+                        {
+                            "0": "gold"
+                        },
+                        {
+                            "0": "iron"
+                        },
+                        {
+                            "0": "lead"
+                        },
+                        {
+                            "0": "mercury"
+                        },
+                        {
+                            "0": "platinum"
+                        },
+                        {
+                            "0": "tin"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "name",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": true,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 6 records retrieved in 0s"
+                    },
+                    "totalRowCount": 6,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT name FROM metal",
+                    "updatable": true,
+                    "fullTableName": "metal"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 223,
+                "end": 225,
                 "language": "mysql",
                 "currentSet": 1,
                 "statements": [
@@ -10653,10 +12246,10 @@
                         "delimiter": ";",
                         "span": {
                             "start": 0,
-                            "length": 0
+                            "length": 206
                         },
                         "contentStart": 0,
-                        "state": 0
+                        "state": 1
                     }
                 ]
             },
