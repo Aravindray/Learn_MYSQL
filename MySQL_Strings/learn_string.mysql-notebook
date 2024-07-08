@@ -2,18 +2,18 @@
     "type": "MySQLNotebook",
     "version": "1.0",
     "caption": "Untitled",
-    "content": "USE COOKBOOK;\r\n# MySQL Strings divided into 2 types - Binary and Non-binary.\r\n-- Binary will store data like image, mp3, encrypted files.\r\n-- Non-binary will store date like Text with character set and collate.\r\n-- Data type for Binary strings are BINARY, VARBINARY, and BLOB. Data type of non-binary strings are \r\n-- CHAR, VARCHAR and TEXT each of which permit CHARACTER SET and COLLATE attribute.\r\n# CHARACTER SET\r\n-- To display all the character set for nonbinary strings use this statement\r\nSHOW CHARACTER SET;\r\nSET @s = CONVERT('abc' USING utf8mb4); -- All characters as stored as 1 to 4 bytes\r\nSELECT @s, LENGTH(@s), CHAR_LENGTH(@s);\r\nSET @s = CONVERT('abc' USING utf16); -- All characters stored as 2 bytes\r\nSELECT @s, LENGTH(@s), CHAR_LENGTH(@s);\r\n-- It store characters as single byte or multi byte based on the character set.\r\n# Collation\r\n-- To display all the collation use this statement\r\nSHOW COLLATION;\r\n-- Collation will take care of character searching and sorting operations.\r\n-- Examples of collation how it will effect the sorting order\r\nCREATE TABLE tmp_tbl_1 ( c CHAR(3) CHARACTER SET utf8mb4);\r\nINSERT INTO tmp_tbl_1 VALUES ('AAA'), ('bbb'), ('aaa'), ('BBB');\r\nSELECT c from tmp_tbl_1;\r\nSELECT c from tmp_tbl_1 ORDER BY c COLLATE utf8mb4_turkish_ci;\r\nSELECT c from tmp_tbl_1 ORDER BY c COLLATE utf8mb4_tr_0900_as_cs;\r\nSELECT c FROM tmp_tbl_1 ORDER BY c COLLATE utf8mb4_bin;\r\nCREATE TABLE tmp_spanish_tbl (c CHAR(2) CHARACTER SET utf8mb4);\r\nINSERT INTO tmp_spanish_tbl (c) VALUES ('cg'), ('ch'), ('ci'), ('lk'), ('ll'), ('lm');\r\nSELECT c FROM tmp_spanish_tbl ORDER BY c COLLATE utf8mb4_general_ci;\r\nSELECT c FROM tmp_spanish_tbl ORDER BY c COLLATE utf8mb4_spanish2_ci;\r\n# Choosing a string data type\r\nCREATE TABLE tmp_tbl_2 (c1 CHAR(10), c2 VARCHAR(10));\r\nINSERT INTO tmp_tbl_2 (c1, c2) VALUES ('abc       ','abc       ');\r\nSELECT c1, c2, CHAR_LENGTH(c1), CHAR_LENGTH(c2) FROM tmp_tbl_2;\r\nCREATE TABLE tmp_turkish_tbl (c CHAR(3) CHARACTER SET utf8mb4);\r\nINSERT INTO tmp_turkish_tbl VALUES('iii'), ('şşş'), ('ööö'), ('ççç');\r\nSELECT * FROM tmp_turkish_tbl;\r\n# String Literals\r\n-- Enclose the text of string with single quotes and dobule quotes, 'Hello, World!' or \"Hello, World!\"\r\n-- Use Hexadecimal notation x'61626364' is equalant to 'abcd'\r\n-- Use Introducer which means write the character set with underscore, _utf8mb4 'abcd' or _ucs2 'abcd'\r\n-- Use different quotes for example if you set variable to @s = 'I'm asleep'. This would through an error use opposite quotaion like this statement\r\nSELECT \"I'm asleep\", 'He said, \"Boo!\"';\r\n-- This will also work\r\nSELECT 'I''m asleep', 'I\\'m wide awake';\r\nSELECT \"He said, \"\"BOO!\"\"\", \"And I said, \\\"Yikes\\\"\";\r\n-- To write a literal blackslash within a string dobule it\r\nSELECT \"In windows to indentify the download path c:\\\\user\\\\downloads\" AS `double blackslash`;\r\n-- Some of escape sequences are \\', \\\", \\\\, \\b (backslash), \\n (newline or linefeed), \\t (tab) and \\0 (ASCII NULL)\r\nSELECT 0x49276D2061736C656570;\r\n-- Above select value return the hex value, because by default mysql 8.0 set --binary-as-hex is true.\r\n-- To view the atual result invoke the client program with --binary-as-hex = 0\r\n# Checking or changing string character set or collation\r\n-- To check the string character set or collation user CHARASET() or COLLATION() funcion.\r\n-- To change string from one character set to another use CONVERT(... USING ...) function to change collation use COLLATE operator.\r\nSELECT USER(), CHARSET(USER()), COLLATION(USER());\r\nSET NAMES 'utf8mb4';\r\nSELECT CHARSET('abc'), COLLATION('abc');\r\nSET NAMES 'utf8mb4' COLLATE 'utf8mb4_bin';\r\nSELECT CHARSET('abc'), COLLATION('abc');\r\nSET @s1 = _latin1 'my string', @s2 = CONVERT(@s1 USING utf8mb4);\r\nSELECT @s1, @s2, CHARSET(@s1), CHARSET(@s2);\r\nSET @s1 = _latin1 'my string', @s2 = @s1 COLLATE latin1_spanish_ci;\r\nSELECT @s1, @s2, COLLATION(@s1), COLLATION(@s2);\r\n-- New collation must be legal for the character set of the string. If it fails it through an error\r\nSELECT _latin1 'abc' COLLATE 'utf8mb4_bin';\r\nSET @s1 = _latin1 'my string';\r\nSET @s2 = CONVERT(@s1 USING utf8mb4) COLLATE utf8mb4_spanish_ci;\r\nSELECT @s1, CHARSET(@s1), COLLATION(@s1), @s2, CHARSET(@s2), COLLATION(@s2);\r\n-- CONVERT() function also convert binary string to nonbinary string and vice versa.\r\nSET @s1 = _latin1 'my string';\r\nSET @s2 = CONVERT(@s1 USING binary);\r\nSET @s3 = CONVERT(@s2 USING utf8mb4);\r\nSELECT @s1, CHARSET(@s1), @s2, CHARSET(@s2), @s3, CHARSET(@s3);\r\n-- I think binary-as-hex is enabled that's why the error presist.\r\nSELECT @s1, @s2, @s3;\r\nSELECT CHARSET(@s1), CHARSET(@s2), CHARSET(@s3);\r\nSELECT @s3;\r\nSET @s3 = CONVERT(@s2 USING utf8mb4);\r\nSELECT @s3;\r\nSELECT @s2;\r\n-- Another alternative method to convert nonbinary string to binary is CAST(... AS ...) function\r\nSET @s4 = CAST(@s1 AS binary);\r\nSELECT @s1, CHARSET(@s1), @s4, CHARSET(@s4);\r\n# Convert letter cases\r\n-- To convert a string to upper or lower user UPPER() or LOWER() function. If it not working properly\r\n-- the string is in binary data data type, convert it to proper nonbinary string data type with character set and collation.\r\nSELECT thing, UPPER(thing), LOWER(thing) FROM limbs;\r\n-- We can not able to change the letter case for binary string\r\nCREATE TABLE tmp_tbl_3 (c VARBINARY(10)) SELECT 'aBcD' as c;\r\nSELECT c, UPPER(c), LOWER(c) FROM tmp_tbl_3;\r\n-- To view the actual result open the session with binary-as-hex=0\r\n-- If you want to convert the letter case for binary string convert it to nonbinary string first with proper character set and collate\r\nSELECT c, UPPER(CONVERT(c USING utf8mb4)) as upper, LOWER(CONVERT(c USING utf8mb4)) AS lower FROM tmp_tbl_3;\r\nSELECT CHARSET(c) FROM tmp_tbl_3;\r\n-- If you want to convert nonbinary string first letter only upper case use this method\r\n-- CONCAT(UPPER(LEFT(c1, 1)), MID(c1,2)) FROM tbl; It is not clever to write the method everytime so create a function\r\nCREATE FUNCTION initial_cap (s VARCHAR(255))\r\nRETURNS VARCHAR(255) DETERMINISTIC\r\nRETURN CONCAT(UPPER(LEFT(s,1)),MID(s,2));\r\n-- Above function need to root user privilege\r\n# Comparing String Values\r\nSELECT 'cat' = 'cat', 'cat' = 'dog', 'cat' <> 'cat', 'cat' <> 'dog';\r\nSELECT 'cat' < 'auk', 'cat' < 'dog', 'cat' BETWEEN 'auk' AND 'eel';\r\nSET @s1 = CAST('cat' AS BINARY), @s2 = CAST('CAT' AS BINARY);\r\nSELECT @s1 = @s2;\r\nSET @s1 = CONVERT(@s1 USING utf8mb4);\r\nSET @s2 = CONVERT(@s2 USING utf8mb4);\r\nSELECT @s1 = @s2;\r\nSET @s1 = _latin1 'cat', @s2 = _latin1 'CAT';\r\nSELECT @s1 = @s2;\r\nSELECT @s1 COLLATE latin1_general_cs = @s2 COLLATE latin1_general_cs AS `@s1 = @s2`;\r\n-- If you compare a nonbinary string with binary string, the comparison treat both strings as binary\r\nSELECT _latin1 'cat' = CAST('CAT' AS BINARY);\r\n-- Thus to compare two nonbinary string as binary convert any one of them as binary\r\nSET @s1 = _latin1 'cat', @s2 = _latin1 'CAT';\r\nSELECT @s1 = @s2, CAST(@s1 AS BINARY) = @s2, @s1 = CAST(@s2 AS BINARY);\r\n# Converting between decimal(base 10), octal(base 8), and Hexadecimal(base 16) format\r\n-- To conver from one base to another user CONV() function\r\n-- You can convert decimal to BIN(), OCT() and HEX() function but what if we do reverse process\r\n-- Syntax CONV(number, from_base, to_base)\r\nSELECT CONV(8, 10, 2) AS DECtoBIN;\r\nSELECT BIN(8);\r\nSELECT CONV('F',16, 10);\r\n# Converting between ASCII, BIT, Hexadecimal\r\n-- Use ASCII() function\r\nSELECT ASCII('Lara');\r\n-- ASCII character return only left most character\r\nSELECT ASCII('L');\r\nSELECT CONV(ASCII('Lara'),10,16);\r\nSELECT DISTINCT CONV(ASCII(last_name),10,16) FROM name;\r\nSELECT UUID();\r\nSELECT UUID_TO_BIN(UUID());\r\n-- BIT_COUNT() This function returns active bit values\r\n-- SELECT ... INTO ... method will store the select result in a variable\r\n-- SELECT UUID_TO_BIN(UUID()) INTO @uuid_bin;\r\nSELECT BIT_COUNT(@uuid_bin);\r\nSELECT @uuid_bin, BIT_COUNT(@uuid_bin); -- Check the result with cmd prompt\r\nSELECT BIT_COUNT(18);\r\nSELECT 1 << 7;\r\nSELECT BIT_OR(1 << 7);\r\n-- Check book page no 304 about BIR_OR() function\r\n-- IPv6 and IPv4 address represented as string data type, To return the binary value we can use\r\n-- INET_ATON() function. This function convert dotted IPv4 address to numberic value.\r\nSELECT INET_ATON('10.0.2.1');\r\nSELECT HEX(INET_ATON('10.0.2.1')); -- Hex representation of IP address\r\nSELECT HEX(INET6_ATON('10.0.2.1'));\r\n# Pattern Matching with SQL Patterns\r\n-- Syntax for SQL Pattern is SELECT ... [NOT] LIKE 'pattern';\r\nSELECT * FROM metal;\r\n-- SQL Pattern contain 2 special metachatacters _ (exactly one chatacter) and % (zero or more characters)\r\n-- Metacharacters are the character that represent other than itself.\r\nSELECT name FROM metal WHERE name LIKE 'me%'; -- Starts with\r\nSELECT name FROM metal WHERE name LIKE '%d'; -- Ends with\r\nSELECT name FROM metal WHERE name LIKE '%in%'; -- Any Popsition\r\nSELECT name FROM metal WHERE name LIKE '__at%'; -- Specific position\r\n-- Pattern match with NOT LIKE operator\r\nSELECT name FROM metal WHERE name NOT LIKE '%i%';\r\n-- SQL Pattern does not match NULL, it is true for both LIKE and NOT LIKE\r\nSELECT NULL LIKE '', NULL NOT LIKE '';\r\n-- In some cases SQL Pattern are equivalent to sub string comparison\r\nSELECT \"str LIKE 'abc%'\" AS `Pattern Match`, \"LEFT(str, 3) = 'abc'\" AS `substring comparison`;\r\nSELECT \"str LIKE '%abc'\" AS `Pattern Match`, \"RIGHT(str, 3) = 'abc'\" AS `substring comparison`;\r\n",
+    "content": "USE COOKBOOK;\r\n# MySQL Strings divided into 2 types - Binary and Non-binary.\r\n-- Binary will store data like image, mp3, encrypted files.\r\n-- Non-binary will store date like Text with character set and collate.\r\n-- Data type for Binary strings are BINARY, VARBINARY, and BLOB. Data type of non-binary strings are \r\n-- CHAR, VARCHAR and TEXT each of which permit CHARACTER SET and COLLATE attribute.\r\n# CHARACTER SET\r\n-- To display all the character set for nonbinary strings use this statement\r\nSHOW CHARACTER SET;\r\nSET @s = CONVERT('abc' USING utf8mb4); -- All characters as stored as 1 to 4 bytes\r\nSELECT @s, LENGTH(@s), CHAR_LENGTH(@s);\r\nSET @s = CONVERT('abc' USING utf16); -- All characters stored as 2 bytes\r\nSELECT @s, LENGTH(@s), CHAR_LENGTH(@s);\r\n-- It store characters as single byte or multi byte based on the character set.\r\n# Collation\r\n-- To display all the collation use this statement\r\nSHOW COLLATION;\r\n-- Collation will take care of character searching and sorting operations.\r\n-- Examples of collation how it will effect the sorting order\r\nCREATE TABLE tmp_tbl_1 ( c CHAR(3) CHARACTER SET utf8mb4);\r\nINSERT INTO tmp_tbl_1 VALUES ('AAA'), ('bbb'), ('aaa'), ('BBB');\r\nSELECT c from tmp_tbl_1;\r\nSELECT c from tmp_tbl_1 ORDER BY c COLLATE utf8mb4_turkish_ci;\r\nSELECT c from tmp_tbl_1 ORDER BY c COLLATE utf8mb4_tr_0900_as_cs;\r\nSELECT c FROM tmp_tbl_1 ORDER BY c COLLATE utf8mb4_bin;\r\nCREATE TABLE tmp_spanish_tbl (c CHAR(2) CHARACTER SET utf8mb4);\r\nINSERT INTO tmp_spanish_tbl (c) VALUES ('cg'), ('ch'), ('ci'), ('lk'), ('ll'), ('lm');\r\nSELECT c FROM tmp_spanish_tbl ORDER BY c COLLATE utf8mb4_general_ci;\r\nSELECT c FROM tmp_spanish_tbl ORDER BY c COLLATE utf8mb4_spanish2_ci;\r\n# Choosing a string data type\r\nCREATE TABLE tmp_tbl_2 (c1 CHAR(10), c2 VARCHAR(10));\r\nINSERT INTO tmp_tbl_2 (c1, c2) VALUES ('abc       ','abc       ');\r\nSELECT c1, c2, CHAR_LENGTH(c1), CHAR_LENGTH(c2) FROM tmp_tbl_2;\r\nCREATE TABLE tmp_turkish_tbl (c CHAR(3) CHARACTER SET utf8mb4);\r\nINSERT INTO tmp_turkish_tbl VALUES('iii'), ('şşş'), ('ööö'), ('ççç');\r\nSELECT * FROM tmp_turkish_tbl;\r\n# String Literals\r\n-- Enclose the text of string with single quotes and dobule quotes, 'Hello, World!' or \"Hello, World!\"\r\n-- Use Hexadecimal notation x'61626364' is equalant to 'abcd'\r\n-- Use Introducer which means write the character set with underscore, _utf8mb4 'abcd' or _ucs2 'abcd'\r\n-- Use different quotes for example if you set variable to @s = 'I'm asleep'. This would through an error use opposite quotaion like this statement\r\nSELECT \"I'm asleep\", 'He said, \"Boo!\"';\r\n-- This will also work\r\nSELECT 'I''m asleep', 'I\\'m wide awake';\r\nSELECT \"He said, \"\"BOO!\"\"\", \"And I said, \\\"Yikes\\\"\";\r\n-- To write a literal blackslash within a string dobule it\r\nSELECT \"In windows to indentify the download path c:\\\\user\\\\downloads\" AS `double blackslash`;\r\n-- Some of escape sequences are \\', \\\", \\\\, \\b (backslash), \\n (newline or linefeed), \\t (tab) and \\0 (ASCII NULL)\r\nSELECT 0x49276D2061736C656570;\r\n-- Above select value return the hex value, because by default mysql 8.0 set --binary-as-hex is true.\r\n-- To view the atual result invoke the client program with --binary-as-hex = 0\r\n# Checking or changing string character set or collation\r\n-- To check the string character set or collation user CHARASET() or COLLATION() funcion.\r\n-- To change string from one character set to another use CONVERT(... USING ...) function to change collation use COLLATE operator.\r\nSELECT USER(), CHARSET(USER()), COLLATION(USER());\r\nSET NAMES 'utf8mb4';\r\nSELECT CHARSET('abc'), COLLATION('abc');\r\nSET NAMES 'utf8mb4' COLLATE 'utf8mb4_bin';\r\nSELECT CHARSET('abc'), COLLATION('abc');\r\nSET @s1 = _latin1 'my string', @s2 = CONVERT(@s1 USING utf8mb4);\r\nSELECT @s1, @s2, CHARSET(@s1), CHARSET(@s2);\r\nSET @s1 = _latin1 'my string', @s2 = @s1 COLLATE latin1_spanish_ci;\r\nSELECT @s1, @s2, COLLATION(@s1), COLLATION(@s2);\r\n-- New collation must be legal for the character set of the string. If it fails it through an error\r\nSELECT _latin1 'abc' COLLATE 'utf8mb4_bin';\r\nSET @s1 = _latin1 'my string';\r\nSET @s2 = CONVERT(@s1 USING utf8mb4) COLLATE utf8mb4_spanish_ci;\r\nSELECT @s1, CHARSET(@s1), COLLATION(@s1), @s2, CHARSET(@s2), COLLATION(@s2);\r\n-- CONVERT() function also convert binary string to nonbinary string and vice versa.\r\nSET @s1 = _latin1 'my string';\r\nSET @s2 = CONVERT(@s1 USING binary);\r\nSET @s3 = CONVERT(@s2 USING utf8mb4);\r\nSELECT @s1, CHARSET(@s1), @s2, CHARSET(@s2), @s3, CHARSET(@s3);\r\n-- I think binary-as-hex is enabled that's why the error presist.\r\nSELECT @s1, @s2, @s3;\r\nSELECT CHARSET(@s1), CHARSET(@s2), CHARSET(@s3);\r\nSELECT @s3;\r\nSET @s3 = CONVERT(@s2 USING utf8mb4);\r\nSELECT @s3;\r\nSELECT @s2;\r\n-- Another alternative method to convert nonbinary string to binary is CAST(... AS ...) function\r\nSET @s4 = CAST(@s1 AS binary);\r\nSELECT @s1, CHARSET(@s1), @s4, CHARSET(@s4);\r\n# Convert letter cases\r\n-- To convert a string to upper or lower user UPPER() or LOWER() function. If it not working properly\r\n-- the string is in binary data data type, convert it to proper nonbinary string data type with character set and collation.\r\nSELECT thing, UPPER(thing), LOWER(thing) FROM limbs;\r\n-- We can not able to change the letter case for binary string\r\nCREATE TABLE tmp_tbl_3 (c VARBINARY(10)) SELECT 'aBcD' as c;\r\nSELECT c, UPPER(c), LOWER(c) FROM tmp_tbl_3;\r\n-- To view the actual result open the session with binary-as-hex=0\r\n-- If you want to convert the letter case for binary string convert it to nonbinary string first with proper character set and collate\r\nSELECT c, UPPER(CONVERT(c USING utf8mb4)) as upper, LOWER(CONVERT(c USING utf8mb4)) AS lower FROM tmp_tbl_3;\r\nSELECT CHARSET(c) FROM tmp_tbl_3;\r\n-- If you want to convert nonbinary string first letter only upper case use this method\r\n-- CONCAT(UPPER(LEFT(c1, 1)), MID(c1,2)) FROM tbl; It is not clever to write the method everytime so create a function\r\nCREATE FUNCTION initial_cap (s VARCHAR(255))\r\nRETURNS VARCHAR(255) DETERMINISTIC\r\nRETURN CONCAT(UPPER(LEFT(s,1)),MID(s,2));\r\n-- Above function need to root user privilege\r\n# Comparing String Values\r\nSELECT 'cat' = 'cat', 'cat' = 'dog', 'cat' <> 'cat', 'cat' <> 'dog';\r\nSELECT 'cat' < 'auk', 'cat' < 'dog', 'cat' BETWEEN 'auk' AND 'eel';\r\nSET @s1 = CAST('cat' AS BINARY), @s2 = CAST('CAT' AS BINARY);\r\nSELECT @s1 = @s2;\r\nSET @s1 = CONVERT(@s1 USING utf8mb4);\r\nSET @s2 = CONVERT(@s2 USING utf8mb4);\r\nSELECT @s1 = @s2;\r\nSET @s1 = _latin1 'cat', @s2 = _latin1 'CAT';\r\nSELECT @s1 = @s2;\r\nSELECT @s1 COLLATE latin1_general_cs = @s2 COLLATE latin1_general_cs AS `@s1 = @s2`;\r\n-- If you compare a nonbinary string with binary string, the comparison treat both strings as binary\r\nSELECT _latin1 'cat' = CAST('CAT' AS BINARY);\r\n-- Thus to compare two nonbinary string as binary convert any one of them as binary\r\nSET @s1 = _latin1 'cat', @s2 = _latin1 'CAT';\r\nSELECT @s1 = @s2, CAST(@s1 AS BINARY) = @s2, @s1 = CAST(@s2 AS BINARY);\r\n# Converting between decimal(base 10), octal(base 8), and Hexadecimal(base 16) format\r\n-- To conver from one base to another user CONV() function\r\n-- You can convert decimal to BIN(), OCT() and HEX() function but what if we do reverse process\r\n-- Syntax CONV(number, from_base, to_base)\r\nSELECT CONV(8, 10, 2) AS DECtoBIN;\r\nSELECT BIN(8);\r\nSELECT CONV('F',16, 10);\r\n# Converting between ASCII, BIT, Hexadecimal\r\n-- Use ASCII() function\r\nSELECT ASCII('Lara');\r\n-- ASCII character return only left most character\r\nSELECT ASCII('L');\r\nSELECT CONV(ASCII('Lara'),10,16);\r\nSELECT DISTINCT CONV(ASCII(last_name),10,16) FROM name;\r\nSELECT UUID();\r\nSELECT UUID_TO_BIN(UUID());\r\n-- BIT_COUNT() This function returns active bit values\r\n-- SELECT ... INTO ... method will store the select result in a variable\r\n-- SELECT UUID_TO_BIN(UUID()) INTO @uuid_bin;\r\nSELECT BIT_COUNT(@uuid_bin);\r\nSELECT @uuid_bin, BIT_COUNT(@uuid_bin); -- Check the result with cmd prompt\r\nSELECT BIT_COUNT(18);\r\nSELECT 1 << 7;\r\nSELECT BIT_OR(1 << 7);\r\n-- Check book page no 304 about BIR_OR() function\r\n-- IPv6 and IPv4 address represented as string data type, To return the binary value we can use\r\n-- INET_ATON() function. This function convert dotted IPv4 address to numberic value.\r\nSELECT INET_ATON('10.0.2.1');\r\nSELECT HEX(INET_ATON('10.0.2.1')); -- Hex representation of IP address\r\nSELECT HEX(INET6_ATON('10.0.2.1'));\r\n# Pattern Matching with SQL Patterns\r\n-- Syntax for SQL Pattern is SELECT ... [NOT] LIKE 'pattern';\r\nSELECT * FROM metal;\r\n-- SQL Pattern contain 2 special metachatacters _ (exactly one chatacter) and % (zero or more characters)\r\n-- Metacharacters are the character that represent other than itself.\r\nSELECT name FROM metal WHERE name LIKE 'me%'; -- Starts with\r\nSELECT name FROM metal WHERE name LIKE '%d'; -- Ends with\r\nSELECT name FROM metal WHERE name LIKE '%in%'; -- Any Popsition\r\nSELECT name FROM metal WHERE name LIKE '__at%'; -- Specific position\r\n-- Pattern match with NOT LIKE operator\r\nSELECT name FROM metal WHERE name NOT LIKE '%i%';\r\n-- SQL Pattern does not match NULL, it is true for both LIKE and NOT LIKE\r\nSELECT NULL LIKE '', NULL NOT LIKE '';\r\n-- In some cases SQL Pattern are equivalent to sub string comparison\r\nSELECT \"str LIKE 'abc%'\" AS `Pattern Match`, \"LEFT(str, 3) = 'abc'\" AS `substring comparison`;\r\nSELECT \"str LIKE '%abc'\" AS `Pattern Match`, \"RIGHT(str, 3) = 'abc'\" AS `substring comparison`;\r\n-- But comparing to sub string comparison SQL Pattern is more efficient and fast.\r\nCREATE TABLE tmp_tbl_4 \r\n(\r\n    `Function value test` VARCHAR(100),\r\n    `Pattern match test` VARCHAR(100)\r\n);\r\nINSERT INTO tmp_tbl_4 VALUES (\"YEAR(d) = 1975\", \"d LIKE '1975-%'\"), (\"MONTH(d) = 6\", \"d LIKE '%-06-%'\"), (\"DAYOFMONTH(d) = 21\", \"d LIKE '%-21%'\");\r\nSELECT * FROM tmp_tbl_4;\r\n# Pattern matching with regular expression\r\n-- Syntax SELECT ... REGEXP 'pattern';\r\nSELECT name FROM metal WHERE name REGEXP '^me';\r\nSELECT name FROM metal WHERE name REGEXP 'd$';\r\nSELECT name FROM metal WHERE name REGEXP 'in';\r\nSELECT name FROM metal WHERE name REGEXP '^..at';\r\n",
     "options": {},
     "viewState": {
         "cursorState": [
             {
                 "inSelectionMode": false,
                 "selectionStart": {
-                    "lineNumber": 163,
+                    "lineNumber": 177,
                     "column": 1
                 },
                 "position": {
-                    "lineNumber": 163,
+                    "lineNumber": 177,
                     "column": 1
                 }
             }
@@ -21,10 +21,10 @@
         "viewState": {
             "scrollLeft": 0,
             "firstPosition": {
-                "lineNumber": 156,
+                "lineNumber": 172,
                 "column": 1
             },
-            "firstPositionDeltaTop": 12
+            "firstPositionDeltaTop": -22
         },
         "contributionsState": {
             "editor.contrib.folding": {},
@@ -43,7 +43,7 @@
                         {
                             "type": 4,
                             "index": 0,
-                            "resultId": "b23ee7bb-d15f-4a8f-df49-f861c7922663",
+                            "resultId": "fda006d6-7e43-4fd0-bed8-9cf99b4d9026",
                             "content": "OK, 0 records retrieved in 0s"
                         }
                     ]
@@ -72,7 +72,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "18696aad-02af-459d-a31e-84ec328cbab8"
+                        "c99568f9-f47f-41d0-a169-eb189311302b"
                     ]
                 },
                 "currentHeight": 36,
@@ -91,8 +91,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "18696aad-02af-459d-a31e-84ec328cbab8",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "c99568f9-f47f-41d0-a169-eb189311302b",
                     "rows": [
                         {
                             "0": "armscii8",
@@ -478,7 +478,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "45f350d0-2b73-4d79-b733-1898e4fadce8"
+                        "b49d885f-5cec-48e9-b0b6-d866aba473b2"
                     ]
                 },
                 "currentHeight": 36,
@@ -497,8 +497,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "45f350d0-2b73-4d79-b733-1898e4fadce8",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "b49d885f-5cec-48e9-b0b6-d866aba473b2",
                     "rows": [
                         {
                             "0": "abc",
@@ -628,7 +628,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "a6611160-ee90-43dd-f3fb-5855b4ef3c36"
+                        "32992e4d-4a53-4c89-fee8-f1e28ef5ddd3"
                     ]
                 },
                 "currentHeight": 36,
@@ -647,8 +647,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "a6611160-ee90-43dd-f3fb-5855b4ef3c36",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "32992e4d-4a53-4c89-fee8-f1e28ef5ddd3",
                     "rows": [
                         {
                             "0": "abc",
@@ -737,7 +737,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "6abac4e5-dbcb-4583-edb1-b604982e510b"
+                        "5eea99af-6b08-4d6c-a1cf-27ab168ffa70"
                     ]
                 },
                 "currentHeight": 36,
@@ -756,8 +756,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "6abac4e5-dbcb-4583-edb1-b604982e510b",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "5eea99af-6b08-4d6c-a1cf-27ab168ffa70",
                     "rows": [
                         {
                             "0": "armscii8_bin",
@@ -3543,7 +3543,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "e60bc57b-d357-4c31-9106-90fe460b87a6"
+                        "0a71e16a-efad-4e85-fd30-268664e1a384"
                     ]
                 },
                 "currentHeight": 36,
@@ -3562,8 +3562,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "e60bc57b-d357-4c31-9106-90fe460b87a6",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "0a71e16a-efad-4e85-fd30-268664e1a384",
                     "rows": [
                         {
                             "0": "AAA"
@@ -3619,7 +3619,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "7e9cda8d-7174-4c21-a483-3a85cc2e1cfc"
+                        "c03beb6c-febc-4067-d427-f61f8243f39a"
                     ]
                 },
                 "currentHeight": 206.5625,
@@ -3638,8 +3638,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "7e9cda8d-7174-4c21-a483-3a85cc2e1cfc",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "c03beb6c-febc-4067-d427-f61f8243f39a",
                     "rows": [
                         {
                             "0": "AAA"
@@ -3695,7 +3695,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "797e4040-3063-4d5a-bfa6-c340be241abd"
+                        "0273f549-a425-426f-f01e-2511417b6e81"
                     ]
                 },
                 "currentHeight": 206.5625,
@@ -3714,8 +3714,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "797e4040-3063-4d5a-bfa6-c340be241abd",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "0273f549-a425-426f-f01e-2511417b6e81",
                     "rows": [
                         {
                             "0": "aaa"
@@ -3771,7 +3771,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "0ff54b12-28c6-49e4-bf9d-89c983855ccb"
+                        "66242e06-246a-4e85-951f-f93a3d9792fa"
                     ]
                 },
                 "currentHeight": 206.5625,
@@ -3790,8 +3790,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "0ff54b12-28c6-49e4-bf9d-89c983855ccb",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "66242e06-246a-4e85-951f-f93a3d9792fa",
                     "rows": [
                         {
                             "0": "AAA"
@@ -3911,7 +3911,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "5c3c6c48-80ad-4827-bdc3-54e051433772"
+                        "7083b544-afdc-4747-863d-eec599986961"
                     ]
                 },
                 "currentHeight": 272.84375,
@@ -3930,8 +3930,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "5c3c6c48-80ad-4827-bdc3-54e051433772",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "7083b544-afdc-4747-863d-eec599986961",
                     "rows": [
                         {
                             "0": "cg"
@@ -3993,7 +3993,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "c1819b4d-7234-4db3-83e3-25d160c54e81"
+                        "2e26e1a6-ce51-45a3-8007-0bea350c54e3"
                     ]
                 },
                 "currentHeight": 272.84375,
@@ -4012,8 +4012,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "c1819b4d-7234-4db3-83e3-25d160c54e81",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "2e26e1a6-ce51-45a3-8007-0bea350c54e3",
                     "rows": [
                         {
                             "0": "cg"
@@ -4139,7 +4139,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "eebc625e-bb94-4547-e849-f58ffca074ad"
+                        "1c6756d8-ad68-414a-c32d-68ca54860cc8"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -4158,8 +4158,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "eebc625e-bb94-4547-e849-f58ffca074ad",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "1c6756d8-ad68-414a-c32d-68ca54860cc8",
                     "rows": [
                         {
                             "0": "abc",
@@ -4331,7 +4331,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "1b6e8aeb-86d8-4d0f-da13-146cffa1ef6e"
+                        "a27c98f7-da78-472c-8a44-66f533cb27f9"
                     ]
                 },
                 "currentHeight": 206.5625,
@@ -4350,8 +4350,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "1b6e8aeb-86d8-4d0f-da13-146cffa1ef6e",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "a27c98f7-da78-472c-8a44-66f533cb27f9",
                     "rows": [
                         {
                             "0": "iii"
@@ -4407,7 +4407,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "f3965067-1148-41d7-a157-3aa35fc9dbc6"
+                        "fc5c818a-801c-438f-a214-3632726ea428"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -4435,8 +4435,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "f3965067-1148-41d7-a157-3aa35fc9dbc6",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "fc5c818a-801c-438f-a214-3632726ea428",
                     "rows": [
                         {
                             "0": "I'm asleep",
@@ -4501,7 +4501,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "0460c8e0-1e4d-4320-87c9-45ccfbc2f3e2"
+                        "4bc87ba8-0e7e-4adc-e96b-d8753c641aec"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -4520,8 +4520,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "0460c8e0-1e4d-4320-87c9-45ccfbc2f3e2",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "4bc87ba8-0e7e-4adc-e96b-d8753c641aec",
                     "rows": [
                         {
                             "0": "I'm asleep",
@@ -4587,7 +4587,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "064375b4-661d-4f8e-a462-6047fa4adada"
+                        "399fe77f-d814-4b5e-c0dc-6dff7108558a"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -4606,8 +4606,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "064375b4-661d-4f8e-a462-6047fa4adada",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "399fe77f-d814-4b5e-c0dc-6dff7108558a",
                     "rows": [
                         {
                             "0": "He said, \"BOO!\"",
@@ -4672,7 +4672,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "5daaec9d-82e7-415a-fe03-3f9c9303f420"
+                        "7e507e0c-5f63-4e25-e122-3c3c490f1380"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -4691,8 +4691,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "5daaec9d-82e7-415a-fe03-3f9c9303f420",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "7e507e0c-5f63-4e25-e122-3c3c490f1380",
                     "rows": [
                         {
                             "0": "In windows to indentify the download path c:\\user\\downloads"
@@ -4738,7 +4738,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "584b78cd-4e9c-487c-e195-d08ab9146837"
+                        "e2d0d00f-af0b-4cb4-f26c-a692c3f1975d"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -4757,8 +4757,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "584b78cd-4e9c-487c-e195-d08ab9146837",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "e2d0d00f-af0b-4cb4-f26c-a692c3f1975d",
                     "rows": [
                         {
                             "0": "SSdtIGFzbGVlcA=="
@@ -4797,7 +4797,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "83845b2d-b6cc-4a48-db67-8b2726fcb779"
+                        "2a4beeae-f4f7-4ffb-8bc7-5f292f7485eb"
                     ]
                 },
                 "currentHeight": 36,
@@ -4816,8 +4816,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "83845b2d-b6cc-4a48-db67-8b2726fcb779",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "2a4beeae-f4f7-4ffb-8bc7-5f292f7485eb",
                     "rows": [
                         {
                             "0": "cbuser@localhost",
@@ -4934,7 +4934,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "26a2f8cc-331a-4a2f-b39e-38dfcd2e21eb"
+                        "0beea15a-9d1e-48cd-f63a-693c5edfb222"
                     ]
                 },
                 "currentHeight": 36,
@@ -4953,8 +4953,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "26a2f8cc-331a-4a2f-b39e-38dfcd2e21eb",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "0beea15a-9d1e-48cd-f63a-693c5edfb222",
                     "rows": [
                         {
                             "0": "utf8mb4",
@@ -5052,7 +5052,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "147f2202-4fc2-4add-93a9-f629d24f1942"
+                        "aae693d1-fcb6-4a68-b014-dfa7c60017d2"
                     ]
                 },
                 "currentHeight": 36,
@@ -5071,8 +5071,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "147f2202-4fc2-4add-93a9-f629d24f1942",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "aae693d1-fcb6-4a68-b014-dfa7c60017d2",
                     "rows": [
                         {
                             "0": "utf8mb4",
@@ -5170,7 +5170,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "d791c5bf-2d43-4d2a-ef51-236b60a672ca"
+                        "63896932-88cf-49c3-edf8-09b9e7759f36"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -5189,8 +5189,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "d791c5bf-2d43-4d2a-ef51-236b60a672ca",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "63896932-88cf-49c3-edf8-09b9e7759f36",
                     "rows": [
                         {
                             "0": "my string",
@@ -5326,7 +5326,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "282eb533-4f12-445c-f2a0-33b06e2556fb"
+                        "943e72d0-f3aa-4bef-9526-9951c57122c1"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -5345,8 +5345,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "282eb533-4f12-445c-f2a0-33b06e2556fb",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "943e72d0-f3aa-4bef-9526-9951c57122c1",
                     "rows": [
                         {
                             "0": "my string",
@@ -5532,7 +5532,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "b1c88cd6-a1a0-4b92-a9b4-a217f118ea68"
+                        "b8b1cdcb-8dc4-4773-db38-05954bcc990c"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -5551,8 +5551,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "b1c88cd6-a1a0-4b92-a9b4-a217f118ea68",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "b8b1cdcb-8dc4-4773-db38-05954bcc990c",
                     "rows": [
                         {
                             "0": "my string",
@@ -5801,7 +5801,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "b66f8310-8082-4b8c-daa4-ebed8fa5ce63"
+                        "fbe9edae-af00-4c72-ae73-2b3b2bb02e31"
                     ]
                 },
                 "currentHeight": 36,
@@ -5820,8 +5820,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "b66f8310-8082-4b8c-daa4-ebed8fa5ce63",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "fbe9edae-af00-4c72-ae73-2b3b2bb02e31",
                     "rows": [
                         {
                             "0": "my string",
@@ -5890,7 +5890,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "4ff3d30a-595f-4744-dc4a-de6ff6ba4b52"
+                        "333b1dac-a2d2-40c3-bd0a-71c52c5ba50b"
                     ]
                 },
                 "currentHeight": 36,
@@ -5909,8 +5909,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "4ff3d30a-595f-4744-dc4a-de6ff6ba4b52",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "333b1dac-a2d2-40c3-bd0a-71c52c5ba50b",
                     "rows": [
                         {
                             "0": "latin1",
@@ -5995,7 +5995,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "e6771f76-e11e-4fad-aa12-de0e7b950bc9"
+                        "4dfc5fb5-8569-47eb-9ca6-9934033c5d5b"
                     ]
                 },
                 "currentHeight": 105.140625,
@@ -6014,8 +6014,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "e6771f76-e11e-4fad-aa12-de0e7b950bc9",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "4dfc5fb5-8569-47eb-9ca6-9934033c5d5b",
                     "rows": [
                         {
                             "0": null
@@ -6086,7 +6086,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "5f04bce8-9fef-4b41-caef-b7f1a62bd216"
+                        "6432642a-c047-4330-dc88-d776765d86c1"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -6105,8 +6105,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "5f04bce8-9fef-4b41-caef-b7f1a62bd216",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "6432642a-c047-4330-dc88-d776765d86c1",
                     "rows": [
                         {
                             "0": "my string"
@@ -6153,7 +6153,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "0b132aea-a63d-43a1-9161-247e5ae351c4"
+                        "6029581a-deed-429a-d6f6-42706eb51a7f"
                     ]
                 },
                 "currentHeight": 105.140625,
@@ -6172,8 +6172,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "0b132aea-a63d-43a1-9161-247e5ae351c4",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "6029581a-deed-429a-d6f6-42706eb51a7f",
                     "rows": [
                         {
                             "0": {}
@@ -6244,7 +6244,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "cca05b94-afdd-4a84-fbbf-4e4d980b2412"
+                        "35961c5d-b811-45c3-bc54-cf987a0b54b7"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -6263,8 +6263,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "cca05b94-afdd-4a84-fbbf-4e4d980b2412",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "35961c5d-b811-45c3-bc54-cf987a0b54b7",
                     "rows": [
                         {
                             "0": "my string",
@@ -6360,7 +6360,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "578727f0-5511-41fe-ea6a-8ec7b42f572b"
+                        "4b4cb79a-c469-44d1-ee3d-4453a6a46720"
                     ]
                 },
                 "currentHeight": 352,
@@ -6379,8 +6379,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "578727f0-5511-41fe-ea6a-8ec7b42f572b",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "4b4cb79a-c469-44d1-ee3d-4453a6a46720",
                     "rows": [
                         {
                             "0": "armchair",
@@ -6547,7 +6547,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "db194555-31b4-4395-85f7-beb7dbd60415"
+                        "86931dd8-d1b7-4d08-dde0-07b004e36b58"
                     ]
                 },
                 "currentHeight": 36,
@@ -6566,8 +6566,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "db194555-31b4-4395-85f7-beb7dbd60415",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "86931dd8-d1b7-4d08-dde0-07b004e36b58",
                     "rows": [
                         {
                             "0": "YUJjRA==",
@@ -6628,7 +6628,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "dcd285d4-538b-42c6-b2a0-27667ea44c3b"
+                        "d10f1de7-2628-4fa6-9623-3b4fe5fd6623"
                     ]
                 },
                 "currentHeight": 36,
@@ -6647,8 +6647,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "dcd285d4-538b-42c6-b2a0-27667ea44c3b",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "d10f1de7-2628-4fa6-9623-3b4fe5fd6623",
                     "rows": [
                         {
                             "0": "YUJjRA==",
@@ -6725,7 +6725,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "8aefade0-8fec-4e71-9984-df6874288618"
+                        "698020a6-d1ba-44d8-84f0-866c9b6c583f"
                     ]
                 },
                 "currentHeight": 36,
@@ -6744,8 +6744,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "8aefade0-8fec-4e71-9984-df6874288618",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "698020a6-d1ba-44d8-84f0-866c9b6c583f",
                     "rows": [
                         {
                             "0": "binary"
@@ -6827,7 +6827,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "0ecd9b1e-9640-4322-a1ab-afed9d29491b"
+                        "0581461c-1f04-4d07-eb24-a9b8655bd747"
                     ]
                 },
                 "currentHeight": 36,
@@ -6846,8 +6846,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "0ecd9b1e-9640-4322-a1ab-afed9d29491b",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "0581461c-1f04-4d07-eb24-a9b8655bd747",
                     "rows": [
                         {
                             "0": 1,
@@ -6959,7 +6959,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "beeba4bc-8597-496b-c9cf-523cbbb10c96"
+                        "e5a875e0-af62-4210-c8da-881e58816905"
                     ]
                 },
                 "currentHeight": 36,
@@ -6978,8 +6978,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "beeba4bc-8597-496b-c9cf-523cbbb10c96",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "e5a875e0-af62-4210-c8da-881e58816905",
                     "rows": [
                         {
                             "0": 0,
@@ -7102,7 +7102,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "0660ea5a-9bad-46da-8ae0-a6ff0afdc46b"
+                        "86622033-90ee-413c-92bd-d10ea34bfe9d"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -7121,8 +7121,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "0660ea5a-9bad-46da-8ae0-a6ff0afdc46b",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "86622033-90ee-413c-92bd-d10ea34bfe9d",
                     "rows": [
                         {
                             "0": 0
@@ -7218,7 +7218,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "563dff4e-522b-415e-b113-815a17a545d2"
+                        "b19a2d55-0f3a-420e-a589-9c0796f8cc6f"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -7237,8 +7237,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "563dff4e-522b-415e-b113-815a17a545d2",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "b19a2d55-0f3a-420e-a589-9c0796f8cc6f",
                     "rows": [
                         {
                             "0": 1
@@ -7319,7 +7319,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "d15a4d36-faf3-45fc-aa37-c13dab322e34"
+                        "d9313fdf-cc5a-458b-ab8f-2b7cc1b69b0f"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -7338,8 +7338,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "d15a4d36-faf3-45fc-aa37-c13dab322e34",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "d9313fdf-cc5a-458b-ab8f-2b7cc1b69b0f",
                     "rows": [
                         {
                             "0": 1
@@ -7388,7 +7388,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "97a27087-f1ed-4701-acd0-30af18de00cd"
+                        "35883495-1a62-4ea9-b131-1370048ca988"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -7407,8 +7407,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "97a27087-f1ed-4701-acd0-30af18de00cd",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "35883495-1a62-4ea9-b131-1370048ca988",
                     "rows": [
                         {
                             "0": 0
@@ -7457,7 +7457,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "db189e0f-c74c-4319-ff36-257adc927001"
+                        "43c5db73-5b3c-4bfc-9f18-d5c67ca956a2"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -7476,8 +7476,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "db189e0f-c74c-4319-ff36-257adc927001",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "43c5db73-5b3c-4bfc-9f18-d5c67ca956a2",
                     "rows": [
                         {
                             "0": 0
@@ -7526,8 +7526,8 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "bb57cb72-9fb4-413d-e6fc-9cda29903222",
-                        "0bdc312b-42cf-4b77-e3a7-e8d435de16a4"
+                        "6fddd697-15e9-4ac1-958e-792f957304fb",
+                        "12838a6a-a745-4388-e550-9c855a90f70b"
                     ]
                 },
                 "currentHeight": 134.140625,
@@ -7564,8 +7564,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "bb57cb72-9fb4-413d-e6fc-9cda29903222",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "6fddd697-15e9-4ac1-958e-792f957304fb",
                     "rows": [
                         {
                             "0": 1,
@@ -7647,8 +7647,8 @@
                     "fullTableName": ""
                 },
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "0bdc312b-42cf-4b77-e3a7-e8d435de16a4",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "12838a6a-a745-4388-e550-9c855a90f70b",
                     "rows": [],
                     "executionInfo": {
                         "text": "OK, 0 records retrieved in 0s",
@@ -7671,7 +7671,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "c6f3465a-1a02-4a1b-c0e3-805479b6b94a"
+                        "379375ca-41ee-4fba-83a8-68d22e974017"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -7690,8 +7690,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "c6f3465a-1a02-4a1b-c0e3-805479b6b94a",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "379375ca-41ee-4fba-83a8-68d22e974017",
                     "rows": [
                         {
                             "0": "1000"
@@ -7738,7 +7738,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "23175a3f-123c-4aa7-dce5-4963167ad400"
+                        "812d1b99-3c88-4f04-cfbe-bb0fcad7ef52"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -7757,8 +7757,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "23175a3f-123c-4aa7-dce5-4963167ad400",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "812d1b99-3c88-4f04-cfbe-bb0fcad7ef52",
                     "rows": [
                         {
                             "0": "1000"
@@ -7805,7 +7805,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "1f544235-d91c-4833-d28c-44112645067d"
+                        "bbd02d8a-235e-474b-a4b8-74bec6a41a9d"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -7824,8 +7824,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "1f544235-d91c-4833-d28c-44112645067d",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "bbd02d8a-235e-474b-a4b8-74bec6a41a9d",
                     "rows": [
                         {
                             "0": "15"
@@ -7872,7 +7872,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "2431e00e-1803-4132-9c3e-1751dc3f6004"
+                        "4f14efb3-31df-4777-e68a-f6288d2b5358"
                     ]
                 },
                 "currentHeight": 36,
@@ -7891,8 +7891,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "2431e00e-1803-4132-9c3e-1751dc3f6004",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "4f14efb3-31df-4777-e68a-f6288d2b5358",
                     "rows": [
                         {
                             "0": 76
@@ -7942,7 +7942,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "700ef6da-469b-47fd-aedd-4759ff067e9f"
+                        "0b18eac3-99a9-4548-ba8b-735eb96548e8"
                     ]
                 },
                 "currentHeight": 36,
@@ -7961,8 +7961,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "700ef6da-469b-47fd-aedd-4759ff067e9f",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "0b18eac3-99a9-4548-ba8b-735eb96548e8",
                     "rows": [
                         {
                             "0": 76
@@ -8012,7 +8012,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "866cd9e9-8802-495d-e6e1-1b87c73e8107"
+                        "4b4a8f82-ec2c-4f2d-f5d1-4947e256c32b"
                     ]
                 },
                 "currentHeight": 36,
@@ -8031,8 +8031,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "866cd9e9-8802-495d-e6e1-1b87c73e8107",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "4b4a8f82-ec2c-4f2d-f5d1-4947e256c32b",
                     "rows": [
                         {
                             "0": "4C"
@@ -8079,7 +8079,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "93c55fdd-59a0-4468-ac23-d2d37310d403"
+                        "4a5209cb-ca49-4d3b-bd09-2f1d30114d25"
                     ]
                 },
                 "currentHeight": 36,
@@ -8098,8 +8098,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "93c55fdd-59a0-4468-ac23-d2d37310d403",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "4a5209cb-ca49-4d3b-bd09-2f1d30114d25",
                     "rows": [
                         {
                             "0": "42"
@@ -8152,7 +8152,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "6276ba62-4177-4747-e955-15d297be4e71"
+                        "e9f5256f-4ce0-4a6e-d639-a7d4b3e80c5c"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -8171,8 +8171,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "6276ba62-4177-4747-e955-15d297be4e71",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "e9f5256f-4ce0-4a6e-d639-a7d4b3e80c5c",
                     "rows": [
                         {
                             "0": "0a2b3b6f-3aed-11ef-b202-e86a642cec41"
@@ -8219,7 +8219,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "607e10fe-4a16-44d1-9578-ecf9db07f3c7"
+                        "4a82924e-79e5-4766-eec8-0d01e1419594"
                     ]
                 },
                 "currentHeight": 36,
@@ -8238,8 +8238,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "607e10fe-4a16-44d1-9578-ecf9db07f3c7",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "4a82924e-79e5-4766-eec8-0d01e1419594",
                     "rows": [
                         {
                             "0": "EnmEnjrtEe+yAuhqZCzsQQ=="
@@ -8310,7 +8310,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "d8f7edcd-7a41-4738-f599-202284809364"
+                        "a95d741e-0790-4fe3-abd0-4d3ebd27516a"
                     ]
                 },
                 "currentHeight": 36,
@@ -8329,8 +8329,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "d8f7edcd-7a41-4738-f599-202284809364",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "a95d741e-0790-4fe3-abd0-4d3ebd27516a",
                     "rows": [
                         {
                             "0": null
@@ -8379,7 +8379,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "cc0017b5-77f3-4d2b-d8d9-b3fca0ae0a91"
+                        "3c10b494-71f1-42f7-ccea-6b38585f9820"
                     ]
                 },
                 "currentHeight": 36,
@@ -8407,8 +8407,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "cc0017b5-77f3-4d2b-d8d9-b3fca0ae0a91",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "3c10b494-71f1-42f7-ccea-6b38585f9820",
                     "rows": [
                         {
                             "0": null,
@@ -8468,7 +8468,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "56bc7ccc-d3ef-4e11-f8bd-822225deb736"
+                        "d3a58954-33e9-432f-d3a9-1da16cf3cefd"
                     ]
                 },
                 "currentHeight": 36,
@@ -8487,8 +8487,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "56bc7ccc-d3ef-4e11-f8bd-822225deb736",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "d3a58954-33e9-432f-d3a9-1da16cf3cefd",
                     "rows": [
                         {
                             "0": 2
@@ -8537,7 +8537,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "f6abf78d-e7f1-48e2-94dc-5fe246f68ead"
+                        "3977ecec-4a5b-498f-8805-0e7befc9f23a"
                     ]
                 },
                 "currentHeight": 36,
@@ -8556,8 +8556,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "f6abf78d-e7f1-48e2-94dc-5fe246f68ead",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "3977ecec-4a5b-498f-8805-0e7befc9f23a",
                     "rows": [
                         {
                             "0": 128
@@ -8606,7 +8606,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "129d1dd5-6628-465d-aaef-ae53e395861d"
+                        "00ddea29-e682-4efa-b505-65e96b9af17d"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -8625,8 +8625,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "129d1dd5-6628-465d-aaef-ae53e395861d",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "00ddea29-e682-4efa-b505-65e96b9af17d",
                     "rows": [
                         {
                             "0": 128
@@ -8675,7 +8675,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "c936a8b1-d705-46ec-ee87-691d3726b666"
+                        "4f087381-1beb-4a67-d2c8-ba2b2245be61"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -8694,8 +8694,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "c936a8b1-d705-46ec-ee87-691d3726b666",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "4f087381-1beb-4a67-d2c8-ba2b2245be61",
                     "rows": [
                         {
                             "0": 167772673
@@ -8744,8 +8744,8 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "c28d073b-ae06-4497-ebb6-73cf98e418b1",
-                        "ce57fb26-fc55-4a4e-bb84-64976871e33d"
+                        "6e264f35-b9b2-40ec-8d93-8439e2ebf953",
+                        "f89f224a-2d14-446d-fbd9-929615c727e5"
                     ]
                 },
                 "currentHeight": 134.140625,
@@ -8773,8 +8773,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "c28d073b-ae06-4497-ebb6-73cf98e418b1",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "6e264f35-b9b2-40ec-8d93-8439e2ebf953",
                     "rows": [
                         {
                             "0": "A000201"
@@ -8812,8 +8812,8 @@
                     "fullTableName": ""
                 },
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "ce57fb26-fc55-4a4e-bb84-64976871e33d",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "f89f224a-2d14-446d-fbd9-929615c727e5",
                     "rows": [],
                     "executionInfo": {
                         "text": "OK, 0 records retrieved in 0s",
@@ -8836,7 +8836,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "cb55aeb8-2669-4ca4-e71f-37d9b1142fee"
+                        "1bebec77-9f69-4d98-ae6e-a2d80a8fc4b6"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -8855,8 +8855,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "cb55aeb8-2669-4ca4-e71f-37d9b1142fee",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "1bebec77-9f69-4d98-ae6e-a2d80a8fc4b6",
                     "rows": [
                         {
                             "0": "0A000201"
@@ -8903,7 +8903,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "f2582ca8-edc9-49cb-f624-8bc5c56671b1"
+                        "9b30a3dc-f530-4300-9da2-8c1cd795cfa3"
                     ]
                 },
                 "currentHeight": 36,
@@ -8922,8 +8922,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "f2582ca8-edc9-49cb-f624-8bc5c56671b1",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "9b30a3dc-f530-4300-9da2-8c1cd795cfa3",
                     "rows": [
                         {
                             "0": "gold"
@@ -8985,7 +8985,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "b3ef0644-0f0c-4dda-ddea-c0c5eb8b160d"
+                        "aabf10d3-8bec-4ba0-de06-e022b3de21d9"
                     ]
                 },
                 "currentHeight": 36,
@@ -9013,8 +9013,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "b3ef0644-0f0c-4dda-ddea-c0c5eb8b160d",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "aabf10d3-8bec-4ba0-de06-e022b3de21d9",
                     "rows": [
                         {
                             "0": "mercury"
@@ -9061,7 +9061,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "d610630f-c715-450b-d90e-8bb1c604c678"
+                        "45528025-ba9c-40c3-b4d6-e26b8fd92823"
                     ]
                 },
                 "currentHeight": 36,
@@ -9089,8 +9089,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "d610630f-c715-450b-d90e-8bb1c604c678",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "45528025-ba9c-40c3-b4d6-e26b8fd92823",
                     "rows": [
                         {
                             "0": "gold"
@@ -9140,8 +9140,8 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "902273ec-4dc3-47e1-baca-7317c3fa9a50",
-                        "50cfd90c-c225-4876-ef42-da55e38dade6"
+                        "bd846288-299a-4b8a-fdbd-bcfc6c5f2346",
+                        "85823966-5afe-4c36-cba1-b6bf6234d834"
                     ]
                 },
                 "currentHeight": 36,
@@ -9169,8 +9169,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "902273ec-4dc3-47e1-baca-7317c3fa9a50",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "bd846288-299a-4b8a-fdbd-bcfc6c5f2346",
                     "rows": [
                         {
                             "0": "platinum"
@@ -9211,8 +9211,8 @@
                     "fullTableName": "metal"
                 },
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "50cfd90c-c225-4876-ef42-da55e38dade6",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "85823966-5afe-4c36-cba1-b6bf6234d834",
                     "rows": [],
                     "executionInfo": {
                         "text": "OK, 0 records retrieved in 0s",
@@ -9235,8 +9235,8 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "d47ba44f-d6ba-49bb-b6fc-47ed2fae2982",
-                        "786a4a14-358c-4b7b-e2ae-054a66c3add1"
+                        "176ddc53-c7d6-4c48-8d55-29a9b4ea5eb3",
+                        "29051af2-0fe3-455c-cf31-1d85e684da0d"
                     ]
                 },
                 "currentHeight": 134.140625,
@@ -9264,8 +9264,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "d47ba44f-d6ba-49bb-b6fc-47ed2fae2982",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "176ddc53-c7d6-4c48-8d55-29a9b4ea5eb3",
                     "rows": [
                         {
                             "0": "platinum"
@@ -9303,8 +9303,8 @@
                     "fullTableName": "metal"
                 },
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "786a4a14-358c-4b7b-e2ae-054a66c3add1",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "29051af2-0fe3-455c-cf31-1d85e684da0d",
                     "rows": [],
                     "executionInfo": {
                         "text": "OK, 0 records retrieved in 0s",
@@ -9327,7 +9327,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "80f095cc-d615-41a6-a6f7-ab7d0795f7cc"
+                        "50813375-8c88-4e7a-d545-dc4854ca7152"
                     ]
                 },
                 "currentHeight": 173.421875,
@@ -9346,8 +9346,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "80f095cc-d615-41a6-a6f7-ab7d0795f7cc",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "50813375-8c88-4e7a-d545-dc4854ca7152",
                     "rows": [
                         {
                             "0": "gold"
@@ -9400,7 +9400,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "d220aa39-d334-49d8-a700-2432a8a6010a"
+                        "b3d7b294-ae4a-47d2-81b2-9b9da173e468"
                     ]
                 },
                 "currentHeight": 105.140625,
@@ -9419,8 +9419,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "d220aa39-d334-49d8-a700-2432a8a6010a",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "b3d7b294-ae4a-47d2-81b2-9b9da173e468",
                     "rows": [
                         {
                             "0": null,
@@ -9490,8 +9490,8 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "64f7c616-6f9b-4610-8db1-1daa39b5edd1",
-                        "c5a5e8de-75e8-417c-9dc3-afa7db6b980c"
+                        "07641c52-d157-4346-8c8c-60df49d8c5bc",
+                        "7200801b-0414-4235-eed3-e69eeb1075dc"
                     ]
                 },
                 "currentHeight": 134.140625,
@@ -9528,8 +9528,8 @@
             },
             "data": [
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "64f7c616-6f9b-4610-8db1-1daa39b5edd1",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "07641c52-d157-4346-8c8c-60df49d8c5bc",
                     "rows": [
                         {
                             "0": "str LIKE 'abc%'",
@@ -9585,8 +9585,8 @@
                     "updatable": false
                 },
                 {
-                    "tabId": "544988b0-a72b-449b-9b4f-cae0c07cc831",
-                    "resultId": "c5a5e8de-75e8-417c-9dc3-afa7db6b980c",
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "7200801b-0414-4235-eed3-e69eeb1075dc",
                     "rows": [
                         {
                             "0": "str LIKE '%abc'",
@@ -9646,7 +9646,439 @@
         {
             "state": {
                 "start": 163,
-                "end": 163,
+                "end": 168,
+                "language": "mysql",
+                "result": {
+                    "type": "text",
+                    "text": [
+                        {
+                            "type": 4,
+                            "index": 0,
+                            "resultId": "facc6782-8318-4fa6-90eb-d1369cb91cae",
+                            "content": "OK, 0 records retrieved in 132.525ms"
+                        }
+                    ]
+                },
+                "currentHeight": 28,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 188
+                        },
+                        "contentStart": 82,
+                        "state": 3
+                    }
+                ]
+            },
+            "data": []
+        },
+        {
+            "state": {
+                "start": 169,
+                "end": 169,
+                "language": "mysql",
+                "result": {
+                    "type": "text",
+                    "text": [
+                        {
+                            "type": 4,
+                            "index": 0,
+                            "resultId": "1d5864fb-53ca-43ba-a2e1-27c98f906923",
+                            "content": "OK, 3 rows affected in 19.339ms"
+                        }
+                    ]
+                },
+                "currentHeight": 28,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 146
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": []
+        },
+        {
+            "state": {
+                "start": 170,
+                "end": 170,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "aad00102-b162-4e18-fd67-b704bcde19ae"
+                    ]
+                },
+                "currentHeight": 36,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 24
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "aad00102-b162-4e18-fd67-b704bcde19ae",
+                    "rows": [
+                        {
+                            "0": "YEAR(d) = 1975",
+                            "1": "d LIKE '1975-%'"
+                        },
+                        {
+                            "0": "MONTH(d) = 6",
+                            "1": "d LIKE '%-06-%'"
+                        },
+                        {
+                            "0": "DAYOFMONTH(d) = 21",
+                            "1": "d LIKE '%-21%'"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "Function value test",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "Pattern match test",
+                            "field": "1",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 3 records retrieved in 0s"
+                    },
+                    "totalRowCount": 3,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT * FROM tmp_tbl_4",
+                    "updatable": false,
+                    "fullTableName": "tmp_tbl_4"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 171,
+                "end": 173,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "f06dd00e-e1af-4e68-8066-fadf0132f132"
+                    ]
+                },
+                "currentHeight": 107.140625,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 129
+                        },
+                        "contentStart": 82,
+                        "state": 2
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "f06dd00e-e1af-4e68-8066-fadf0132f132",
+                    "rows": [
+                        {
+                            "0": "mercury"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "name",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": true,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 56.086ms"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "# Pattern matching with regular expression\n-- Syntax SELECT ... REGEXP 'pattern';\nSELECT name FROM metal WHERE name REGEXP '^me';",
+                    "updatable": true,
+                    "fullTableName": "metal"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 174,
+                "end": 174,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "96d10abf-d8cb-43b5-dfae-d14865f576c0"
+                    ]
+                },
+                "currentHeight": 140.28125,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 46
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "96d10abf-d8cb-43b5-dfae-d14865f576c0",
+                    "rows": [
+                        {
+                            "0": "gold"
+                        },
+                        {
+                            "0": "lead"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "name",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": true,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 2 records retrieved in 0s"
+                    },
+                    "totalRowCount": 2,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT name FROM metal WHERE name REGEXP 'd$'",
+                    "updatable": true,
+                    "fullTableName": "metal"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 175,
+                "end": 175,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "5bae6481-e723-4bb4-bc31-a639b32e0500"
+                    ]
+                },
+                "currentHeight": 140.28125,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 46
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "5bae6481-e723-4bb4-bc31-a639b32e0500",
+                    "rows": [
+                        {
+                            "0": "platinum"
+                        },
+                        {
+                            "0": "tin"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "name",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": true,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 2 records retrieved in 2.779ms"
+                    },
+                    "totalRowCount": 2,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT name FROM metal WHERE name REGEXP 'in'",
+                    "updatable": true,
+                    "fullTableName": "metal"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 176,
+                "end": 176,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "b42de2e9-b2cc-4aa2-c4d2-ce1137db716e"
+                    ]
+                },
+                "currentHeight": 107.140625,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 49
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "223058aa-99f2-4930-e986-cd7c17ea6bff",
+                    "resultId": "b42de2e9-b2cc-4aa2-c4d2-ce1137db716e",
+                    "rows": [
+                        {
+                            "0": "platinum"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "name",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": true,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 0s"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT name FROM metal WHERE name REGEXP '^..at'",
+                    "updatable": true,
+                    "fullTableName": "metal"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 177,
+                "end": 177,
                 "language": "mysql",
                 "currentSet": 1,
                 "statements": [
