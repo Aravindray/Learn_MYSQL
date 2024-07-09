@@ -2,29 +2,29 @@
     "type": "MySQLNotebook",
     "version": "1.0",
     "caption": "Untitled",
-    "content": "# Intoduction\r\n",
+    "content": "USE cookbook;\r\n# Intodruction\r\n-- Mysql has several data type for representing temporal data\r\n# Choosing a Temporal Data type\r\n-- There are DATE, TIME, TIMESTAMP and DATETIME data type for representing temporal data type.\r\n-- Choose an appropirate data type based on characteristics and secification.\r\nSELECT * from time_val;\r\nSELECT * FROM date_val;\r\nSELECT * FROM datetime_val;\r\nSELECT CURTIME(), CURTIME(2), CURTIME(6);\r\n-- Result not displayed as expected\r\n# Using Fractional Seconds support\r\nSELECT POSITION AS POS, no, driver, car, laps, DATE_FORMAT(time, '%H:%i:%s:%f') AS time, points as pts FROM formula1 ORDER BY time;\r\nSELECT * FROM formula1;\r\nSELECT MIN(time) from formula1 into @fastest;\r\nWITH time_gap AS (\r\n SELECT\r\n position,\r\n car,\r\n driver,\r\n time,\r\n TIMESTAMPDIFF(SECOND, time , @fastest) AS seconds\r\n FROM formula1\r\n),\r\nDIFFERENCES AS (\r\n SELECT\r\n position as pos,\r\n driver,\r\n car,\r\n time,\r\n seconds,\r\n MOD(seconds, 60) AS seconds_part,\r\n MOD(seconds, 3600) AS minutes_part\r\n FROM time_gap\r\n)\r\nSELECT\r\n pos,\r\n driver,\r\n time,\r\n CONCAT(\r\n FLOOR(minutes_part / 60), ' min ',\r\n SUBSTRING_INDEX(SUBSTRING_INDEX(seconds_part,'-',2),'-',-1),' secs'\r\n ) AS difference\r\nFROM differences;\r\n-- we will learn more about CTE in recipe 10.18\r\n# Changing MySQL Date Format\r\n-- MySQL support only ISO format for storing dates. But if our date is different format or close to ISO format we can convert it first to ISO format and store it in mysql db.\r\n-- With the help of STR_TO_DATE() function we can convert non-ISO format to ISO format date format.\r\nCREATE TABLE tmp_tbl_5 \r\n(\r\n    date DATE\r\n);\r\nINSERT INTO tmp_tbl_5 VALUES (STR_TO_DATE('May 13, 2007', '%M %d, %Y'));\r\nSELECT * FROM tmp_tbl_5;\r\n-- Mysql display the date and time in ISO format, But we can tell Mysql to display required format using DATE_FORMAT() and TIME_FORMAT() functions.\r\n-- Syntax: DATE_FORMAT(DATE|DATETIME|TIMESTAMP, string specifiers)\r\n-- String specifiers is same as the STR_TO_DATE() supported specifier.\r\nSELECT d, DATE_FORMAT(d, '%M %d, %Y') AS date FROM date_val;\r\nSELECT dt, DATE_FORMAT(dt, '%c/%e/%y %r') AS `Format 1`, DATE_FORMAT(dt, '%M %e, %Y %T') AS `Format 2` FROM datetime_val;\r\nSELECT dt, TIME_FORMAT(dt, '%r'), TIME_FORMAT(dt, '%T') FROM datetime_val;\r\n-- I have created the function from root user login",
     "options": {},
     "viewState": {
         "cursorState": [
             {
                 "inSelectionMode": false,
                 "selectionStart": {
-                    "lineNumber": 2,
-                    "column": 1
+                    "lineNumber": 61,
+                    "column": 52
                 },
                 "position": {
-                    "lineNumber": 2,
-                    "column": 1
+                    "lineNumber": 61,
+                    "column": 52
                 }
             }
         ],
         "viewState": {
             "scrollLeft": 0,
             "firstPosition": {
-                "lineNumber": 1,
+                "lineNumber": 59,
                 "column": 1
             },
-            "firstPositionDeltaTop": 0
+            "firstPositionDeltaTop": 108
         },
         "contributionsState": {
             "editor.contrib.folding": {},
@@ -35,7 +35,1429 @@
         {
             "state": {
                 "start": 1,
-                "end": 2,
+                "end": 1,
+                "language": "mysql",
+                "result": {
+                    "type": "text",
+                    "text": [
+                        {
+                            "type": 4,
+                            "index": 0,
+                            "resultId": "d9d3fb5b-c274-4eb5-b1b8-86b980cd0fa4",
+                            "content": "OK, 0 records retrieved in 0s"
+                        }
+                    ]
+                },
+                "currentHeight": 28,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 13
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": []
+        },
+        {
+            "state": {
+                "start": 2,
+                "end": 7,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "a06a5cc2-b6c6-4996-88cc-5494dbd885f1"
+                    ]
+                },
+                "currentHeight": 36,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 305
+                        },
+                        "contentStart": 282,
+                        "state": 3
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "5d5118c0-49e5-4735-909a-644cc1ec5938",
+                    "resultId": "a06a5cc2-b6c6-4996-88cc-5494dbd885f1",
+                    "rows": [
+                        {
+                            "0": 1,
+                            "1": "15:00:00",
+                            "2": "15:00:00"
+                        },
+                        {
+                            "0": 2,
+                            "1": "05:01:30",
+                            "2": "02:30:20"
+                        },
+                        {
+                            "0": 3,
+                            "1": "12:30:20",
+                            "2": "17:30:45"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "id",
+                            "field": "0",
+                            "dataType": {
+                                "type": 4,
+                                "flags": [
+                                    "SIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 10,
+                                "parameterFormatType": "OneOrZero",
+                                "synonyms": [
+                                    "INTEGER",
+                                    "INT4"
+                                ]
+                            },
+                            "inPK": true,
+                            "nullable": false,
+                            "autoIncrement": true
+                        },
+                        {
+                            "title": "t1",
+                            "field": "1",
+                            "dataType": {
+                                "type": 28,
+                                "dateTimePrecision": 3,
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": true,
+                            "autoIncrement": false,
+                            "default": null
+                        },
+                        {
+                            "title": "t2",
+                            "field": "2",
+                            "dataType": {
+                                "type": 28,
+                                "dateTimePrecision": 3,
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": true,
+                            "autoIncrement": false,
+                            "default": null
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 3 records retrieved in 34.952ms"
+                    },
+                    "totalRowCount": 3,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "# Intodruction\n-- Mysql has several data type for representing temporal data\n# Choosing a Temporal Data type\n-- There are DATE, TIME, TIMESTAMP and DATETIME data type for representing temporal data type.\n-- Choose an appropirate data type based on characteristics and secification.\nSELECT * from time_val;",
+                    "updatable": true,
+                    "fullTableName": "time_val"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 8,
+                "end": 8,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "cf412360-448c-41ee-927c-3a916e673997"
+                    ]
+                },
+                "currentHeight": 36,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 23
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "5d5118c0-49e5-4735-909a-644cc1ec5938",
+                    "resultId": "cf412360-448c-41ee-927c-3a916e673997",
+                    "rows": [
+                        {
+                            "0": "1864-02-28"
+                        },
+                        {
+                            "0": "1900-01-15"
+                        },
+                        {
+                            "0": "1999-12-31"
+                        },
+                        {
+                            "0": "2000-06-04"
+                        },
+                        {
+                            "0": "2017-03-16"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "d",
+                            "field": "0",
+                            "dataType": {
+                                "type": 27,
+                                "needsQuotes": true
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 5 records retrieved in 15.626ms"
+                    },
+                    "totalRowCount": 5,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT * FROM date_val",
+                    "updatable": false,
+                    "fullTableName": "date_val"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 9,
+                "end": 9,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "b17424e8-ae6a-4e38-f98b-7faa5e7cf966"
+                    ]
+                },
+                "currentHeight": 36,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 27
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "5d5118c0-49e5-4735-909a-644cc1ec5938",
+                    "resultId": "b17424e8-ae6a-4e38-f98b-7faa5e7cf966",
+                    "rows": [
+                        {
+                            "0": "1970-01-01 00:00:00"
+                        },
+                        {
+                            "0": "1999-12-31 09:00:00"
+                        },
+                        {
+                            "0": "2000-06-04 15:45:30"
+                        },
+                        {
+                            "0": "2017-03-16 12:30:15"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "dt",
+                            "field": "0",
+                            "dataType": {
+                                "type": 26,
+                                "dateTimePrecision": 8,
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 4 records retrieved in 9.579ms"
+                    },
+                    "totalRowCount": 4,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT * FROM datetime_val",
+                    "updatable": false,
+                    "fullTableName": "datetime_val"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 10,
+                "end": 10,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "7f11aa97-12a3-4ee6-adc1-c63aca982e26"
+                    ]
+                },
+                "currentHeight": 107.140625,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 41
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "5d5118c0-49e5-4735-909a-644cc1ec5938",
+                    "resultId": "7f11aa97-12a3-4ee6-adc1-c63aca982e26",
+                    "rows": [
+                        {
+                            "0": "12:23:41",
+                            "1": "12:23:41.330000",
+                            "2": "12:23:41.336424"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "CURTIME()",
+                            "field": "0",
+                            "dataType": {
+                                "type": 28,
+                                "dateTimePrecision": 3,
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "CURTIME(2)",
+                            "field": "1",
+                            "dataType": {
+                                "type": 28,
+                                "dateTimePrecision": 3,
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "CURTIME(6)",
+                            "field": "2",
+                            "dataType": {
+                                "type": 28,
+                                "dateTimePrecision": 3,
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 0s"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT CURTIME(), CURTIME(2), CURTIME(6)",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 11,
+                "end": 13,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "a8303c53-9630-4915-eadc-7e7ec584cbc3"
+                    ]
+                },
+                "currentHeight": 36,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 203
+                        },
+                        "contentStart": 71,
+                        "state": 3
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "5d5118c0-49e5-4735-909a-644cc1ec5938",
+                    "resultId": "a8303c53-9630-4915-eadc-7e7ec584cbc3",
+                    "rows": [
+                        {
+                            "0": 1,
+                            "1": 77,
+                            "2": "Valtteri Bottas",
+                            "3": "MERCEDES",
+                            "4": 58,
+                            "5": "01:31:04:103000",
+                            "6": 26
+                        },
+                        {
+                            "0": 2,
+                            "1": 33,
+                            "2": "Max Verstappen",
+                            "3": "RED BULL RACING HONDA",
+                            "4": 58,
+                            "5": "01:45:58:243000",
+                            "6": 18
+                        },
+                        {
+                            "0": 3,
+                            "1": 11,
+                            "2": "Sergio Perez",
+                            "3": "RED BULL RACING HONDA",
+                            "4": 58,
+                            "5": "01:46:10:342000",
+                            "6": 15
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "POS",
+                            "field": "0",
+                            "dataType": {
+                                "type": 4,
+                                "flags": [
+                                    "SIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 10,
+                                "parameterFormatType": "OneOrZero",
+                                "synonyms": [
+                                    "INTEGER",
+                                    "INT4"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "no",
+                            "field": "1",
+                            "dataType": {
+                                "type": 4,
+                                "flags": [
+                                    "SIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 10,
+                                "parameterFormatType": "OneOrZero",
+                                "synonyms": [
+                                    "INTEGER",
+                                    "INT4"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "driver",
+                            "field": "2",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "car",
+                            "field": "3",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "laps",
+                            "field": "4",
+                            "dataType": {
+                                "type": 2,
+                                "flags": [
+                                    "UNSIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 5,
+                                "parameterFormatType": "OneOrZero",
+                                "synonyms": [
+                                    "INT2"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "time",
+                            "field": "5",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "pts",
+                            "field": "6",
+                            "dataType": {
+                                "type": 2,
+                                "flags": [
+                                    "UNSIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 5,
+                                "parameterFormatType": "OneOrZero",
+                                "synonyms": [
+                                    "INT2"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 3 records retrieved in 0.233ms"
+                    },
+                    "totalRowCount": 3,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "-- Result not displayed as expected\nSELECT POSITION AS POS, no, driver, car, laps, DATE_FORMAT(time, '%H:%i:%s:%f') AS time, points as pts FROM formula1 ORDER BY time;",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 14,
+                "end": 14,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "893e82fe-9783-4dd8-99a7-eec57636a492"
+                    ]
+                },
+                "currentHeight": 36,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 23
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "5d5118c0-49e5-4735-909a-644cc1ec5938",
+                    "resultId": "893e82fe-9783-4dd8-99a7-eec57636a492",
+                    "rows": [
+                        {
+                            "0": 1,
+                            "1": 1,
+                            "2": 77,
+                            "3": "Valtteri Bottas",
+                            "4": "MERCEDES",
+                            "5": 58,
+                            "6": "2021-10-08 01:31:04.103000",
+                            "7": 26
+                        },
+                        {
+                            "0": 2,
+                            "1": 2,
+                            "2": 33,
+                            "3": "Max Verstappen",
+                            "4": "RED BULL RACING HONDA",
+                            "5": 58,
+                            "6": "2021-10-08 01:45:58.243000",
+                            "7": 18
+                        },
+                        {
+                            "0": 3,
+                            "1": 3,
+                            "2": 11,
+                            "3": "Sergio Perez",
+                            "4": "RED BULL RACING HONDA",
+                            "5": 58,
+                            "6": "2021-10-08 01:46:10.342000",
+                            "7": 15
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "id",
+                            "field": "0",
+                            "dataType": {
+                                "type": 4,
+                                "flags": [
+                                    "SIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 10,
+                                "parameterFormatType": "OneOrZero",
+                                "synonyms": [
+                                    "INTEGER",
+                                    "INT4"
+                                ]
+                            },
+                            "inPK": true,
+                            "nullable": false,
+                            "autoIncrement": true
+                        },
+                        {
+                            "title": "position",
+                            "field": "1",
+                            "dataType": {
+                                "type": 4,
+                                "flags": [
+                                    "SIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 10,
+                                "parameterFormatType": "OneOrZero",
+                                "synonyms": [
+                                    "INTEGER",
+                                    "INT4"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": true,
+                            "autoIncrement": false,
+                            "default": null
+                        },
+                        {
+                            "title": "no",
+                            "field": "2",
+                            "dataType": {
+                                "type": 4,
+                                "flags": [
+                                    "SIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 10,
+                                "parameterFormatType": "OneOrZero",
+                                "synonyms": [
+                                    "INTEGER",
+                                    "INT4"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": true,
+                            "autoIncrement": false,
+                            "default": null
+                        },
+                        {
+                            "title": "driver",
+                            "field": "3",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": true,
+                            "autoIncrement": false,
+                            "default": null
+                        },
+                        {
+                            "title": "car",
+                            "field": "4",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": true,
+                            "autoIncrement": false,
+                            "default": null
+                        },
+                        {
+                            "title": "laps",
+                            "field": "5",
+                            "dataType": {
+                                "type": 2,
+                                "flags": [
+                                    "UNSIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 5,
+                                "parameterFormatType": "OneOrZero",
+                                "synonyms": [
+                                    "INT2"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": true,
+                            "autoIncrement": false,
+                            "default": null
+                        },
+                        {
+                            "title": "time",
+                            "field": "6",
+                            "dataType": {
+                                "type": 26,
+                                "dateTimePrecision": 8,
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": true,
+                            "autoIncrement": false,
+                            "default": null
+                        },
+                        {
+                            "title": "points",
+                            "field": "7",
+                            "dataType": {
+                                "type": 2,
+                                "flags": [
+                                    "UNSIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 5,
+                                "parameterFormatType": "OneOrZero",
+                                "synonyms": [
+                                    "INT2"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": true,
+                            "autoIncrement": false,
+                            "default": null
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 3 records retrieved in 0s"
+                    },
+                    "totalRowCount": 3,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT * FROM formula1",
+                    "updatable": true,
+                    "fullTableName": "formula1"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 15,
+                "end": 15,
+                "language": "mysql",
+                "result": {
+                    "type": "text",
+                    "text": [
+                        {
+                            "type": 4,
+                            "index": 0,
+                            "resultId": "694f32ab-8975-4bed-b078-1be625c942c9",
+                            "content": "OK, 1 row affected in 8.057ms"
+                        }
+                    ]
+                },
+                "currentHeight": 28,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 45
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": []
+        },
+        {
+            "state": {
+                "start": 16,
+                "end": 44,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "825c2908-8500-4167-a7e3-e319c3b9969d"
+                    ]
+                },
+                "currentHeight": 173.421875,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 469
+                        },
+                        "contentStart": 0,
+                        "state": 3
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "5d5118c0-49e5-4735-909a-644cc1ec5938",
+                    "resultId": "825c2908-8500-4167-a7e3-e319c3b9969d",
+                    "rows": [
+                        {
+                            "0": 1,
+                            "1": "Valtteri Bottas",
+                            "2": "2021-10-08 01:31:04.103000",
+                            "3": "0 min 0 secs"
+                        },
+                        {
+                            "0": 2,
+                            "1": "Max Verstappen",
+                            "2": "2021-10-08 01:45:58.243000",
+                            "3": "-15 min 54 secs"
+                        },
+                        {
+                            "0": 3,
+                            "1": "Sergio Perez",
+                            "2": "2021-10-08 01:46:10.342000",
+                            "3": "-16 min 6 secs"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "pos",
+                            "field": "0",
+                            "dataType": {
+                                "type": 4,
+                                "flags": [
+                                    "SIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 10,
+                                "parameterFormatType": "OneOrZero",
+                                "synonyms": [
+                                    "INTEGER",
+                                    "INT4"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "driver",
+                            "field": "1",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "time",
+                            "field": "2",
+                            "dataType": {
+                                "type": 26,
+                                "dateTimePrecision": 8,
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "difference",
+                            "field": "3",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 3 records retrieved in 0s"
+                    },
+                    "totalRowCount": 3,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "WITH time_gap AS (\n SELECT\n position,\n car,\n driver,\n time,\n TIMESTAMPDIFF(SECOND, time , @fastest) AS seconds\n FROM formula1\n),\nDIFFERENCES AS (\n SELECT\n position as pos,\n driver,\n car,\n time,\n seconds,\n MOD(seconds, 60) AS seconds_part,\n MOD(seconds, 3600) AS minutes_part\n FROM time_gap\n)\nSELECT\n pos,\n driver,\n time,\n CONCAT(\n FLOOR(minutes_part / 60), ' min ',\n SUBSTRING_INDEX(SUBSTRING_INDEX(seconds_part,'-',2),'-',-1),' secs'\n ) AS difference\nFROM differences;",
+                    "updatable": false
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 45,
+                "end": 52,
+                "language": "mysql",
+                "result": {
+                    "type": "text",
+                    "text": [
+                        {
+                            "type": 4,
+                            "index": 0,
+                            "resultId": "63a862de-287f-4200-b70b-a684c4962b5d",
+                            "content": "OK, 0 records retrieved in 186.424ms"
+                        }
+                    ]
+                },
+                "currentHeight": 28,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 394
+                        },
+                        "contentStart": 352,
+                        "state": 3
+                    }
+                ]
+            },
+            "data": []
+        },
+        {
+            "state": {
+                "start": 53,
+                "end": 53,
+                "language": "mysql",
+                "result": {
+                    "type": "text",
+                    "text": [
+                        {
+                            "type": 4,
+                            "index": 0,
+                            "resultId": "8551395a-856b-4c7e-b015-4eabbb7fe65e",
+                            "content": "OK, 1 row affected in 17.904ms"
+                        }
+                    ]
+                },
+                "currentHeight": 28,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 72
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": []
+        },
+        {
+            "state": {
+                "start": 54,
+                "end": 54,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "c63e7dbd-b3cf-4ddf-ec0c-f152e3297b30"
+                    ]
+                },
+                "currentHeight": 36,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 24
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "5d5118c0-49e5-4735-909a-644cc1ec5938",
+                    "resultId": "c63e7dbd-b3cf-4ddf-ec0c-f152e3297b30",
+                    "rows": [
+                        {
+                            "0": "2007-05-13"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "date",
+                            "field": "0",
+                            "dataType": {
+                                "type": 27,
+                                "needsQuotes": true
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 0s"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT * FROM tmp_tbl_5",
+                    "updatable": false,
+                    "fullTableName": "tmp_tbl_5"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 55,
+                "end": 58,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "b83caed3-301a-4040-9079-ab6324eb9f66"
+                    ]
+                },
+                "currentHeight": 239.703125,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 346
+                        },
+                        "contentStart": 286,
+                        "state": 3
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "5d5118c0-49e5-4735-909a-644cc1ec5938",
+                    "resultId": "b83caed3-301a-4040-9079-ab6324eb9f66",
+                    "rows": [
+                        {
+                            "0": "1864-02-28",
+                            "1": "February 28, 1864"
+                        },
+                        {
+                            "0": "1900-01-15",
+                            "1": "January 15, 1900"
+                        },
+                        {
+                            "0": "1999-12-31",
+                            "1": "December 31, 1999"
+                        },
+                        {
+                            "0": "2000-06-04",
+                            "1": "June 04, 2000"
+                        },
+                        {
+                            "0": "2017-03-16",
+                            "1": "March 16, 2017"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "d",
+                            "field": "0",
+                            "dataType": {
+                                "type": 27,
+                                "needsQuotes": true
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "date",
+                            "field": "1",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 5 records retrieved in 0s"
+                    },
+                    "totalRowCount": 5,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "-- Mysql display the date and time in ISO format, But we can tell Mysql to display required format using DATE_FORMAT() and TIME_FORMAT() functions.\n-- Syntax: DATE_FORMAT(DATE|DATETIME|TIMESTAMP, string specifiers)\n-- String specifiers is same as the STR_TO_DATE() supported specifier.\nSELECT d, DATE_FORMAT(d, '%M %d, %Y') AS date FROM date_val;",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 59,
+                "end": 59,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "0dc42070-9f21-4c86-db2c-058df6bc4f60"
+                    ]
+                },
+                "currentHeight": 206.5625,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 121
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "5d5118c0-49e5-4735-909a-644cc1ec5938",
+                    "resultId": "0dc42070-9f21-4c86-db2c-058df6bc4f60",
+                    "rows": [
+                        {
+                            "0": "1970-01-01 00:00:00",
+                            "1": "1/1/70 12:00:00 AM",
+                            "2": "January 1, 1970 00:00:00"
+                        },
+                        {
+                            "0": "1999-12-31 09:00:00",
+                            "1": "12/31/99 09:00:00 AM",
+                            "2": "December 31, 1999 09:00:00"
+                        },
+                        {
+                            "0": "2000-06-04 15:45:30",
+                            "1": "6/4/00 03:45:30 PM",
+                            "2": "June 4, 2000 15:45:30"
+                        },
+                        {
+                            "0": "2017-03-16 12:30:15",
+                            "1": "3/16/17 12:30:15 PM",
+                            "2": "March 16, 2017 12:30:15"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "dt",
+                            "field": "0",
+                            "dataType": {
+                                "type": 26,
+                                "dateTimePrecision": 8,
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "Format 1",
+                            "field": "1",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "Format 2",
+                            "field": "2",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 4 records retrieved in 0s"
+                    },
+                    "totalRowCount": 4,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT dt, DATE_FORMAT(dt, '%c/%e/%y %r') AS `Format 1`, DATE_FORMAT(dt, '%M %e, %Y %T') AS `Format 2` FROM datetime_val",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 60,
+                "end": 60,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "d767e373-dd87-4ac3-9ad7-6ad331c080ea"
+                    ]
+                },
+                "currentHeight": 206.5625,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 74
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "5d5118c0-49e5-4735-909a-644cc1ec5938",
+                    "resultId": "d767e373-dd87-4ac3-9ad7-6ad331c080ea",
+                    "rows": [
+                        {
+                            "0": "1970-01-01 00:00:00",
+                            "1": "12:00:00 AM",
+                            "2": "00:00:00"
+                        },
+                        {
+                            "0": "1999-12-31 09:00:00",
+                            "1": "09:00:00 AM",
+                            "2": "09:00:00"
+                        },
+                        {
+                            "0": "2000-06-04 15:45:30",
+                            "1": "03:45:30 PM",
+                            "2": "15:45:30"
+                        },
+                        {
+                            "0": "2017-03-16 12:30:15",
+                            "1": "12:30:15 PM",
+                            "2": "12:30:15"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "dt",
+                            "field": "0",
+                            "dataType": {
+                                "type": 26,
+                                "dateTimePrecision": 8,
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "TIME_FORMAT(dt, '%r')",
+                            "field": "1",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "TIME_FORMAT(dt, '%T')",
+                            "field": "2",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 4 records retrieved in 0.996ms"
+                    },
+                    "totalRowCount": 4,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT dt, TIME_FORMAT(dt, '%r'), TIME_FORMAT(dt, '%T') FROM datetime_val",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 61,
+                "end": 61,
                 "language": "mysql",
                 "currentSet": 1,
                 "statements": [
@@ -43,7 +1465,7 @@
                         "delimiter": ";",
                         "span": {
                             "start": 0,
-                            "length": 14
+                            "length": 51
                         },
                         "contentStart": 0,
                         "state": 1
