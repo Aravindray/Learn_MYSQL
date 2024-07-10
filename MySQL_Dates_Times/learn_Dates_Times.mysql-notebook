@@ -2,18 +2,18 @@
     "type": "MySQLNotebook",
     "version": "1.0",
     "caption": "Untitled",
-    "content": "USE cookbook;\r\n# Intodruction\r\n-- Mysql has several data type for representing temporal data\r\n# Choosing a Temporal Data type\r\n-- There are DATE, TIME, TIMESTAMP and DATETIME data type for representing temporal data type.\r\n-- Choose an appropirate data type based on characteristics and secification.\r\nSELECT * from time_val;\r\nSELECT * FROM date_val;\r\nSELECT * FROM datetime_val;\r\nSELECT CURTIME(), CURTIME(2), CURTIME(6);\r\n-- Result not displayed as expected\r\n# Using Fractional Seconds support\r\nSELECT POSITION AS POS, no, driver, car, laps, DATE_FORMAT(time, '%H:%i:%s:%f') AS time, points as pts FROM formula1 ORDER BY time;\r\nSELECT * FROM formula1;\r\nSELECT MIN(time) from formula1 into @fastest;\r\nWITH time_gap AS (\r\n SELECT\r\n position,\r\n car,\r\n driver,\r\n time,\r\n TIMESTAMPDIFF(SECOND, time , @fastest) AS seconds\r\n FROM formula1\r\n),\r\nDIFFERENCES AS (\r\n SELECT\r\n position as pos,\r\n driver,\r\n car,\r\n time,\r\n seconds,\r\n MOD(seconds, 60) AS seconds_part,\r\n MOD(seconds, 3600) AS minutes_part\r\n FROM time_gap\r\n)\r\nSELECT\r\n pos,\r\n driver,\r\n time,\r\n CONCAT(\r\n FLOOR(minutes_part / 60), ' min ',\r\n SUBSTRING_INDEX(SUBSTRING_INDEX(seconds_part,'-',2),'-',-1),' secs'\r\n ) AS difference\r\nFROM differences;\r\n-- we will learn more about CTE in recipe 10.18\r\n# Changing MySQL Date Format\r\n-- MySQL support only ISO format for storing dates. But if our date is different format or close to ISO format we can convert it first to ISO format and store it in mysql db.\r\n-- With the help of STR_TO_DATE() function we can convert non-ISO format to ISO format date format.\r\nCREATE TABLE tmp_tbl_5 \r\n(\r\n    date DATE\r\n);\r\nINSERT INTO tmp_tbl_5 VALUES (STR_TO_DATE('May 13, 2007', '%M %d, %Y'));\r\nSELECT * FROM tmp_tbl_5;\r\n-- Mysql display the date and time in ISO format, But we can tell Mysql to display required format using DATE_FORMAT() and TIME_FORMAT() functions.\r\n-- Syntax: DATE_FORMAT(DATE|DATETIME|TIMESTAMP, string specifiers)\r\n-- String specifiers is same as the STR_TO_DATE() supported specifier.\r\nSELECT d, DATE_FORMAT(d, '%M %d, %Y') AS date FROM date_val;\r\nSELECT dt, DATE_FORMAT(dt, '%c/%e/%y %r') AS `Format 1`, DATE_FORMAT(dt, '%M %e, %Y %T') AS `Format 2` FROM datetime_val;\r\nSELECT dt, TIME_FORMAT(dt, '%r'), TIME_FORMAT(dt, '%T') FROM datetime_val;\r\n-- I have created the function from root user login\r\nSELECT t1, time_ampm(t1) FROM time_val;\r\nCREATE TABLE tmp_tbl_6 (ts TIMESTAMP);\r\nINSERT INTO tmp_tbl_6 VALUES('2021-06-21 12:30:00');\r\nSELECT ts FROM tmp_tbl_6;\r\nSELECT @@global.time_zone, @@session.time_zone;\r\n-- To see the system time zone check the global variable\r\nSHOW GLOBAL VARIABLES LIKE 'system_time_zone';\r\n# Setting Server Time Zone\r\nSHOW GLOBAL VARIABLES LIKE 'time_zone';\r\n-- You may choose to set the global time zone variable \r\n-- SET GLOBAL time_zone = '+03:00';\r\n-- once time_zone changed you may verify it SELECT @@global.time_zone, @@session.time_zone;\r\n-- Not understood properly - Recipe 8.5\r\n# Shifting Temporal Value Between Time Zones\r\n-- You have date-and-time value and want to know what it will be in different time zone. User CONVERT_TZ() function\r\n-- Syntax: CONVERT_TZ(date-time, from_time_zone, to_time_zone);\r\nSET @dt = '2021-11-28 08:00:00';\r\nSELECT @dt AS Chicago,\r\nCONVERT_TZ(@dt, 'US/Central', 'Europe/Istanbul') AS Istanbul,\r\nCONVERT_TZ(@dt, 'US/Central', 'Europe/London') AS London,\r\nCONVERT_TZ(@dt, 'US/Central', 'America/Edmonton') AS Edmonton,\r\nCONVERT_TZ(@dt, 'US/Central', 'Australia/Brisbane') AS Brisbane;\r\n-- Preceding statement only work if you store the named timezone in mysql server, so use the UTC offset\r\nSELECT @dt AS Chicago,\r\nCONVERT_TZ(@dt, '-06:00', '+03:00') AS Istanbul,\r\nCONVERT_TZ(@dt, '-06:00', '+00:00') AS London,\r\nCONVERT_TZ(@dt, '-06:00', '-07:00') AS Edmonton,\r\nCONVERT_TZ(@dt, '-06:00', '+10:00') AS Brisbane;\r\n# Determining current date or time\r\n-- You want to know what current date and time, use CURDATE(), CURTIME(), and NOW() functions.\r\n-- If you want to know what UTC date and tiem, Use UTC_DATE(), UTC_TIME(), and UTC_TIMESTAMP() functions.\r\nSELECT CURDATE(), CURTIME(), NOW();\r\nSELECT UTC_DATE(), UTC_TIME(), UTC_TIMESTAMP();\r\n# Using TIMESTAMP, DATETIME to track row modification time\r\n-- TIMESTAMP and DATETIME have DEFAULT CURRENT_TIMESTAMP for new record addition,\r\n-- and ON UPDATE CURRENT_TIMESTAMP for row modification column attirbutes is helpful.\r\nDROP TABLE IF EXISTS tsdemo;\r\nCREATE TABLE tsdemo (\r\nval INT NOT NULL AUTO_INCREMENT PRIMARY KEY,\r\nts_both TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\r\nts_create TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\r\nts_update TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP\r\n) ENGINE=InnoDB;\r\nINSERT INTO tsdemo (val) VALUES (1);\r\nINSERT INTO tsdemo (val) VALUES (5);\r\nINSERT INTO tsdemo (val) VALUES (10);\r\nSELECT * FROM tsdemo;\r\nUPDATE tsdemo SET val = 11 WHERE val = 10;\r\nSELECT * FROM tsdemo;\r\nUPDATE tsdemo SET val = val + 1;\r\nSELECT * FROM tsdemo;\r\nUPDATE tsdemo SET val = val;\r\nSELECT * FROM tsdemo;\r\nSHOW CREATE TABLE tsdemo;\r\n# Extracting parts of Dates or Time\r\n# Decomposing dates or times using component-extractions functions\r\n-- DATE() and TIME() extract the date and time component from the temporal value.\r\nSELECT dt, DATE(dt), TIME(dt) FROM datetime_val;\r\nSELECT dt, YEAR(dt), DAYOFMONTH(dt), HOUR(dt), SECOND(dt) from datetime_val;\r\nSET @date_time = '2021-11-24 22:11:12.000201';\r\nSELECT HOUR(@date_time) AS hour, MINUTE(@date_time) AS minute, SECOND(@date_time) AS second, MICROSECOND(@date_time) AS microsecond;\r\nSELECT d, DAYOFYEAR(d) FROM date_val;\r\nSELECT d, DAYNAME(d), DATE_FORMAT(d, '%a') FROM date_val;\r\nSELECT d, DAYNAME(d), DAYOFWEEK(d), WEEKDAY(d) FROM date_val;\r\n-- EXTRACT() Is another function that extract componenet from temporal value.\r\nSELECT dt, EXTRACT(DAY FROM dt), EXTRACT(HOUR FROM dt) FROM datetime_val;\r\nSELECT CURDATE(), YEAR(CURDATE()) AS year, MONTH(CURDATE()) AS month,\r\nMONTHNAME(CURDATE()) AS monthname, DAY(CURDATE()) AS day, DAYNAME(CURDATE()) AS dayname;\r\nSELECT NOW(), HOUR(NOW()) as hour, MINUTE(NOW()) as minute, SECOND(NOW()) AS second;\r\n# Decomposing Dates or Times using formatting functions.\r\n-- With DATE_FORMAT() and TIME_FORMAT() function we can extract components by specifying the format string\r\nSELECT dt, DATE_FORMAT(dt, '%Y') AS year, DATE_FORMAT(dt, '%d') AS day, TIME_FORMAT(dt, '%H') as hour,\r\nTIME_FORMAT(dt, '%s') AS second, TIME_FORMAT(dt, '%f') AS microsecond FROM datetime_val;\r\nSELECT dt, DATE_FORMAT(dt, '%Y-%m-%d') AS `date part`, TIME_FORMAT(dt, '%T') as `time part` FROM datetime_val;\r\nSELECT dt, DATE_FORMAT(dt, '%M %e, %Y') as `descriptive date`, TIME_FORMAT(dt, '%H:%i') as `hour/minute` FROM datetime_val;\r\n# Synthesizing dates or times from components values\r\n-- Composition Function - MAKETIME() function construct time value from hour, minute and seconds\r\n-- Formatting Function - DATE_FORMAT() and TIME_FORMAT() replace the desire values\r\n-- String Concat - Or pull out part from the date or time component and CONCAT() them.\r\n-- Syntax: MAKETIME(hour, mintue, second) take 3 arguments and return date function.\r\nSELECT MAKETIME(10,30,58), MAKETIME(-5, 0, 11); -- Not working as expected\r\nSELECT MAKETIME(10,30,58), MAKETIME(5, 0, 11);\r\n",
+    "content": "USE cookbook;\r\n# Intodruction\r\n-- Mysql has several data type for representing temporal data\r\n# Choosing a Temporal Data type\r\n-- There are DATE, TIME, TIMESTAMP and DATETIME data type for representing temporal data type.\r\n-- Choose an appropirate data type based on characteristics and secification.\r\nSELECT * from time_val;\r\nSELECT * FROM date_val;\r\nSELECT * FROM datetime_val;\r\nSELECT CURTIME(), CURTIME(2), CURTIME(6);\r\n-- Result not displayed as expected\r\n# Using Fractional Seconds support\r\nSELECT POSITION AS POS, no, driver, car, laps, DATE_FORMAT(time, '%H:%i:%s:%f') AS time, points as pts FROM formula1 ORDER BY time;\r\nSELECT * FROM formula1;\r\nSELECT MIN(time) from formula1 into @fastest;\r\nWITH time_gap AS (\r\n SELECT\r\n position,\r\n car,\r\n driver,\r\n time,\r\n TIMESTAMPDIFF(SECOND, time , @fastest) AS seconds\r\n FROM formula1\r\n),\r\nDIFFERENCES AS (\r\n SELECT\r\n position as pos,\r\n driver,\r\n car,\r\n time,\r\n seconds,\r\n MOD(seconds, 60) AS seconds_part,\r\n MOD(seconds, 3600) AS minutes_part\r\n FROM time_gap\r\n)\r\nSELECT\r\n pos,\r\n driver,\r\n time,\r\n CONCAT(\r\n FLOOR(minutes_part / 60), ' min ',\r\n SUBSTRING_INDEX(SUBSTRING_INDEX(seconds_part,'-',2),'-',-1),' secs'\r\n ) AS difference\r\nFROM differences;\r\n-- we will learn more about CTE in recipe 10.18\r\n# Changing MySQL Date Format\r\n-- MySQL support only ISO format for storing dates. But if our date is different format or close to ISO format we can convert it first to ISO format and store it in mysql db.\r\n-- With the help of STR_TO_DATE() function we can convert non-ISO format to ISO format date format.\r\nCREATE TABLE tmp_tbl_5 \r\n(\r\n    date DATE\r\n);\r\nINSERT INTO tmp_tbl_5 VALUES (STR_TO_DATE('May 13, 2007', '%M %d, %Y'));\r\nSELECT * FROM tmp_tbl_5;\r\n-- Mysql display the date and time in ISO format, But we can tell Mysql to display required format using DATE_FORMAT() and TIME_FORMAT() functions.\r\n-- Syntax: DATE_FORMAT(DATE|DATETIME|TIMESTAMP, string specifiers)\r\n-- String specifiers is same as the STR_TO_DATE() supported specifier.\r\nSELECT d, DATE_FORMAT(d, '%M %d, %Y') AS date FROM date_val;\r\nSELECT dt, DATE_FORMAT(dt, '%c/%e/%y %r') AS `Format 1`, DATE_FORMAT(dt, '%M %e, %Y %T') AS `Format 2` FROM datetime_val;\r\nSELECT dt, TIME_FORMAT(dt, '%r'), TIME_FORMAT(dt, '%T') FROM datetime_val;\r\n-- I have created the function from root user login\r\nSELECT t1, time_ampm(t1) FROM time_val;\r\nCREATE TABLE tmp_tbl_6 (ts TIMESTAMP);\r\nINSERT INTO tmp_tbl_6 VALUES('2021-06-21 12:30:00');\r\nSELECT ts FROM tmp_tbl_6;\r\nSELECT @@global.time_zone, @@session.time_zone;\r\n-- To see the system time zone check the global variable\r\nSHOW GLOBAL VARIABLES LIKE 'system_time_zone';\r\n# Setting Server Time Zone\r\nSHOW GLOBAL VARIABLES LIKE 'time_zone';\r\n-- You may choose to set the global time zone variable \r\n-- SET GLOBAL time_zone = '+03:00';\r\n-- once time_zone changed you may verify it SELECT @@global.time_zone, @@session.time_zone;\r\n-- Not understood properly - Recipe 8.5\r\n# Shifting Temporal Value Between Time Zones\r\n-- You have date-and-time value and want to know what it will be in different time zone. User CONVERT_TZ() function\r\n-- Syntax: CONVERT_TZ(date-time, from_time_zone, to_time_zone);\r\nSET @dt = '2021-11-28 08:00:00';\r\nSELECT @dt AS Chicago,\r\nCONVERT_TZ(@dt, 'US/Central', 'Europe/Istanbul') AS Istanbul,\r\nCONVERT_TZ(@dt, 'US/Central', 'Europe/London') AS London,\r\nCONVERT_TZ(@dt, 'US/Central', 'America/Edmonton') AS Edmonton,\r\nCONVERT_TZ(@dt, 'US/Central', 'Australia/Brisbane') AS Brisbane;\r\n-- Preceding statement only work if you store the named timezone in mysql server, so use the UTC offset\r\nSELECT @dt AS Chicago,\r\nCONVERT_TZ(@dt, '-06:00', '+03:00') AS Istanbul,\r\nCONVERT_TZ(@dt, '-06:00', '+00:00') AS London,\r\nCONVERT_TZ(@dt, '-06:00', '-07:00') AS Edmonton,\r\nCONVERT_TZ(@dt, '-06:00', '+10:00') AS Brisbane;\r\n# Determining current date or time\r\n-- You want to know what current date and time, use CURDATE(), CURTIME(), and NOW() functions.\r\n-- If you want to know what UTC date and tiem, Use UTC_DATE(), UTC_TIME(), and UTC_TIMESTAMP() functions.\r\nSELECT CURDATE(), CURTIME(), NOW();\r\nSELECT UTC_DATE(), UTC_TIME(), UTC_TIMESTAMP();\r\n# Using TIMESTAMP, DATETIME to track row modification time\r\n-- TIMESTAMP and DATETIME have DEFAULT CURRENT_TIMESTAMP for new record addition,\r\n-- and ON UPDATE CURRENT_TIMESTAMP for row modification column attirbutes is helpful.\r\nDROP TABLE IF EXISTS tsdemo;\r\nCREATE TABLE tsdemo (\r\nval INT NOT NULL AUTO_INCREMENT PRIMARY KEY,\r\nts_both TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\r\nts_create TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\r\nts_update TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP\r\n) ENGINE=InnoDB;\r\nINSERT INTO tsdemo (val) VALUES (1);\r\nINSERT INTO tsdemo (val) VALUES (5);\r\nINSERT INTO tsdemo (val) VALUES (10);\r\nSELECT * FROM tsdemo;\r\nUPDATE tsdemo SET val = 11 WHERE val = 10;\r\nSELECT * FROM tsdemo;\r\nUPDATE tsdemo SET val = val + 1;\r\nSELECT * FROM tsdemo;\r\nUPDATE tsdemo SET val = val;\r\nSELECT * FROM tsdemo;\r\nSHOW CREATE TABLE tsdemo;\r\n# Extracting parts of Dates or Time\r\n# Decomposing dates or times using component-extractions functions\r\n-- DATE() and TIME() extract the date and time component from the temporal value.\r\nSELECT dt, DATE(dt), TIME(dt) FROM datetime_val;\r\nSELECT dt, YEAR(dt), DAYOFMONTH(dt), HOUR(dt), SECOND(dt) from datetime_val;\r\nSET @date_time = '2021-11-24 22:11:12.000201';\r\nSELECT HOUR(@date_time) AS hour, MINUTE(@date_time) AS minute, SECOND(@date_time) AS second, MICROSECOND(@date_time) AS microsecond;\r\nSELECT d, DAYOFYEAR(d) FROM date_val;\r\nSELECT d, DAYNAME(d), DATE_FORMAT(d, '%a') FROM date_val;\r\nSELECT d, DAYNAME(d), DAYOFWEEK(d), WEEKDAY(d) FROM date_val;\r\n-- EXTRACT() Is another function that extract componenet from temporal value.\r\nSELECT dt, EXTRACT(DAY FROM dt), EXTRACT(HOUR FROM dt) FROM datetime_val;\r\nSELECT CURDATE(), YEAR(CURDATE()) AS year, MONTH(CURDATE()) AS month,\r\nMONTHNAME(CURDATE()) AS monthname, DAY(CURDATE()) AS day, DAYNAME(CURDATE()) AS dayname;\r\nSELECT NOW(), HOUR(NOW()) as hour, MINUTE(NOW()) as minute, SECOND(NOW()) AS second;\r\n# Decomposing Dates or Times using formatting functions.\r\n-- With DATE_FORMAT() and TIME_FORMAT() function we can extract components by specifying the format string\r\nSELECT dt, DATE_FORMAT(dt, '%Y') AS year, DATE_FORMAT(dt, '%d') AS day, TIME_FORMAT(dt, '%H') as hour,\r\nTIME_FORMAT(dt, '%s') AS second, TIME_FORMAT(dt, '%f') AS microsecond FROM datetime_val;\r\nSELECT dt, DATE_FORMAT(dt, '%Y-%m-%d') AS `date part`, TIME_FORMAT(dt, '%T') as `time part` FROM datetime_val;\r\nSELECT dt, DATE_FORMAT(dt, '%M %e, %Y') as `descriptive date`, TIME_FORMAT(dt, '%H:%i') as `hour/minute` FROM datetime_val;\r\n# Synthesizing dates or times from components values\r\n-- Composition Function - MAKETIME() function construct time value from hour, minute and seconds\r\n-- Formatting Function - DATE_FORMAT() and TIME_FORMAT() replace the desire values\r\n-- String Concat - Or pull out part from the date or time component and CONCAT() them.\r\n-- Syntax: MAKETIME(hour, mintue, second) take 3 arguments and return date function.\r\nSELECT MAKETIME(10,30,58), MAKETIME(-5, 0, 11); -- Not working as expected\r\nSELECT MAKETIME(10,30,58), MAKETIME(5, 0, 11);\r\nSELECT d, CONCAT(YEAR(d),'-',MONTH(d),'-01') FROM date_val;\r\nSELECT d, CONCAT(YEAR(d),'-', LPAD(MONTH(d),2,'0'), '-01') FROM date_val;\r\nSELECT t1, CONCAT(LPAD(HOUR(t1), 2, '0'), ':', LPAD(MINUTE(t1),2,'0'),':00') AS combined FROM time_val;\r\nSET @d = '2009-06-03', @t = '16:05:08';\r\nSELECT @d, @t, CONCAT(@d, ' ' , @t);\r\n# Converting between temporal value and basic units\r\n-- To convert between time values and seconds use TIME_TO_SEC() and SEC_TO_TIME() functions.\r\n-- To convert between date values and dates use TO_DAYS() and FROM_DAYS() functions.\r\n-- To convert between date-and-time values and seconds UNIX_TIMESTAMP() and FROM_UNIXTIME() functions.\r\n# Converting times to seconds\r\nSELECT t1, TIME_TO_SEC(t1), SEC_TO_TIME(TIME_TO_SEC(t1)) FROM time_val;\r\nSELECT t1, TIME_TO_SEC(t1) AS `seconds`, TIME_TO_SEC(t1) / 60 AS `minutes`, TIME_TO_SEC(t1) / (60*60) AS `hours`, TIME_TO_SEC(t1) / (24*60*60) AS `days` FROM time_val;\r\n-- Use FLOOR() function if you prefer integer value\r\nSELECT dt,\r\nTIME_TO_SEC(dt) as `time part in seconds`,\r\nSEC_TO_TIME(TIME_TO_SEC(dt)) as `time part as TIME`\r\nFROM datetime_val;\r\n# converting between dates and days\r\nSELECT d,\r\nTO_DAYS(d) AS `Date to Days`,\r\nFROM_DAYS(TO_DAYS(d)) AS `Date to days to Date`\r\nFROM date_val;\r\nSELECT dt,\r\nTO_DAYS(dt) AS `date part in days`,\r\nFROM_DAYS(TO_DAYS(dt)) AS `date part as DATE`\r\nFROM datetime_val;\r\n# Converting between date-and-time values to seconds\r\nSELECT dt,\r\nUNIX_TIMESTAMP(dt) as `seconds`,\r\nFROM_UNIXTIME(UNIX_TIMESTAMP(dt)) as `timestamp`\r\nFROM datetime_val;\r\n",
     "options": {},
     "viewState": {
         "cursorState": [
             {
                 "inSelectionMode": false,
                 "selectionStart": {
-                    "lineNumber": 144,
+                    "lineNumber": 175,
                     "column": 1
                 },
                 "position": {
-                    "lineNumber": 144,
+                    "lineNumber": 175,
                     "column": 1
                 }
             }
@@ -21,10 +21,10 @@
         "viewState": {
             "scrollLeft": 0,
             "firstPosition": {
-                "lineNumber": 136,
+                "lineNumber": 167,
                 "column": 1
             },
-            "firstPositionDeltaTop": 29
+            "firstPositionDeltaTop": -12
         },
         "contributionsState": {
             "editor.contrib.folding": {},
@@ -43,8 +43,8 @@
                         {
                             "type": 4,
                             "index": 0,
-                            "resultId": "30de8683-f9b2-42d2-e138-58ab214792b5",
-                            "content": "OK, 0 records retrieved in 0.958ms"
+                            "resultId": "10680c6a-1453-438f-d511-e5a24bdcbe18",
+                            "content": "OK, 0 records retrieved in 0s"
                         }
                     ]
                 },
@@ -72,7 +72,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "1cbf4c28-052f-4c01-8e7a-bcf7fe5b8c6e"
+                        "b456dde7-6bae-4030-d417-3b114d0bb65b"
                     ]
                 },
                 "currentHeight": 36,
@@ -91,8 +91,8 @@
             },
             "data": [
                 {
-                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
-                    "resultId": "1cbf4c28-052f-4c01-8e7a-bcf7fe5b8c6e",
+                    "tabId": "96e69bb9-9539-40b9-f9ac-264e64e12255",
+                    "resultId": "b456dde7-6bae-4030-d417-3b114d0bb65b",
                     "rows": [
                         {
                             "0": 1,
@@ -181,7 +181,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "e525849e-7f73-4956-8276-8a33bc590469"
+                        "8b662e17-1955-499a-8afe-10bbf4c6fbf2"
                     ]
                 },
                 "currentHeight": 36,
@@ -200,8 +200,8 @@
             },
             "data": [
                 {
-                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
-                    "resultId": "e525849e-7f73-4956-8276-8a33bc590469",
+                    "tabId": "96e69bb9-9539-40b9-f9ac-264e64e12255",
+                    "resultId": "8b662e17-1955-499a-8afe-10bbf4c6fbf2",
                     "rows": [
                         {
                             "0": "1864-02-28"
@@ -253,7 +253,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "e1ae50f4-f920-4441-9105-39ab27140763"
+                        "7dc22353-46a9-467d-988e-2670eae470cb"
                     ]
                 },
                 "currentHeight": 36,
@@ -272,8 +272,8 @@
             },
             "data": [
                 {
-                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
-                    "resultId": "e1ae50f4-f920-4441-9105-39ab27140763",
+                    "tabId": "96e69bb9-9539-40b9-f9ac-264e64e12255",
+                    "resultId": "7dc22353-46a9-467d-988e-2670eae470cb",
                     "rows": [
                         {
                             "0": "1970-01-01 00:00:00"
@@ -324,7 +324,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "3c45e9b1-2d15-42eb-9dbf-5f39aa70bf31"
+                        "ea2f768d-ac84-4775-f4a2-4444f78ef9f4"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -343,8 +343,8 @@
             },
             "data": [
                 {
-                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
-                    "resultId": "3c45e9b1-2d15-42eb-9dbf-5f39aa70bf31",
+                    "tabId": "96e69bb9-9539-40b9-f9ac-264e64e12255",
+                    "resultId": "ea2f768d-ac84-4775-f4a2-4444f78ef9f4",
                     "rows": [
                         {
                             "0": "12:23:41",
@@ -414,7 +414,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "52efe3fb-259f-45b9-ae30-a7b2720dcc83"
+                        "8c51b4ef-e47e-423d-afa5-a7cf2be444cd"
                     ]
                 },
                 "currentHeight": 36,
@@ -433,8 +433,8 @@
             },
             "data": [
                 {
-                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
-                    "resultId": "52efe3fb-259f-45b9-ae30-a7b2720dcc83",
+                    "tabId": "96e69bb9-9539-40b9-f9ac-264e64e12255",
+                    "resultId": "8c51b4ef-e47e-423d-afa5-a7cf2be444cd",
                     "rows": [
                         {
                             "0": 1,
@@ -619,7 +619,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "690c18ea-da10-4cfa-efa0-0bd9af41ecac"
+                        "79babe0f-7039-4076-b19d-f44d8004c22c"
                     ]
                 },
                 "currentHeight": 36,
@@ -638,8 +638,8 @@
             },
             "data": [
                 {
-                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
-                    "resultId": "690c18ea-da10-4cfa-efa0-0bd9af41ecac",
+                    "tabId": "96e69bb9-9539-40b9-f9ac-264e64e12255",
+                    "resultId": "79babe0f-7039-4076-b19d-f44d8004c22c",
                     "rows": [
                         {
                             "0": 1,
@@ -881,7 +881,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "64700d12-37b2-47c0-9206-f42adc482890"
+                        "a51f506c-7758-44fc-b4de-8452fee2e593"
                     ]
                 },
                 "currentHeight": 173.421875,
@@ -900,8 +900,8 @@
             },
             "data": [
                 {
-                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
-                    "resultId": "64700d12-37b2-47c0-9206-f42adc482890",
+                    "tabId": "96e69bb9-9539-40b9-f9ac-264e64e12255",
+                    "resultId": "a51f506c-7758-44fc-b4de-8452fee2e593",
                     "rows": [
                         {
                             "0": 1,
@@ -1077,7 +1077,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "f78e383d-f51a-4a6f-9e58-89b6fcfbb627"
+                        "eec65519-75a0-4f80-f277-f88180addd61"
                     ]
                 },
                 "currentHeight": 36,
@@ -1096,8 +1096,8 @@
             },
             "data": [
                 {
-                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
-                    "resultId": "f78e383d-f51a-4a6f-9e58-89b6fcfbb627",
+                    "tabId": "96e69bb9-9539-40b9-f9ac-264e64e12255",
+                    "resultId": "eec65519-75a0-4f80-f277-f88180addd61",
                     "rows": [
                         {
                             "0": "2007-05-13"
@@ -1137,7 +1137,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "a5869910-50be-439c-8746-5d95296d5339"
+                        "af17ec82-a521-41cd-e893-d59bd1d72c78"
                     ]
                 },
                 "currentHeight": 239.703125,
@@ -1156,8 +1156,8 @@
             },
             "data": [
                 {
-                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
-                    "resultId": "a5869910-50be-439c-8746-5d95296d5339",
+                    "tabId": "96e69bb9-9539-40b9-f9ac-264e64e12255",
+                    "resultId": "af17ec82-a521-41cd-e893-d59bd1d72c78",
                     "rows": [
                         {
                             "0": "1864-02-28",
@@ -1232,7 +1232,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "cce63a51-56d6-43fa-d65d-fbe70b3effdf"
+                        "256c8d02-0c43-40c5-e6ec-d5c5d623b2d6"
                     ]
                 },
                 "currentHeight": 206.5625,
@@ -1251,8 +1251,8 @@
             },
             "data": [
                 {
-                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
-                    "resultId": "cce63a51-56d6-43fa-d65d-fbe70b3effdf",
+                    "tabId": "96e69bb9-9539-40b9-f9ac-264e64e12255",
+                    "resultId": "256c8d02-0c43-40c5-e6ec-d5c5d623b2d6",
                     "rows": [
                         {
                             "0": "1970-01-01 00:00:00",
@@ -1347,7 +1347,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "d47bbb10-0842-4bd8-ef57-c061030551d9"
+                        "da8c0607-aa18-41ce-a8e0-cf6ba20255d2"
                     ]
                 },
                 "currentHeight": 206.5625,
@@ -1366,8 +1366,8 @@
             },
             "data": [
                 {
-                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
-                    "resultId": "d47bbb10-0842-4bd8-ef57-c061030551d9",
+                    "tabId": "96e69bb9-9539-40b9-f9ac-264e64e12255",
+                    "resultId": "da8c0607-aa18-41ce-a8e0-cf6ba20255d2",
                     "rows": [
                         {
                             "0": "1970-01-01 00:00:00",
@@ -1462,7 +1462,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "e85ed406-50f5-4998-d009-513bb87b4a8c"
+                        "a00ed96c-99d2-40bf-f589-ad6c9efec1a9"
                     ]
                 },
                 "currentHeight": 173.421875,
@@ -1481,8 +1481,8 @@
             },
             "data": [
                 {
-                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
-                    "resultId": "e85ed406-50f5-4998-d009-513bb87b4a8c",
+                    "tabId": "96e69bb9-9539-40b9-f9ac-264e64e12255",
+                    "resultId": "a00ed96c-99d2-40bf-f589-ad6c9efec1a9",
                     "rows": [
                         {
                             "0": "15:00:00",
@@ -1615,7 +1615,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "57d9a562-d43e-41dc-d790-7565d25dbd09"
+                        "c99a2bb4-6099-4f71-f0c1-7f5f0ef2366c"
                     ]
                 },
                 "currentHeight": 36,
@@ -1634,8 +1634,8 @@
             },
             "data": [
                 {
-                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
-                    "resultId": "57d9a562-d43e-41dc-d790-7565d25dbd09",
+                    "tabId": "96e69bb9-9539-40b9-f9ac-264e64e12255",
+                    "resultId": "c99a2bb4-6099-4f71-f0c1-7f5f0ef2366c",
                     "rows": [
                         {
                             "0": "2021-06-21 12:30:00"
@@ -1677,7 +1677,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "2f01e939-6170-4349-f7b2-46d384e91cf1"
+                        "440b687a-581c-4a13-aed9-cebd6533ba8d"
                     ]
                 },
                 "currentHeight": 36,
@@ -1696,8 +1696,8 @@
             },
             "data": [
                 {
-                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
-                    "resultId": "2f01e939-6170-4349-f7b2-46d384e91cf1",
+                    "tabId": "96e69bb9-9539-40b9-f9ac-264e64e12255",
+                    "resultId": "440b687a-581c-4a13-aed9-cebd6533ba8d",
                     "rows": [
                         {
                             "0": "SYSTEM",
@@ -1763,7 +1763,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "2dbcb652-b767-470f-b741-0ebce8d97669"
+                        "2871f15b-ad67-44d0-bd14-002a894792fd"
                     ]
                 },
                 "currentHeight": 36,
@@ -1782,8 +1782,8 @@
             },
             "data": [
                 {
-                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
-                    "resultId": "2dbcb652-b767-470f-b741-0ebce8d97669",
+                    "tabId": "96e69bb9-9539-40b9-f9ac-264e64e12255",
+                    "resultId": "2871f15b-ad67-44d0-bd14-002a894792fd",
                     "rows": [
                         {
                             "0": "system_time_zone",
@@ -1848,7 +1848,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "2632339e-e939-41e9-816d-3bdd12c7a636"
+                        "f05d3319-58af-4969-fc3b-f0bba3263ea5"
                     ]
                 },
                 "currentHeight": 36,
@@ -1867,8 +1867,8 @@
             },
             "data": [
                 {
-                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
-                    "resultId": "2632339e-e939-41e9-816d-3bdd12c7a636",
+                    "tabId": "96e69bb9-9539-40b9-f9ac-264e64e12255",
+                    "resultId": "f05d3319-58af-4969-fc3b-f0bba3263ea5",
                     "rows": [
                         {
                             "0": "time_zone",
@@ -1965,7 +1965,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "c1a2b393-4c1d-46de-d366-c996746b00eb"
+                        "8305481d-507d-4ac6-fc7e-73bf4c02bdf1"
                     ]
                 },
                 "currentHeight": 36,
@@ -1984,8 +1984,8 @@
             },
             "data": [
                 {
-                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
-                    "resultId": "c1a2b393-4c1d-46de-d366-c996746b00eb",
+                    "tabId": "96e69bb9-9539-40b9-f9ac-264e64e12255",
+                    "resultId": "8305481d-507d-4ac6-fc7e-73bf4c02bdf1",
                     "rows": [
                         {
                             "0": "2021-11-28 08:00:00",
@@ -2088,7 +2088,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "6e9f5753-980a-4f4b-84ac-9bc821fa68e0"
+                        "34e44c2f-85b7-46ee-ac27-49c523452f36"
                     ]
                 },
                 "currentHeight": 36,
@@ -2107,8 +2107,8 @@
             },
             "data": [
                 {
-                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
-                    "resultId": "6e9f5753-980a-4f4b-84ac-9bc821fa68e0",
+                    "tabId": "96e69bb9-9539-40b9-f9ac-264e64e12255",
+                    "resultId": "34e44c2f-85b7-46ee-ac27-49c523452f36",
                     "rows": [
                         {
                             "0": "2021-11-28 08:00:00",
@@ -2211,7 +2211,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "1f574ea4-c5f8-41c7-ff63-2b1f4f429f68"
+                        "a3937da6-21b5-4f5e-aff9-5a80a48600b3"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -2230,8 +2230,8 @@
             },
             "data": [
                 {
-                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
-                    "resultId": "1f574ea4-c5f8-41c7-ff63-2b1f4f429f68",
+                    "tabId": "96e69bb9-9539-40b9-f9ac-264e64e12255",
+                    "resultId": "a3937da6-21b5-4f5e-aff9-5a80a48600b3",
                     "rows": [
                         {
                             "0": "2024-07-09",
@@ -2299,7 +2299,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "ede6f35e-3e42-4ba8-df0a-35277927145b"
+                        "049c19f6-e85d-4398-e5f0-a3ca30674714"
                     ]
                 },
                 "currentHeight": 36,
@@ -2318,8 +2318,8 @@
             },
             "data": [
                 {
-                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
-                    "resultId": "ede6f35e-3e42-4ba8-df0a-35277927145b",
+                    "tabId": "96e69bb9-9539-40b9-f9ac-264e64e12255",
+                    "resultId": "049c19f6-e85d-4398-e5f0-a3ca30674714",
                     "rows": [
                         {
                             "0": "2024-07-09",
@@ -2549,7 +2549,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "9e6f5c1e-00ca-4e15-d1ad-5b66808d6b8c"
+                        "aa5b873d-08bc-4b16-f72f-a1ab56e8480e"
                     ]
                 },
                 "currentHeight": 173.421875,
@@ -2568,8 +2568,8 @@
             },
             "data": [
                 {
-                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
-                    "resultId": "9e6f5c1e-00ca-4e15-d1ad-5b66808d6b8c",
+                    "tabId": "96e69bb9-9539-40b9-f9ac-264e64e12255",
+                    "resultId": "aa5b873d-08bc-4b16-f72f-a1ab56e8480e",
                     "rows": [
                         {
                             "0": 1,
@@ -2707,7 +2707,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "31539df5-0063-498b-8fb1-99b48ca121ad"
+                        "63c23b6a-717e-4f2f-b9ba-4613293d718d"
                     ]
                 },
                 "currentHeight": 173.421875,
@@ -2726,8 +2726,8 @@
             },
             "data": [
                 {
-                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
-                    "resultId": "31539df5-0063-498b-8fb1-99b48ca121ad",
+                    "tabId": "96e69bb9-9539-40b9-f9ac-264e64e12255",
+                    "resultId": "63c23b6a-717e-4f2f-b9ba-4613293d718d",
                     "rows": [
                         {
                             "0": 1,
@@ -2865,7 +2865,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "cb98ba87-bcce-4d2a-8fc5-a22d81ce589d"
+                        "c89f635b-f6d4-4280-ee45-760770216b50"
                     ]
                 },
                 "currentHeight": 36,
@@ -2884,8 +2884,8 @@
             },
             "data": [
                 {
-                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
-                    "resultId": "cb98ba87-bcce-4d2a-8fc5-a22d81ce589d",
+                    "tabId": "96e69bb9-9539-40b9-f9ac-264e64e12255",
+                    "resultId": "c89f635b-f6d4-4280-ee45-760770216b50",
                     "rows": [
                         {
                             "0": 3,
@@ -3023,7 +3023,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "aab17f23-443e-4ab2-b7f1-f4f9659bf9a7"
+                        "1c6ea006-1b8c-4d3c-c765-d925b9f0b3d8"
                     ]
                 },
                 "currentHeight": 173.421875,
@@ -3042,8 +3042,8 @@
             },
             "data": [
                 {
-                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
-                    "resultId": "aab17f23-443e-4ab2-b7f1-f4f9659bf9a7",
+                    "tabId": "96e69bb9-9539-40b9-f9ac-264e64e12255",
+                    "resultId": "1c6ea006-1b8c-4d3c-c765-d925b9f0b3d8",
                     "rows": [
                         {
                             "0": 3,
@@ -3149,7 +3149,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "5efe6043-eeda-4ff8-d55b-7deafba21f63"
+                        "ff311888-aea7-4bf9-8e34-d2ae801f4ccd"
                     ]
                 },
                 "currentHeight": 36,
@@ -3168,8 +3168,8 @@
             },
             "data": [
                 {
-                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
-                    "resultId": "5efe6043-eeda-4ff8-d55b-7deafba21f63",
+                    "tabId": "96e69bb9-9539-40b9-f9ac-264e64e12255",
+                    "resultId": "ff311888-aea7-4bf9-8e34-d2ae801f4ccd",
                     "rows": [
                         {
                             "0": "tsdemo",
@@ -3234,7 +3234,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "252ec936-07a1-409c-bdd6-a75b54204c4e"
+                        "13f4723d-b1e4-4a0b-ee4f-8a3241b68a3e"
                     ]
                 },
                 "currentHeight": 36,
@@ -3253,8 +3253,8 @@
             },
             "data": [
                 {
-                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
-                    "resultId": "252ec936-07a1-409c-bdd6-a75b54204c4e",
+                    "tabId": "96e69bb9-9539-40b9-f9ac-264e64e12255",
+                    "resultId": "13f4723d-b1e4-4a0b-ee4f-8a3241b68a3e",
                     "rows": [
                         {
                             "0": "1970-01-01 00:00:00",
@@ -3337,7 +3337,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "aa4c40b1-777d-4939-b1c1-3792d29d7ad3"
+                        "8a11b669-3922-42e2-e225-8b3ca45c142b"
                     ]
                 },
                 "currentHeight": 36,
@@ -3356,8 +3356,8 @@
             },
             "data": [
                 {
-                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
-                    "resultId": "aa4c40b1-777d-4939-b1c1-3792d29d7ad3",
+                    "tabId": "96e69bb9-9539-40b9-f9ac-264e64e12255",
+                    "resultId": "8a11b669-3922-42e2-e225-8b3ca45c142b",
                     "rows": [
                         {
                             "0": "1970-01-01 00:00:00",
@@ -3538,7 +3538,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "dacc9887-c00d-436a-b259-494ee8bb8606"
+                        "8fa144d6-a9cb-4d12-9ca7-5eef90e58211"
                     ]
                 },
                 "currentHeight": 36,
@@ -3557,8 +3557,8 @@
             },
             "data": [
                 {
-                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
-                    "resultId": "dacc9887-c00d-436a-b259-494ee8bb8606",
+                    "tabId": "96e69bb9-9539-40b9-f9ac-264e64e12255",
+                    "resultId": "8fa144d6-a9cb-4d12-9ca7-5eef90e58211",
                     "rows": [
                         {
                             "0": 22,
@@ -3673,7 +3673,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "ff5733d2-9dc3-4bdd-ce16-771088e98ea2"
+                        "20c2c746-2a79-445e-96fb-caaeac257e66"
                     ]
                 },
                 "currentHeight": 36,
@@ -3692,8 +3692,8 @@
             },
             "data": [
                 {
-                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
-                    "resultId": "ff5733d2-9dc3-4bdd-ce16-771088e98ea2",
+                    "tabId": "96e69bb9-9539-40b9-f9ac-264e64e12255",
+                    "resultId": "20c2c746-2a79-445e-96fb-caaeac257e66",
                     "rows": [
                         {
                             "0": "1864-02-28",
@@ -3771,7 +3771,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "31d11c2d-0ec1-4f9f-acba-5f0053e258d3"
+                        "ad9e136b-86ac-43d8-9924-0129a7a0ac6e"
                     ]
                 },
                 "currentHeight": 36,
@@ -3790,8 +3790,8 @@
             },
             "data": [
                 {
-                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
-                    "resultId": "31d11c2d-0ec1-4f9f-acba-5f0053e258d3",
+                    "tabId": "96e69bb9-9539-40b9-f9ac-264e64e12255",
+                    "resultId": "ad9e136b-86ac-43d8-9924-0129a7a0ac6e",
                     "rows": [
                         {
                             "0": "1864-02-28",
@@ -3889,7 +3889,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "beb20558-34bc-48ab-f837-1980cd9f50fb"
+                        "94c721c6-1d34-42a3-e881-fb36e24b77fa"
                     ]
                 },
                 "currentHeight": 36,
@@ -3908,8 +3908,8 @@
             },
             "data": [
                 {
-                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
-                    "resultId": "beb20558-34bc-48ab-f837-1980cd9f50fb",
+                    "tabId": "96e69bb9-9539-40b9-f9ac-264e64e12255",
+                    "resultId": "94c721c6-1d34-42a3-e881-fb36e24b77fa",
                     "rows": [
                         {
                             "0": "1864-02-28",
@@ -4034,7 +4034,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "0cd4bd32-a9e2-4fc7-9d40-a98fc96ccb1f"
+                        "135b7465-5621-45ae-fdda-0a72ebf63f3c"
                     ]
                 },
                 "currentHeight": 36,
@@ -4053,8 +4053,8 @@
             },
             "data": [
                 {
-                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
-                    "resultId": "0cd4bd32-a9e2-4fc7-9d40-a98fc96ccb1f",
+                    "tabId": "96e69bb9-9539-40b9-f9ac-264e64e12255",
+                    "resultId": "135b7465-5621-45ae-fdda-0a72ebf63f3c",
                     "rows": [
                         {
                             "0": "1970-01-01 00:00:00",
@@ -4155,7 +4155,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "6d8ac9a6-6b1e-4a9d-c6d1-046a571e3a50"
+                        "8cf66c21-0da6-4d07-f65a-6b4e41de4c9c"
                     ]
                 },
                 "currentHeight": 36,
@@ -4174,8 +4174,8 @@
             },
             "data": [
                 {
-                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
-                    "resultId": "6d8ac9a6-6b1e-4a9d-c6d1-046a571e3a50",
+                    "tabId": "96e69bb9-9539-40b9-f9ac-264e64e12255",
+                    "resultId": "8cf66c21-0da6-4d07-f65a-6b4e41de4c9c",
                     "rows": [
                         {
                             "0": "2024-07-10",
@@ -4317,7 +4317,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "fddeb8ca-919c-4ab2-a33d-72b9d561024d"
+                        "a47e33d0-b301-473c-b8ce-46c23d78d20a"
                     ]
                 },
                 "currentHeight": 36,
@@ -4336,8 +4336,8 @@
             },
             "data": [
                 {
-                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
-                    "resultId": "fddeb8ca-919c-4ab2-a33d-72b9d561024d",
+                    "tabId": "96e69bb9-9539-40b9-f9ac-264e64e12255",
+                    "resultId": "a47e33d0-b301-473c-b8ce-46c23d78d20a",
                     "rows": [
                         {
                             "0": "2024-07-10 13:13:06",
@@ -4445,7 +4445,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "0261829e-3633-450b-bb9e-33fbb6107164"
+                        "8876221f-92a1-4557-d107-96071a216755"
                     ]
                 },
                 "currentHeight": 36,
@@ -4464,8 +4464,8 @@
             },
             "data": [
                 {
-                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
-                    "resultId": "0261829e-3633-450b-bb9e-33fbb6107164",
+                    "tabId": "96e69bb9-9539-40b9-f9ac-264e64e12255",
+                    "resultId": "8876221f-92a1-4557-d107-96071a216755",
                     "rows": [
                         {
                             "0": "1970-01-01 00:00:00",
@@ -4626,7 +4626,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "24dddb5b-1ce3-47b9-dc1e-a98b2546159b"
+                        "e3512778-a192-463a-af20-49be392cf8e4"
                     ]
                 },
                 "currentHeight": 206.5625,
@@ -4645,8 +4645,8 @@
             },
             "data": [
                 {
-                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
-                    "resultId": "24dddb5b-1ce3-47b9-dc1e-a98b2546159b",
+                    "tabId": "96e69bb9-9539-40b9-f9ac-264e64e12255",
+                    "resultId": "e3512778-a192-463a-af20-49be392cf8e4",
                     "rows": [
                         {
                             "0": "1970-01-01 00:00:00",
@@ -4741,7 +4741,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "ed86e923-256c-43b1-ec77-7173dd2d925d"
+                        "fa571f62-05ec-4b35-a00c-9268a0ec0a2a"
                     ]
                 },
                 "currentHeight": 206.5625,
@@ -4760,8 +4760,8 @@
             },
             "data": [
                 {
-                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
-                    "resultId": "ed86e923-256c-43b1-ec77-7173dd2d925d",
+                    "tabId": "96e69bb9-9539-40b9-f9ac-264e64e12255",
+                    "resultId": "fa571f62-05ec-4b35-a00c-9268a0ec0a2a",
                     "rows": [
                         {
                             "0": "1970-01-01 00:00:00",
@@ -4867,7 +4867,7 @@
                         "text": ""
                     }
                 },
-                "currentHeight": 34,
+                "currentHeight": 28,
                 "currentSet": 1,
                 "statements": [
                     {
@@ -4909,7 +4909,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "ba3a491e-f98a-4937-a6bb-c7ba14efea70"
+                        "183a123a-7ffb-4c02-b895-15573b06c3bf"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -4928,8 +4928,8 @@
             },
             "data": [
                 {
-                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
-                    "resultId": "ba3a491e-f98a-4937-a6bb-c7ba14efea70",
+                    "tabId": "96e69bb9-9539-40b9-f9ac-264e64e12255",
+                    "resultId": "183a123a-7ffb-4c02-b895-15573b06c3bf",
                     "rows": [
                         {
                             "0": "10:30:58",
@@ -4981,6 +4981,1142 @@
             "state": {
                 "start": 144,
                 "end": 144,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "20d9ffc1-d1f7-4afa-edd9-ea2d0f67edce"
+                    ]
+                },
+                "currentHeight": 36,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 59
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "96e69bb9-9539-40b9-f9ac-264e64e12255",
+                    "resultId": "20d9ffc1-d1f7-4afa-edd9-ea2d0f67edce",
+                    "rows": [
+                        {
+                            "0": "1864-02-28",
+                            "1": "1864-2-01"
+                        },
+                        {
+                            "0": "1900-01-15",
+                            "1": "1900-1-01"
+                        },
+                        {
+                            "0": "1999-12-31",
+                            "1": "1999-12-01"
+                        },
+                        {
+                            "0": "2000-06-04",
+                            "1": "2000-6-01"
+                        },
+                        {
+                            "0": "2017-03-16",
+                            "1": "2017-3-01"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "d",
+                            "field": "0",
+                            "dataType": {
+                                "type": 27,
+                                "needsQuotes": true
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "CONCAT(YEAR(d),'-',MONTH(d),'-01')",
+                            "field": "1",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 5 records retrieved in 26.073ms"
+                    },
+                    "totalRowCount": 5,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT d, CONCAT(YEAR(d),'-',MONTH(d),'-01') FROM date_val",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 145,
+                "end": 145,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "af67f71a-ba0b-4b11-bf1f-a61c93496273"
+                    ]
+                },
+                "currentHeight": 239.703125,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 73
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "96e69bb9-9539-40b9-f9ac-264e64e12255",
+                    "resultId": "af67f71a-ba0b-4b11-bf1f-a61c93496273",
+                    "rows": [
+                        {
+                            "0": "1864-02-28",
+                            "1": "1864-02-01"
+                        },
+                        {
+                            "0": "1900-01-15",
+                            "1": "1900-01-01"
+                        },
+                        {
+                            "0": "1999-12-31",
+                            "1": "1999-12-01"
+                        },
+                        {
+                            "0": "2000-06-04",
+                            "1": "2000-06-01"
+                        },
+                        {
+                            "0": "2017-03-16",
+                            "1": "2017-03-01"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "d",
+                            "field": "0",
+                            "dataType": {
+                                "type": 27,
+                                "needsQuotes": true
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "CONCAT(YEAR(d),'-', LPAD(MONTH(d),2,'0'), '-01')",
+                            "field": "1",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 5 records retrieved in 8.012ms"
+                    },
+                    "totalRowCount": 5,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT d, CONCAT(YEAR(d),'-', LPAD(MONTH(d),2,'0'), '-01') FROM date_val",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 146,
+                "end": 146,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "317cb626-176d-4202-c385-1ec196535f5c"
+                    ]
+                },
+                "currentHeight": 173.421875,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 103
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "96e69bb9-9539-40b9-f9ac-264e64e12255",
+                    "resultId": "317cb626-176d-4202-c385-1ec196535f5c",
+                    "rows": [
+                        {
+                            "0": "15:00:00",
+                            "1": "15:00:00"
+                        },
+                        {
+                            "0": "05:01:30",
+                            "1": "05:01:00"
+                        },
+                        {
+                            "0": "12:30:20",
+                            "1": "12:30:00"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "t1",
+                            "field": "0",
+                            "dataType": {
+                                "type": 28,
+                                "dateTimePrecision": 3,
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "combined",
+                            "field": "1",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 3 records retrieved in 0s"
+                    },
+                    "totalRowCount": 3,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT t1, CONCAT(LPAD(HOUR(t1), 2, '0'), ':', LPAD(MINUTE(t1),2,'0'),':00') AS combined FROM time_val",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 147,
+                "end": 147,
+                "language": "mysql",
+                "result": {
+                    "type": "text",
+                    "text": [
+                        {
+                            "type": 4,
+                            "index": 0,
+                            "resultId": "7f694096-5ff4-469c-8d48-e345d23f11fc",
+                            "content": "OK, 0 records retrieved in 11.166ms"
+                        }
+                    ]
+                },
+                "currentHeight": 28,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 39
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": []
+        },
+        {
+            "state": {
+                "start": 148,
+                "end": 148,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "6d7eb175-d078-40f9-f5f8-f6a4618d5d0b"
+                    ]
+                },
+                "currentHeight": 107.140625,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 36
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "96e69bb9-9539-40b9-f9ac-264e64e12255",
+                    "resultId": "6d7eb175-d078-40f9-f5f8-f6a4618d5d0b",
+                    "rows": [
+                        {
+                            "0": "2009-06-03",
+                            "1": "16:05:08",
+                            "2": "2009-06-03 16:05:08"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "@d",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "@t",
+                            "field": "1",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "CONCAT(@d, ' ' , @t)",
+                            "field": "2",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 0s"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT @d, @t, CONCAT(@d, ' ' , @t)",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 149,
+                "end": 154,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "b0f41594-01ae-4387-a418-2516145f8100"
+                    ]
+                },
+                "currentHeight": 36,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 434
+                        },
+                        "contentStart": 363,
+                        "state": 3
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "96e69bb9-9539-40b9-f9ac-264e64e12255",
+                    "resultId": "b0f41594-01ae-4387-a418-2516145f8100",
+                    "rows": [
+                        {
+                            "0": "15:00:00",
+                            "1": 54000,
+                            "2": "15:00:00"
+                        },
+                        {
+                            "0": "05:01:30",
+                            "1": 18090,
+                            "2": "05:01:30"
+                        },
+                        {
+                            "0": "12:30:20",
+                            "1": 45020,
+                            "2": "12:30:20"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "t1",
+                            "field": "0",
+                            "dataType": {
+                                "type": 28,
+                                "dateTimePrecision": 3,
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "TIME_TO_SEC(t1)",
+                            "field": "1",
+                            "dataType": {
+                                "type": 4,
+                                "flags": [
+                                    "SIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 10,
+                                "parameterFormatType": "OneOrZero",
+                                "synonyms": [
+                                    "INTEGER",
+                                    "INT4"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "SEC_TO_TIME(TIME_TO_SEC(t1))",
+                            "field": "2",
+                            "dataType": {
+                                "type": 28,
+                                "dateTimePrecision": 3,
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 3 records retrieved in 0s"
+                    },
+                    "totalRowCount": 3,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "# Converting between temporal value and basic units\n-- To convert between time values and seconds use TIME_TO_SEC() and SEC_TO_TIME() functions.\n-- To convert between date values and dates use TO_DAYS() and FROM_DAYS() functions.\n-- To convert between date-and-time values and seconds UNIX_TIMESTAMP() and FROM_UNIXTIME() functions.\n# Converting times to seconds\nSELECT t1, TIME_TO_SEC(t1), SEC_TO_TIME(TIME_TO_SEC(t1)) FROM time_val;",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 155,
+                "end": 155,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "1fba9841-9b88-40a8-f1e5-303b20033e5e"
+                    ]
+                },
+                "currentHeight": 36,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 168
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "96e69bb9-9539-40b9-f9ac-264e64e12255",
+                    "resultId": "1fba9841-9b88-40a8-f1e5-303b20033e5e",
+                    "rows": [
+                        {
+                            "0": "15:00:00",
+                            "1": 54000,
+                            "2": "900.0000",
+                            "3": "15.0000",
+                            "4": "0.6250"
+                        },
+                        {
+                            "0": "05:01:30",
+                            "1": 18090,
+                            "2": "301.5000",
+                            "3": "5.0250",
+                            "4": "0.2094"
+                        },
+                        {
+                            "0": "12:30:20",
+                            "1": 45020,
+                            "2": "750.3333",
+                            "3": "12.5056",
+                            "4": "0.5211"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "t1",
+                            "field": "0",
+                            "dataType": {
+                                "type": 28,
+                                "dateTimePrecision": 3,
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "seconds",
+                            "field": "1",
+                            "dataType": {
+                                "type": 4,
+                                "flags": [
+                                    "SIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 10,
+                                "parameterFormatType": "OneOrZero",
+                                "synonyms": [
+                                    "INTEGER",
+                                    "INT4"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "minutes",
+                            "field": "2",
+                            "dataType": {
+                                "type": 10,
+                                "flags": [
+                                    "UNSIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 65,
+                                "numericScale": 30,
+                                "parameterFormatType": "TwoOrOneOrZero",
+                                "synonyms": [
+                                    "FIXED",
+                                    "NUMERIC",
+                                    "DEC"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "hours",
+                            "field": "3",
+                            "dataType": {
+                                "type": 10,
+                                "flags": [
+                                    "UNSIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 65,
+                                "numericScale": 30,
+                                "parameterFormatType": "TwoOrOneOrZero",
+                                "synonyms": [
+                                    "FIXED",
+                                    "NUMERIC",
+                                    "DEC"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "days",
+                            "field": "4",
+                            "dataType": {
+                                "type": 10,
+                                "flags": [
+                                    "UNSIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 65,
+                                "numericScale": 30,
+                                "parameterFormatType": "TwoOrOneOrZero",
+                                "synonyms": [
+                                    "FIXED",
+                                    "NUMERIC",
+                                    "DEC"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 3 records retrieved in 0s"
+                    },
+                    "totalRowCount": 3,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT t1, TIME_TO_SEC(t1) AS `seconds`, TIME_TO_SEC(t1) / 60 AS `minutes`, TIME_TO_SEC(t1) / (60*60) AS `hours`, TIME_TO_SEC(t1) / (24*60*60) AS `days` FROM time_val;",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 156,
+                "end": 160,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "6ae1f3ae-7662-41d4-b23e-c9d3577a7e5f"
+                    ]
+                },
+                "currentHeight": 36,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 176
+                        },
+                        "contentStart": 52,
+                        "state": 3
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "96e69bb9-9539-40b9-f9ac-264e64e12255",
+                    "resultId": "6ae1f3ae-7662-41d4-b23e-c9d3577a7e5f",
+                    "rows": [
+                        {
+                            "0": "1970-01-01 00:00:00",
+                            "1": 0,
+                            "2": "00:00:00"
+                        },
+                        {
+                            "0": "1999-12-31 09:00:00",
+                            "1": 32400,
+                            "2": "09:00:00"
+                        },
+                        {
+                            "0": "2000-06-04 15:45:30",
+                            "1": 56730,
+                            "2": "15:45:30"
+                        },
+                        {
+                            "0": "2017-03-16 12:30:15",
+                            "1": 45015,
+                            "2": "12:30:15"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "dt",
+                            "field": "0",
+                            "dataType": {
+                                "type": 26,
+                                "dateTimePrecision": 8,
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "time part in seconds",
+                            "field": "1",
+                            "dataType": {
+                                "type": 4,
+                                "flags": [
+                                    "SIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 10,
+                                "parameterFormatType": "OneOrZero",
+                                "synonyms": [
+                                    "INTEGER",
+                                    "INT4"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "time part as TIME",
+                            "field": "2",
+                            "dataType": {
+                                "type": 28,
+                                "dateTimePrecision": 3,
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 4 records retrieved in 0s"
+                    },
+                    "totalRowCount": 4,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "-- Use FLOOR() function if you prefer integer value\nSELECT dt,\nTIME_TO_SEC(dt) as `time part in seconds`,\nSEC_TO_TIME(TIME_TO_SEC(dt)) as `time part as TIME`\nFROM datetime_val;",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 161,
+                "end": 165,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "6d3e5578-35d1-45b3-ccfc-63cab3d6fd35"
+                    ]
+                },
+                "currentHeight": 36,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 138
+                        },
+                        "contentStart": 36,
+                        "state": 3
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "96e69bb9-9539-40b9-f9ac-264e64e12255",
+                    "resultId": "6d3e5578-35d1-45b3-ccfc-63cab3d6fd35",
+                    "rows": [
+                        {
+                            "0": "1864-02-28",
+                            "1": 680870,
+                            "2": "1864-02-28"
+                        },
+                        {
+                            "0": "1900-01-15",
+                            "1": 693975,
+                            "2": "1900-01-15"
+                        },
+                        {
+                            "0": "1999-12-31",
+                            "1": 730484,
+                            "2": "1999-12-31"
+                        },
+                        {
+                            "0": "2000-06-04",
+                            "1": 730640,
+                            "2": "2000-06-04"
+                        },
+                        {
+                            "0": "2017-03-16",
+                            "1": 736769,
+                            "2": "2017-03-16"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "d",
+                            "field": "0",
+                            "dataType": {
+                                "type": 27,
+                                "needsQuotes": true
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "Date to Days",
+                            "field": "1",
+                            "dataType": {
+                                "type": 3,
+                                "flags": [
+                                    "UNSIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 8,
+                                "parameterFormatType": "OneOrZero",
+                                "synonyms": [
+                                    "INT3",
+                                    "MIDDLEINT"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "Date to days to Date",
+                            "field": "2",
+                            "dataType": {
+                                "type": 27,
+                                "needsQuotes": true
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 5 records retrieved in 0s"
+                    },
+                    "totalRowCount": 5,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "# converting between dates and days\nSELECT d,\nTO_DAYS(d) AS `Date to Days`,\nFROM_DAYS(TO_DAYS(d)) AS `Date to days to Date`\nFROM date_val;",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 166,
+                "end": 169,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "d57654b4-b431-4490-de9d-a004fb81624d"
+                    ]
+                },
+                "currentHeight": 206.5625,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 111
+                        },
+                        "contentStart": 0,
+                        "state": 3
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "96e69bb9-9539-40b9-f9ac-264e64e12255",
+                    "resultId": "d57654b4-b431-4490-de9d-a004fb81624d",
+                    "rows": [
+                        {
+                            "0": "1970-01-01 00:00:00",
+                            "1": 719528,
+                            "2": "1970-01-01"
+                        },
+                        {
+                            "0": "1999-12-31 09:00:00",
+                            "1": 730484,
+                            "2": "1999-12-31"
+                        },
+                        {
+                            "0": "2000-06-04 15:45:30",
+                            "1": 730640,
+                            "2": "2000-06-04"
+                        },
+                        {
+                            "0": "2017-03-16 12:30:15",
+                            "1": 736769,
+                            "2": "2017-03-16"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "dt",
+                            "field": "0",
+                            "dataType": {
+                                "type": 26,
+                                "dateTimePrecision": 8,
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "date part in days",
+                            "field": "1",
+                            "dataType": {
+                                "type": 3,
+                                "flags": [
+                                    "UNSIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 8,
+                                "parameterFormatType": "OneOrZero",
+                                "synonyms": [
+                                    "INT3",
+                                    "MIDDLEINT"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "date part as DATE",
+                            "field": "2",
+                            "dataType": {
+                                "type": 27,
+                                "needsQuotes": true
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 4 records retrieved in 0s"
+                    },
+                    "totalRowCount": 4,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT dt,\nTO_DAYS(dt) AS `date part in days`,\nFROM_DAYS(TO_DAYS(dt)) AS `date part as DATE`\nFROM datetime_val;",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 170,
+                "end": 174,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "bb2b20f1-afd9-45f6-b59d-62ca87b64d4a"
+                    ]
+                },
+                "currentHeight": 206.5625,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 164
+                        },
+                        "contentStart": 53,
+                        "state": 3
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "96e69bb9-9539-40b9-f9ac-264e64e12255",
+                    "resultId": "bb2b20f1-afd9-45f6-b59d-62ca87b64d4a",
+                    "rows": [
+                        {
+                            "0": "1970-01-01 00:00:00",
+                            "1": 0,
+                            "2": "1970-01-01 05:30:00"
+                        },
+                        {
+                            "0": "1999-12-31 09:00:00",
+                            "1": 946611000,
+                            "2": "1999-12-31 09:00:00"
+                        },
+                        {
+                            "0": "2000-06-04 15:45:30",
+                            "1": 960113730,
+                            "2": "2000-06-04 15:45:30"
+                        },
+                        {
+                            "0": "2017-03-16 12:30:15",
+                            "1": 1489647615,
+                            "2": "2017-03-16 12:30:15"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "dt",
+                            "field": "0",
+                            "dataType": {
+                                "type": 26,
+                                "dateTimePrecision": 8,
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "seconds",
+                            "field": "1",
+                            "dataType": {
+                                "type": 4,
+                                "flags": [
+                                    "SIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 10,
+                                "parameterFormatType": "OneOrZero",
+                                "synonyms": [
+                                    "INTEGER",
+                                    "INT4"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "timestamp",
+                            "field": "2",
+                            "dataType": {
+                                "type": 26,
+                                "dateTimePrecision": 8,
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 4 records retrieved in 0s"
+                    },
+                    "totalRowCount": 4,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "# Converting between date-and-time values to seconds\nSELECT dt,\nUNIX_TIMESTAMP(dt) as `seconds`,\nFROM_UNIXTIME(UNIX_TIMESTAMP(dt)) as `timestamp`\nFROM datetime_val;",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 175,
+                "end": 175,
                 "language": "mysql",
                 "currentSet": 1,
                 "statements": [
