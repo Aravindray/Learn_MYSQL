@@ -2,18 +2,18 @@
     "type": "MySQLNotebook",
     "version": "1.0",
     "caption": "Untitled",
-    "content": "USE cookbook;\r\n# Intodruction\r\n-- Mysql has several data type for representing temporal data\r\n# Choosing a Temporal Data type\r\n-- There are DATE, TIME, TIMESTAMP and DATETIME data type for representing temporal data type.\r\n-- Choose an appropirate data type based on characteristics and secification.\r\nSELECT * from time_val;\r\nSELECT * FROM date_val;\r\nSELECT * FROM datetime_val;\r\nSELECT CURTIME(), CURTIME(2), CURTIME(6);\r\n-- Result not displayed as expected\r\n# Using Fractional Seconds support\r\nSELECT POSITION AS POS, no, driver, car, laps, DATE_FORMAT(time, '%H:%i:%s:%f') AS time, points as pts FROM formula1 ORDER BY time;\r\nSELECT * FROM formula1;\r\nSELECT MIN(time) from formula1 into @fastest;\r\nWITH time_gap AS (\r\n SELECT\r\n position,\r\n car,\r\n driver,\r\n time,\r\n TIMESTAMPDIFF(SECOND, time , @fastest) AS seconds\r\n FROM formula1\r\n),\r\nDIFFERENCES AS (\r\n SELECT\r\n position as pos,\r\n driver,\r\n car,\r\n time,\r\n seconds,\r\n MOD(seconds, 60) AS seconds_part,\r\n MOD(seconds, 3600) AS minutes_part\r\n FROM time_gap\r\n)\r\nSELECT\r\n pos,\r\n driver,\r\n time,\r\n CONCAT(\r\n FLOOR(minutes_part / 60), ' min ',\r\n SUBSTRING_INDEX(SUBSTRING_INDEX(seconds_part,'-',2),'-',-1),' secs'\r\n ) AS difference\r\nFROM differences;\r\n-- we will learn more about CTE in recipe 10.18\r\n# Changing MySQL Date Format\r\n-- MySQL support only ISO format for storing dates. But if our date is different format or close to ISO format we can convert it first to ISO format and store it in mysql db.\r\n-- With the help of STR_TO_DATE() function we can convert non-ISO format to ISO format date format.\r\nCREATE TABLE tmp_tbl_5 \r\n(\r\n    date DATE\r\n);\r\nINSERT INTO tmp_tbl_5 VALUES (STR_TO_DATE('May 13, 2007', '%M %d, %Y'));\r\nSELECT * FROM tmp_tbl_5;\r\n-- Mysql display the date and time in ISO format, But we can tell Mysql to display required format using DATE_FORMAT() and TIME_FORMAT() functions.\r\n-- Syntax: DATE_FORMAT(DATE|DATETIME|TIMESTAMP, string specifiers)\r\n-- String specifiers is same as the STR_TO_DATE() supported specifier.\r\nSELECT d, DATE_FORMAT(d, '%M %d, %Y') AS date FROM date_val;\r\nSELECT dt, DATE_FORMAT(dt, '%c/%e/%y %r') AS `Format 1`, DATE_FORMAT(dt, '%M %e, %Y %T') AS `Format 2` FROM datetime_val;\r\nSELECT dt, TIME_FORMAT(dt, '%r'), TIME_FORMAT(dt, '%T') FROM datetime_val;\r\n-- I have created the function from root user login\r\nSELECT t1, time_ampm(t1) FROM time_val;\r\nCREATE TABLE tmp_tbl_6 (ts TIMESTAMP);\r\nINSERT INTO tmp_tbl_6 VALUES('2021-06-21 12:30:00');\r\nSELECT ts FROM tmp_tbl_6;\r\nSELECT @@global.time_zone, @@session.time_zone;\r\n-- To see the system time zone check the global variable\r\nSHOW GLOBAL VARIABLES LIKE 'system_time_zone';\r\n# Setting Server Time Zone\r\nSHOW GLOBAL VARIABLES LIKE 'time_zone';\r\n-- You may choose to set the global time zone variable \r\n-- SET GLOBAL time_zone = '+03:00';\r\n-- once time_zone changed you may verify it SELECT @@global.time_zone, @@session.time_zone;\r\n-- Not understood properly - Recipe 8.5\r\n# Shifting Temporal Value Between Time Zones\r\n-- You have date-and-time value and want to know what it will be in different time zone. User CONVERT_TZ() function\r\n-- Syntax: CONVERT_TZ(date-time, from_time_zone, to_time_zone);\r\nSET @dt = '2021-11-28 08:00:00';\r\nSELECT @dt AS Chicago,\r\nCONVERT_TZ(@dt, 'US/Central', 'Europe/Istanbul') AS Istanbul,\r\nCONVERT_TZ(@dt, 'US/Central', 'Europe/London') AS London,\r\nCONVERT_TZ(@dt, 'US/Central', 'America/Edmonton') AS Edmonton,\r\nCONVERT_TZ(@dt, 'US/Central', 'Australia/Brisbane') AS Brisbane;\r\n-- Preceding statement only work if you store the named timezone in mysql server, so use the UTC offset\r\nSELECT @dt AS Chicago,\r\nCONVERT_TZ(@dt, '-06:00', '+03:00') AS Istanbul,\r\nCONVERT_TZ(@dt, '-06:00', '+00:00') AS London,\r\nCONVERT_TZ(@dt, '-06:00', '-07:00') AS Edmonton,\r\nCONVERT_TZ(@dt, '-06:00', '+10:00') AS Brisbane;\r\n# Determining current date or time\r\n-- You want to know what current date and time, use CURDATE(), CURTIME(), and NOW() functions.\r\n-- If you want to know what UTC date and tiem, Use UTC_DATE(), UTC_TIME(), and UTC_TIMESTAMP() functions.\r\nSELECT CURDATE(), CURTIME(), NOW();\r\nSELECT UTC_DATE(), UTC_TIME(), UTC_TIMESTAMP();\r\n# Using TIMESTAMP, DATETIME to track row modification time\r\n-- TIMESTAMP and DATETIME have DEFAULT CURRENT_TIMESTAMP for new record addition,\r\n-- and ON UPDATE CURRENT_TIMESTAMP for row modification column attirbutes is helpful.\r\nDROP TABLE IF EXISTS tsdemo;\r\nCREATE TABLE tsdemo (\r\nval INT NOT NULL AUTO_INCREMENT PRIMARY KEY,\r\nts_both TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\r\nts_create TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\r\nts_update TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP\r\n) ENGINE=InnoDB;\r\nINSERT INTO tsdemo (val) VALUES (1);\r\nINSERT INTO tsdemo (val) VALUES (5);\r\nINSERT INTO tsdemo (val) VALUES (10);\r\nSELECT * FROM tsdemo;\r\nUPDATE tsdemo SET val = 11 WHERE val = 10;\r\nSELECT * FROM tsdemo;\r\n",
+    "content": "USE cookbook;\r\n# Intodruction\r\n-- Mysql has several data type for representing temporal data\r\n# Choosing a Temporal Data type\r\n-- There are DATE, TIME, TIMESTAMP and DATETIME data type for representing temporal data type.\r\n-- Choose an appropirate data type based on characteristics and secification.\r\nSELECT * from time_val;\r\nSELECT * FROM date_val;\r\nSELECT * FROM datetime_val;\r\nSELECT CURTIME(), CURTIME(2), CURTIME(6);\r\n-- Result not displayed as expected\r\n# Using Fractional Seconds support\r\nSELECT POSITION AS POS, no, driver, car, laps, DATE_FORMAT(time, '%H:%i:%s:%f') AS time, points as pts FROM formula1 ORDER BY time;\r\nSELECT * FROM formula1;\r\nSELECT MIN(time) from formula1 into @fastest;\r\nWITH time_gap AS (\r\n SELECT\r\n position,\r\n car,\r\n driver,\r\n time,\r\n TIMESTAMPDIFF(SECOND, time , @fastest) AS seconds\r\n FROM formula1\r\n),\r\nDIFFERENCES AS (\r\n SELECT\r\n position as pos,\r\n driver,\r\n car,\r\n time,\r\n seconds,\r\n MOD(seconds, 60) AS seconds_part,\r\n MOD(seconds, 3600) AS minutes_part\r\n FROM time_gap\r\n)\r\nSELECT\r\n pos,\r\n driver,\r\n time,\r\n CONCAT(\r\n FLOOR(minutes_part / 60), ' min ',\r\n SUBSTRING_INDEX(SUBSTRING_INDEX(seconds_part,'-',2),'-',-1),' secs'\r\n ) AS difference\r\nFROM differences;\r\n-- we will learn more about CTE in recipe 10.18\r\n# Changing MySQL Date Format\r\n-- MySQL support only ISO format for storing dates. But if our date is different format or close to ISO format we can convert it first to ISO format and store it in mysql db.\r\n-- With the help of STR_TO_DATE() function we can convert non-ISO format to ISO format date format.\r\nCREATE TABLE tmp_tbl_5 \r\n(\r\n    date DATE\r\n);\r\nINSERT INTO tmp_tbl_5 VALUES (STR_TO_DATE('May 13, 2007', '%M %d, %Y'));\r\nSELECT * FROM tmp_tbl_5;\r\n-- Mysql display the date and time in ISO format, But we can tell Mysql to display required format using DATE_FORMAT() and TIME_FORMAT() functions.\r\n-- Syntax: DATE_FORMAT(DATE|DATETIME|TIMESTAMP, string specifiers)\r\n-- String specifiers is same as the STR_TO_DATE() supported specifier.\r\nSELECT d, DATE_FORMAT(d, '%M %d, %Y') AS date FROM date_val;\r\nSELECT dt, DATE_FORMAT(dt, '%c/%e/%y %r') AS `Format 1`, DATE_FORMAT(dt, '%M %e, %Y %T') AS `Format 2` FROM datetime_val;\r\nSELECT dt, TIME_FORMAT(dt, '%r'), TIME_FORMAT(dt, '%T') FROM datetime_val;\r\n-- I have created the function from root user login\r\nSELECT t1, time_ampm(t1) FROM time_val;\r\nCREATE TABLE tmp_tbl_6 (ts TIMESTAMP);\r\nINSERT INTO tmp_tbl_6 VALUES('2021-06-21 12:30:00');\r\nSELECT ts FROM tmp_tbl_6;\r\nSELECT @@global.time_zone, @@session.time_zone;\r\n-- To see the system time zone check the global variable\r\nSHOW GLOBAL VARIABLES LIKE 'system_time_zone';\r\n# Setting Server Time Zone\r\nSHOW GLOBAL VARIABLES LIKE 'time_zone';\r\n-- You may choose to set the global time zone variable \r\n-- SET GLOBAL time_zone = '+03:00';\r\n-- once time_zone changed you may verify it SELECT @@global.time_zone, @@session.time_zone;\r\n-- Not understood properly - Recipe 8.5\r\n# Shifting Temporal Value Between Time Zones\r\n-- You have date-and-time value and want to know what it will be in different time zone. User CONVERT_TZ() function\r\n-- Syntax: CONVERT_TZ(date-time, from_time_zone, to_time_zone);\r\nSET @dt = '2021-11-28 08:00:00';\r\nSELECT @dt AS Chicago,\r\nCONVERT_TZ(@dt, 'US/Central', 'Europe/Istanbul') AS Istanbul,\r\nCONVERT_TZ(@dt, 'US/Central', 'Europe/London') AS London,\r\nCONVERT_TZ(@dt, 'US/Central', 'America/Edmonton') AS Edmonton,\r\nCONVERT_TZ(@dt, 'US/Central', 'Australia/Brisbane') AS Brisbane;\r\n-- Preceding statement only work if you store the named timezone in mysql server, so use the UTC offset\r\nSELECT @dt AS Chicago,\r\nCONVERT_TZ(@dt, '-06:00', '+03:00') AS Istanbul,\r\nCONVERT_TZ(@dt, '-06:00', '+00:00') AS London,\r\nCONVERT_TZ(@dt, '-06:00', '-07:00') AS Edmonton,\r\nCONVERT_TZ(@dt, '-06:00', '+10:00') AS Brisbane;\r\n# Determining current date or time\r\n-- You want to know what current date and time, use CURDATE(), CURTIME(), and NOW() functions.\r\n-- If you want to know what UTC date and tiem, Use UTC_DATE(), UTC_TIME(), and UTC_TIMESTAMP() functions.\r\nSELECT CURDATE(), CURTIME(), NOW();\r\nSELECT UTC_DATE(), UTC_TIME(), UTC_TIMESTAMP();\r\n# Using TIMESTAMP, DATETIME to track row modification time\r\n-- TIMESTAMP and DATETIME have DEFAULT CURRENT_TIMESTAMP for new record addition,\r\n-- and ON UPDATE CURRENT_TIMESTAMP for row modification column attirbutes is helpful.\r\nDROP TABLE IF EXISTS tsdemo;\r\nCREATE TABLE tsdemo (\r\nval INT NOT NULL AUTO_INCREMENT PRIMARY KEY,\r\nts_both TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\r\nts_create TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\r\nts_update TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP\r\n) ENGINE=InnoDB;\r\nINSERT INTO tsdemo (val) VALUES (1);\r\nINSERT INTO tsdemo (val) VALUES (5);\r\nINSERT INTO tsdemo (val) VALUES (10);\r\nSELECT * FROM tsdemo;\r\nUPDATE tsdemo SET val = 11 WHERE val = 10;\r\nSELECT * FROM tsdemo;\r\nUPDATE tsdemo SET val = val + 1;\r\nSELECT * FROM tsdemo;\r\nUPDATE tsdemo SET val = val;\r\nSELECT * FROM tsdemo;\r\nSHOW CREATE TABLE tsdemo;\r\n# Extracting parts of Dates or Time\r\n# Decomposing dates or times using component-extractions functions\r\n-- DATE() and TIME() extract the date and time component from the temporal value.\r\nSELECT dt, DATE(dt), TIME(dt) FROM datetime_val;\r\nSELECT dt, YEAR(dt), DAYOFMONTH(dt), HOUR(dt), SECOND(dt) from datetime_val;\r\nSET @date_time = '2021-11-24 22:11:12.000201';\r\nSELECT HOUR(@date_time) AS hour, MINUTE(@date_time) AS minute, SECOND(@date_time) AS second, MICROSECOND(@date_time) AS microsecond;\r\nSELECT d, DAYOFYEAR(d) FROM date_val;\r\nSELECT d, DAYNAME(d), DATE_FORMAT(d, '%a') FROM date_val;\r\nSELECT d, DAYNAME(d), DAYOFWEEK(d), WEEKDAY(d) FROM date_val;\r\n-- EXTRACT() Is another function that extract componenet from temporal value.\r\nSELECT dt, EXTRACT(DAY FROM dt), EXTRACT(HOUR FROM dt) FROM datetime_val;\r\nSELECT CURDATE(), YEAR(CURDATE()) AS year, MONTH(CURDATE()) AS month,\r\nMONTHNAME(CURDATE()) AS monthname, DAY(CURDATE()) AS day, DAYNAME(CURDATE()) AS dayname;\r\nSELECT NOW(), HOUR(NOW()) as hour, MINUTE(NOW()) as minute, SECOND(NOW()) AS second;\r\n# Decomposing Dates or Times using formatting functions.\r\n-- With DATE_FORMAT() and TIME_FORMAT() function we can extract components by specifying the format string\r\nSELECT dt, DATE_FORMAT(dt, '%Y') AS year, DATE_FORMAT(dt, '%d') AS day, TIME_FORMAT(dt, '%H') as hour,\r\nTIME_FORMAT(dt, '%s') AS second, TIME_FORMAT(dt, '%f') AS microsecond FROM datetime_val;\r\nSELECT dt, DATE_FORMAT(dt, '%Y-%m-%d') AS `date part`, TIME_FORMAT(dt, '%T') as `time part` FROM datetime_val;\r\nSELECT dt, DATE_FORMAT(dt, '%M %e, %Y') as `descriptive date`, TIME_FORMAT(dt, '%H:%i') as `hour/minute` FROM datetime_val;\r\n# Synthesizing dates or times from components values\r\n-- Composition Function - MAKETIME() function construct time value from hour, minute and seconds\r\n-- Formatting Function - DATE_FORMAT() and TIME_FORMAT() replace the desire values\r\n-- String Concat - Or pull out part from the date or time component and CONCAT() them.\r\n-- Syntax: MAKETIME(hour, mintue, second) take 3 arguments and return date function.\r\nSELECT MAKETIME(10,30,58), MAKETIME(-5, 0, 11); -- Not working as expected\r\nSELECT MAKETIME(10,30,58), MAKETIME(5, 0, 11);\r\n",
     "options": {},
     "viewState": {
         "cursorState": [
             {
                 "inSelectionMode": false,
                 "selectionStart": {
-                    "lineNumber": 111,
+                    "lineNumber": 144,
                     "column": 1
                 },
                 "position": {
-                    "lineNumber": 111,
+                    "lineNumber": 144,
                     "column": 1
                 }
             }
@@ -21,10 +21,10 @@
         "viewState": {
             "scrollLeft": 0,
             "firstPosition": {
-                "lineNumber": 105,
+                "lineNumber": 136,
                 "column": 1
             },
-            "firstPositionDeltaTop": -18
+            "firstPositionDeltaTop": 29
         },
         "contributionsState": {
             "editor.contrib.folding": {},
@@ -43,8 +43,8 @@
                         {
                             "type": 4,
                             "index": 0,
-                            "resultId": "6bc1faae-1e76-4aa3-ee21-f058b90da3ad",
-                            "content": "OK, 0 records retrieved in 0s"
+                            "resultId": "30de8683-f9b2-42d2-e138-58ab214792b5",
+                            "content": "OK, 0 records retrieved in 0.958ms"
                         }
                     ]
                 },
@@ -72,7 +72,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "b94481f9-cf3b-4134-c067-cd990da156ea"
+                        "1cbf4c28-052f-4c01-8e7a-bcf7fe5b8c6e"
                     ]
                 },
                 "currentHeight": 36,
@@ -91,8 +91,8 @@
             },
             "data": [
                 {
-                    "tabId": "19a9e183-6096-4917-e85b-c40d19e8bf41",
-                    "resultId": "b94481f9-cf3b-4134-c067-cd990da156ea",
+                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
+                    "resultId": "1cbf4c28-052f-4c01-8e7a-bcf7fe5b8c6e",
                     "rows": [
                         {
                             "0": 1,
@@ -181,7 +181,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "8c58f68d-adec-4ea8-c427-567918e6f516"
+                        "e525849e-7f73-4956-8276-8a33bc590469"
                     ]
                 },
                 "currentHeight": 36,
@@ -200,8 +200,8 @@
             },
             "data": [
                 {
-                    "tabId": "19a9e183-6096-4917-e85b-c40d19e8bf41",
-                    "resultId": "8c58f68d-adec-4ea8-c427-567918e6f516",
+                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
+                    "resultId": "e525849e-7f73-4956-8276-8a33bc590469",
                     "rows": [
                         {
                             "0": "1864-02-28"
@@ -253,7 +253,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "12d72443-2cc5-4ad2-8110-9be43c829738"
+                        "e1ae50f4-f920-4441-9105-39ab27140763"
                     ]
                 },
                 "currentHeight": 36,
@@ -272,8 +272,8 @@
             },
             "data": [
                 {
-                    "tabId": "19a9e183-6096-4917-e85b-c40d19e8bf41",
-                    "resultId": "12d72443-2cc5-4ad2-8110-9be43c829738",
+                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
+                    "resultId": "e1ae50f4-f920-4441-9105-39ab27140763",
                     "rows": [
                         {
                             "0": "1970-01-01 00:00:00"
@@ -324,7 +324,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "f592c064-ec14-4bcc-aaa4-f83c1b614e1b"
+                        "3c45e9b1-2d15-42eb-9dbf-5f39aa70bf31"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -343,8 +343,8 @@
             },
             "data": [
                 {
-                    "tabId": "19a9e183-6096-4917-e85b-c40d19e8bf41",
-                    "resultId": "f592c064-ec14-4bcc-aaa4-f83c1b614e1b",
+                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
+                    "resultId": "3c45e9b1-2d15-42eb-9dbf-5f39aa70bf31",
                     "rows": [
                         {
                             "0": "12:23:41",
@@ -414,7 +414,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "05b43020-d2a2-458f-b3bd-77da49074b71"
+                        "52efe3fb-259f-45b9-ae30-a7b2720dcc83"
                     ]
                 },
                 "currentHeight": 36,
@@ -433,8 +433,8 @@
             },
             "data": [
                 {
-                    "tabId": "19a9e183-6096-4917-e85b-c40d19e8bf41",
-                    "resultId": "05b43020-d2a2-458f-b3bd-77da49074b71",
+                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
+                    "resultId": "52efe3fb-259f-45b9-ae30-a7b2720dcc83",
                     "rows": [
                         {
                             "0": 1,
@@ -619,7 +619,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "fffddaf1-2c94-4f91-e718-97758670a757"
+                        "690c18ea-da10-4cfa-efa0-0bd9af41ecac"
                     ]
                 },
                 "currentHeight": 36,
@@ -638,8 +638,8 @@
             },
             "data": [
                 {
-                    "tabId": "19a9e183-6096-4917-e85b-c40d19e8bf41",
-                    "resultId": "fffddaf1-2c94-4f91-e718-97758670a757",
+                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
+                    "resultId": "690c18ea-da10-4cfa-efa0-0bd9af41ecac",
                     "rows": [
                         {
                             "0": 1,
@@ -881,7 +881,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "e93cdcfc-4784-425c-e604-305c45464e71"
+                        "64700d12-37b2-47c0-9206-f42adc482890"
                     ]
                 },
                 "currentHeight": 173.421875,
@@ -900,8 +900,8 @@
             },
             "data": [
                 {
-                    "tabId": "19a9e183-6096-4917-e85b-c40d19e8bf41",
-                    "resultId": "e93cdcfc-4784-425c-e604-305c45464e71",
+                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
+                    "resultId": "64700d12-37b2-47c0-9206-f42adc482890",
                     "rows": [
                         {
                             "0": 1,
@@ -1077,7 +1077,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "4a09cae8-1af5-4f18-8682-bd8baa80015a"
+                        "f78e383d-f51a-4a6f-9e58-89b6fcfbb627"
                     ]
                 },
                 "currentHeight": 36,
@@ -1096,8 +1096,8 @@
             },
             "data": [
                 {
-                    "tabId": "19a9e183-6096-4917-e85b-c40d19e8bf41",
-                    "resultId": "4a09cae8-1af5-4f18-8682-bd8baa80015a",
+                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
+                    "resultId": "f78e383d-f51a-4a6f-9e58-89b6fcfbb627",
                     "rows": [
                         {
                             "0": "2007-05-13"
@@ -1137,7 +1137,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "4c408bd4-c4c1-4c18-9a37-eb905d965b0a"
+                        "a5869910-50be-439c-8746-5d95296d5339"
                     ]
                 },
                 "currentHeight": 239.703125,
@@ -1156,8 +1156,8 @@
             },
             "data": [
                 {
-                    "tabId": "19a9e183-6096-4917-e85b-c40d19e8bf41",
-                    "resultId": "4c408bd4-c4c1-4c18-9a37-eb905d965b0a",
+                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
+                    "resultId": "a5869910-50be-439c-8746-5d95296d5339",
                     "rows": [
                         {
                             "0": "1864-02-28",
@@ -1232,7 +1232,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "8cf4fb5e-090a-4c3e-e926-e327834f13d2"
+                        "cce63a51-56d6-43fa-d65d-fbe70b3effdf"
                     ]
                 },
                 "currentHeight": 206.5625,
@@ -1251,8 +1251,8 @@
             },
             "data": [
                 {
-                    "tabId": "19a9e183-6096-4917-e85b-c40d19e8bf41",
-                    "resultId": "8cf4fb5e-090a-4c3e-e926-e327834f13d2",
+                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
+                    "resultId": "cce63a51-56d6-43fa-d65d-fbe70b3effdf",
                     "rows": [
                         {
                             "0": "1970-01-01 00:00:00",
@@ -1347,7 +1347,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "6fa3092c-db0d-49b7-ca00-5300a7b3c4d7"
+                        "d47bbb10-0842-4bd8-ef57-c061030551d9"
                     ]
                 },
                 "currentHeight": 206.5625,
@@ -1366,8 +1366,8 @@
             },
             "data": [
                 {
-                    "tabId": "19a9e183-6096-4917-e85b-c40d19e8bf41",
-                    "resultId": "6fa3092c-db0d-49b7-ca00-5300a7b3c4d7",
+                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
+                    "resultId": "d47bbb10-0842-4bd8-ef57-c061030551d9",
                     "rows": [
                         {
                             "0": "1970-01-01 00:00:00",
@@ -1462,7 +1462,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "0ada9521-79fb-4aae-9acc-05b9ae78951e"
+                        "e85ed406-50f5-4998-d009-513bb87b4a8c"
                     ]
                 },
                 "currentHeight": 173.421875,
@@ -1481,8 +1481,8 @@
             },
             "data": [
                 {
-                    "tabId": "19a9e183-6096-4917-e85b-c40d19e8bf41",
-                    "resultId": "0ada9521-79fb-4aae-9acc-05b9ae78951e",
+                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
+                    "resultId": "e85ed406-50f5-4998-d009-513bb87b4a8c",
                     "rows": [
                         {
                             "0": "15:00:00",
@@ -1615,7 +1615,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "0aa0edd0-8af4-4b81-b8b1-6b9d926c33fb"
+                        "57d9a562-d43e-41dc-d790-7565d25dbd09"
                     ]
                 },
                 "currentHeight": 36,
@@ -1634,8 +1634,8 @@
             },
             "data": [
                 {
-                    "tabId": "19a9e183-6096-4917-e85b-c40d19e8bf41",
-                    "resultId": "0aa0edd0-8af4-4b81-b8b1-6b9d926c33fb",
+                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
+                    "resultId": "57d9a562-d43e-41dc-d790-7565d25dbd09",
                     "rows": [
                         {
                             "0": "2021-06-21 12:30:00"
@@ -1677,7 +1677,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "a60d2bcc-6dd4-4ed8-a0bf-a37e4775d462"
+                        "2f01e939-6170-4349-f7b2-46d384e91cf1"
                     ]
                 },
                 "currentHeight": 36,
@@ -1696,8 +1696,8 @@
             },
             "data": [
                 {
-                    "tabId": "19a9e183-6096-4917-e85b-c40d19e8bf41",
-                    "resultId": "a60d2bcc-6dd4-4ed8-a0bf-a37e4775d462",
+                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
+                    "resultId": "2f01e939-6170-4349-f7b2-46d384e91cf1",
                     "rows": [
                         {
                             "0": "SYSTEM",
@@ -1763,7 +1763,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "edb051c2-3706-42a9-8bc3-9b891fc92dc7"
+                        "2dbcb652-b767-470f-b741-0ebce8d97669"
                     ]
                 },
                 "currentHeight": 36,
@@ -1782,8 +1782,8 @@
             },
             "data": [
                 {
-                    "tabId": "19a9e183-6096-4917-e85b-c40d19e8bf41",
-                    "resultId": "edb051c2-3706-42a9-8bc3-9b891fc92dc7",
+                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
+                    "resultId": "2dbcb652-b767-470f-b741-0ebce8d97669",
                     "rows": [
                         {
                             "0": "system_time_zone",
@@ -1848,7 +1848,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "c170ec7a-3c22-46a6-fc53-0b847638e8ec"
+                        "2632339e-e939-41e9-816d-3bdd12c7a636"
                     ]
                 },
                 "currentHeight": 36,
@@ -1867,8 +1867,8 @@
             },
             "data": [
                 {
-                    "tabId": "19a9e183-6096-4917-e85b-c40d19e8bf41",
-                    "resultId": "c170ec7a-3c22-46a6-fc53-0b847638e8ec",
+                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
+                    "resultId": "2632339e-e939-41e9-816d-3bdd12c7a636",
                     "rows": [
                         {
                             "0": "time_zone",
@@ -1965,7 +1965,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "2c76503d-5f24-408e-c5dc-d09f53831d8d"
+                        "c1a2b393-4c1d-46de-d366-c996746b00eb"
                     ]
                 },
                 "currentHeight": 36,
@@ -1984,8 +1984,8 @@
             },
             "data": [
                 {
-                    "tabId": "19a9e183-6096-4917-e85b-c40d19e8bf41",
-                    "resultId": "2c76503d-5f24-408e-c5dc-d09f53831d8d",
+                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
+                    "resultId": "c1a2b393-4c1d-46de-d366-c996746b00eb",
                     "rows": [
                         {
                             "0": "2021-11-28 08:00:00",
@@ -2088,7 +2088,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "cddcc067-599c-4959-8767-6db11480b516"
+                        "6e9f5753-980a-4f4b-84ac-9bc821fa68e0"
                     ]
                 },
                 "currentHeight": 36,
@@ -2107,8 +2107,8 @@
             },
             "data": [
                 {
-                    "tabId": "19a9e183-6096-4917-e85b-c40d19e8bf41",
-                    "resultId": "cddcc067-599c-4959-8767-6db11480b516",
+                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
+                    "resultId": "6e9f5753-980a-4f4b-84ac-9bc821fa68e0",
                     "rows": [
                         {
                             "0": "2021-11-28 08:00:00",
@@ -2211,7 +2211,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "d7766b00-a03a-443a-bfa7-a0e747ca9fb3"
+                        "1f574ea4-c5f8-41c7-ff63-2b1f4f429f68"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -2230,8 +2230,8 @@
             },
             "data": [
                 {
-                    "tabId": "19a9e183-6096-4917-e85b-c40d19e8bf41",
-                    "resultId": "d7766b00-a03a-443a-bfa7-a0e747ca9fb3",
+                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
+                    "resultId": "1f574ea4-c5f8-41c7-ff63-2b1f4f429f68",
                     "rows": [
                         {
                             "0": "2024-07-09",
@@ -2299,7 +2299,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "c0170174-4e06-4ee5-c331-60e7ecdf30cd"
+                        "ede6f35e-3e42-4ba8-df0a-35277927145b"
                     ]
                 },
                 "currentHeight": 36,
@@ -2318,8 +2318,8 @@
             },
             "data": [
                 {
-                    "tabId": "19a9e183-6096-4917-e85b-c40d19e8bf41",
-                    "resultId": "c0170174-4e06-4ee5-c331-60e7ecdf30cd",
+                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
+                    "resultId": "ede6f35e-3e42-4ba8-df0a-35277927145b",
                     "rows": [
                         {
                             "0": "2024-07-09",
@@ -2498,7 +2498,7 @@
                         }
                     ]
                 },
-                "currentHeight": 86,
+                "currentHeight": 28,
                 "currentSet": 1,
                 "statements": [
                     {
@@ -2549,7 +2549,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "46136950-db51-43a8-b0ac-50db11926c22"
+                        "9e6f5c1e-00ca-4e15-d1ad-5b66808d6b8c"
                     ]
                 },
                 "currentHeight": 173.421875,
@@ -2568,8 +2568,8 @@
             },
             "data": [
                 {
-                    "tabId": "19a9e183-6096-4917-e85b-c40d19e8bf41",
-                    "resultId": "46136950-db51-43a8-b0ac-50db11926c22",
+                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
+                    "resultId": "9e6f5c1e-00ca-4e15-d1ad-5b66808d6b8c",
                     "rows": [
                         {
                             "0": 1,
@@ -2683,7 +2683,7 @@
                         }
                     ]
                 },
-                "currentHeight": 34,
+                "currentHeight": 28,
                 "currentSet": 1,
                 "statements": [
                     {
@@ -2707,7 +2707,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "acc16dc5-84ec-4aae-989d-8920d3c80244"
+                        "31539df5-0063-498b-8fb1-99b48ca121ad"
                     ]
                 },
                 "currentHeight": 173.421875,
@@ -2726,8 +2726,8 @@
             },
             "data": [
                 {
-                    "tabId": "19a9e183-6096-4917-e85b-c40d19e8bf41",
-                    "resultId": "acc16dc5-84ec-4aae-989d-8920d3c80244",
+                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
+                    "resultId": "31539df5-0063-498b-8fb1-99b48ca121ad",
                     "rows": [
                         {
                             "0": 1,
@@ -2829,6 +2829,2158 @@
             "state": {
                 "start": 111,
                 "end": 111,
+                "language": "mysql",
+                "result": {
+                    "type": "text",
+                    "text": [
+                        {
+                            "type": 4,
+                            "index": 0,
+                            "resultId": "580aaf17-8d85-46b5-c9be-436d1a8b4906",
+                            "content": "OK, 3 rows affected in 16.468ms"
+                        }
+                    ]
+                },
+                "currentHeight": 28,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 32
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": []
+        },
+        {
+            "state": {
+                "start": 112,
+                "end": 112,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "cb98ba87-bcce-4d2a-8fc5-a22d81ce589d"
+                    ]
+                },
+                "currentHeight": 36,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 21
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
+                    "resultId": "cb98ba87-bcce-4d2a-8fc5-a22d81ce589d",
+                    "rows": [
+                        {
+                            "0": 3,
+                            "1": "2024-07-10 12:44:23",
+                            "2": "2024-07-09 19:43:12",
+                            "3": "2024-07-10 12:44:23"
+                        },
+                        {
+                            "0": 7,
+                            "1": "2024-07-10 12:44:23",
+                            "2": "2024-07-09 19:43:12",
+                            "3": "2024-07-10 12:44:23"
+                        },
+                        {
+                            "0": 13,
+                            "1": "2024-07-10 12:44:23",
+                            "2": "2024-07-09 19:43:12",
+                            "3": "2024-07-10 12:44:23"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "val",
+                            "field": "0",
+                            "dataType": {
+                                "type": 4,
+                                "flags": [
+                                    "SIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 10,
+                                "parameterFormatType": "OneOrZero",
+                                "synonyms": [
+                                    "INTEGER",
+                                    "INT4"
+                                ]
+                            },
+                            "inPK": true,
+                            "nullable": false,
+                            "autoIncrement": true
+                        },
+                        {
+                            "title": "ts_both",
+                            "field": "1",
+                            "dataType": {
+                                "type": 26,
+                                "dateTimePrecision": 8,
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": true,
+                            "autoIncrement": false,
+                            "default": "CURRENT_TIMESTAMP"
+                        },
+                        {
+                            "title": "ts_create",
+                            "field": "2",
+                            "dataType": {
+                                "type": 26,
+                                "dateTimePrecision": 8,
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": true,
+                            "autoIncrement": false,
+                            "default": "CURRENT_TIMESTAMP"
+                        },
+                        {
+                            "title": "ts_update",
+                            "field": "3",
+                            "dataType": {
+                                "type": 26,
+                                "dateTimePrecision": 8,
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": true,
+                            "autoIncrement": false,
+                            "default": "CURRENT_TIMESTAMP"
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 3 records retrieved in 0.795ms"
+                    },
+                    "totalRowCount": 3,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT * FROM tsdemo",
+                    "updatable": true,
+                    "fullTableName": "tsdemo"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 113,
+                "end": 113,
+                "language": "mysql",
+                "result": {
+                    "type": "text",
+                    "text": [
+                        {
+                            "type": 4,
+                            "index": 0,
+                            "resultId": "ad4dfc79-1905-4d44-8747-8ee8252eef6f",
+                            "content": "OK, 0 records retrieved in 0s"
+                        }
+                    ]
+                },
+                "currentHeight": 28,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 28
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": []
+        },
+        {
+            "state": {
+                "start": 114,
+                "end": 114,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "aab17f23-443e-4ab2-b7f1-f4f9659bf9a7"
+                    ]
+                },
+                "currentHeight": 173.421875,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 21
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
+                    "resultId": "aab17f23-443e-4ab2-b7f1-f4f9659bf9a7",
+                    "rows": [
+                        {
+                            "0": 3,
+                            "1": "2024-07-10 12:44:23",
+                            "2": "2024-07-09 19:43:12",
+                            "3": "2024-07-10 12:44:23"
+                        },
+                        {
+                            "0": 7,
+                            "1": "2024-07-10 12:44:23",
+                            "2": "2024-07-09 19:43:12",
+                            "3": "2024-07-10 12:44:23"
+                        },
+                        {
+                            "0": 13,
+                            "1": "2024-07-10 12:44:23",
+                            "2": "2024-07-09 19:43:12",
+                            "3": "2024-07-10 12:44:23"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "val",
+                            "field": "0",
+                            "dataType": {
+                                "type": 4,
+                                "flags": [
+                                    "SIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 10,
+                                "parameterFormatType": "OneOrZero",
+                                "synonyms": [
+                                    "INTEGER",
+                                    "INT4"
+                                ]
+                            },
+                            "inPK": true,
+                            "nullable": false,
+                            "autoIncrement": true
+                        },
+                        {
+                            "title": "ts_both",
+                            "field": "1",
+                            "dataType": {
+                                "type": 26,
+                                "dateTimePrecision": 8,
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": true,
+                            "autoIncrement": false,
+                            "default": "CURRENT_TIMESTAMP"
+                        },
+                        {
+                            "title": "ts_create",
+                            "field": "2",
+                            "dataType": {
+                                "type": 26,
+                                "dateTimePrecision": 8,
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": true,
+                            "autoIncrement": false,
+                            "default": "CURRENT_TIMESTAMP"
+                        },
+                        {
+                            "title": "ts_update",
+                            "field": "3",
+                            "dataType": {
+                                "type": 26,
+                                "dateTimePrecision": 8,
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": true,
+                            "autoIncrement": false,
+                            "default": "CURRENT_TIMESTAMP"
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 3 records retrieved in 0s"
+                    },
+                    "totalRowCount": 3,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT * FROM tsdemo",
+                    "updatable": true,
+                    "fullTableName": "tsdemo"
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 115,
+                "end": 115,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "5efe6043-eeda-4ff8-d55b-7deafba21f63"
+                    ]
+                },
+                "currentHeight": 36,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 25
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
+                    "resultId": "5efe6043-eeda-4ff8-d55b-7deafba21f63",
+                    "rows": [
+                        {
+                            "0": "tsdemo",
+                            "1": "CREATE TABLE `tsdemo` (\n  `val` int NOT NULL AUTO_INCREMENT,\n  `ts_both` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  `ts_create` timestamp NULL DEFAULT CURRENT_TIMESTAMP,\n  `ts_update` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  PRIMARY KEY (`val`)\n) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "Table",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "Create Table",
+                            "field": "1",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 6.035ms"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SHOW CREATE TABLE tsdemo",
+                    "updatable": false
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 116,
+                "end": 119,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "252ec936-07a1-409c-bdd6-a75b54204c4e"
+                    ]
+                },
+                "currentHeight": 36,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 233
+                        },
+                        "contentStart": 185,
+                        "state": 3
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
+                    "resultId": "252ec936-07a1-409c-bdd6-a75b54204c4e",
+                    "rows": [
+                        {
+                            "0": "1970-01-01 00:00:00",
+                            "1": "1970-01-01",
+                            "2": "00:00:00"
+                        },
+                        {
+                            "0": "1999-12-31 09:00:00",
+                            "1": "1999-12-31",
+                            "2": "09:00:00"
+                        },
+                        {
+                            "0": "2000-06-04 15:45:30",
+                            "1": "2000-06-04",
+                            "2": "15:45:30"
+                        },
+                        {
+                            "0": "2017-03-16 12:30:15",
+                            "1": "2017-03-16",
+                            "2": "12:30:15"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "dt",
+                            "field": "0",
+                            "dataType": {
+                                "type": 26,
+                                "dateTimePrecision": 8,
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "DATE(dt)",
+                            "field": "1",
+                            "dataType": {
+                                "type": 27,
+                                "needsQuotes": true
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "TIME(dt)",
+                            "field": "2",
+                            "dataType": {
+                                "type": 28,
+                                "dateTimePrecision": 3,
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 4 records retrieved in 10.78ms"
+                    },
+                    "totalRowCount": 4,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "# Extracting parts of Dates or Time\n# Decomposing dates or times using component-extractions functions\n-- DATE() and TIME() extract the date and time component from the temporal value.\nSELECT dt, DATE(dt), TIME(dt) FROM datetime_val;",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 120,
+                "end": 120,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "aa4c40b1-777d-4939-b1c1-3792d29d7ad3"
+                    ]
+                },
+                "currentHeight": 36,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 76
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
+                    "resultId": "aa4c40b1-777d-4939-b1c1-3792d29d7ad3",
+                    "rows": [
+                        {
+                            "0": "1970-01-01 00:00:00",
+                            "1": 1970,
+                            "2": 1,
+                            "3": 0,
+                            "4": 0
+                        },
+                        {
+                            "0": "1999-12-31 09:00:00",
+                            "1": 1999,
+                            "2": 31,
+                            "3": 9,
+                            "4": 0
+                        },
+                        {
+                            "0": "2000-06-04 15:45:30",
+                            "1": 2000,
+                            "2": 4,
+                            "3": 15,
+                            "4": 30
+                        },
+                        {
+                            "0": "2017-03-16 12:30:15",
+                            "1": 2017,
+                            "2": 16,
+                            "3": 12,
+                            "4": 15
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "dt",
+                            "field": "0",
+                            "dataType": {
+                                "type": 26,
+                                "dateTimePrecision": 8,
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "YEAR(dt)",
+                            "field": "1",
+                            "dataType": {
+                                "type": 2,
+                                "flags": [
+                                    "UNSIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 5,
+                                "parameterFormatType": "OneOrZero",
+                                "synonyms": [
+                                    "INT2"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "DAYOFMONTH(dt)",
+                            "field": "2",
+                            "dataType": {
+                                "type": 1,
+                                "flags": [
+                                    "UNSIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 3,
+                                "parameterFormatType": "OneOrZero",
+                                "synonyms": [
+                                    "BOOL",
+                                    "BOOLEAN",
+                                    "INT1"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "HOUR(dt)",
+                            "field": "3",
+                            "dataType": {
+                                "type": 1,
+                                "flags": [
+                                    "UNSIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 3,
+                                "parameterFormatType": "OneOrZero",
+                                "synonyms": [
+                                    "BOOL",
+                                    "BOOLEAN",
+                                    "INT1"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "SECOND(dt)",
+                            "field": "4",
+                            "dataType": {
+                                "type": 1,
+                                "flags": [
+                                    "UNSIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 3,
+                                "parameterFormatType": "OneOrZero",
+                                "synonyms": [
+                                    "BOOL",
+                                    "BOOLEAN",
+                                    "INT1"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 4 records retrieved in 5.641ms"
+                    },
+                    "totalRowCount": 4,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT dt, YEAR(dt), DAYOFMONTH(dt), HOUR(dt), SECOND(dt) from datetime_val",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 121,
+                "end": 121,
+                "language": "mysql",
+                "result": {
+                    "type": "text",
+                    "text": [
+                        {
+                            "type": 4,
+                            "index": 0,
+                            "resultId": "85f3739e-1aca-4702-ea54-3037d2524ce8",
+                            "content": "OK, 0 records retrieved in 9.007ms"
+                        }
+                    ]
+                },
+                "currentHeight": 28,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 46
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": []
+        },
+        {
+            "state": {
+                "start": 122,
+                "end": 122,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "dacc9887-c00d-436a-b259-494ee8bb8606"
+                    ]
+                },
+                "currentHeight": 36,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 132
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
+                    "resultId": "dacc9887-c00d-436a-b259-494ee8bb8606",
+                    "rows": [
+                        {
+                            "0": 22,
+                            "1": 11,
+                            "2": 12,
+                            "3": 201
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "hour",
+                            "field": "0",
+                            "dataType": {
+                                "type": 1,
+                                "flags": [
+                                    "UNSIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 3,
+                                "parameterFormatType": "OneOrZero",
+                                "synonyms": [
+                                    "BOOL",
+                                    "BOOLEAN",
+                                    "INT1"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "minute",
+                            "field": "1",
+                            "dataType": {
+                                "type": 1,
+                                "flags": [
+                                    "UNSIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 3,
+                                "parameterFormatType": "OneOrZero",
+                                "synonyms": [
+                                    "BOOL",
+                                    "BOOLEAN",
+                                    "INT1"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "second",
+                            "field": "2",
+                            "dataType": {
+                                "type": 1,
+                                "flags": [
+                                    "UNSIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 3,
+                                "parameterFormatType": "OneOrZero",
+                                "synonyms": [
+                                    "BOOL",
+                                    "BOOLEAN",
+                                    "INT1"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "microsecond",
+                            "field": "3",
+                            "dataType": {
+                                "type": 4,
+                                "flags": [
+                                    "SIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 10,
+                                "parameterFormatType": "OneOrZero",
+                                "synonyms": [
+                                    "INTEGER",
+                                    "INT4"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 0s"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT HOUR(@date_time) AS hour, MINUTE(@date_time) AS minute, SECOND(@date_time) AS second, MICROSECOND(@date_time) AS microsecond",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 123,
+                "end": 123,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "ff5733d2-9dc3-4bdd-ce16-771088e98ea2"
+                    ]
+                },
+                "currentHeight": 36,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 37
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
+                    "resultId": "ff5733d2-9dc3-4bdd-ce16-771088e98ea2",
+                    "rows": [
+                        {
+                            "0": "1864-02-28",
+                            "1": 59
+                        },
+                        {
+                            "0": "1900-01-15",
+                            "1": 15
+                        },
+                        {
+                            "0": "1999-12-31",
+                            "1": 365
+                        },
+                        {
+                            "0": "2000-06-04",
+                            "1": 156
+                        },
+                        {
+                            "0": "2017-03-16",
+                            "1": 75
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "d",
+                            "field": "0",
+                            "dataType": {
+                                "type": 27,
+                                "needsQuotes": true
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "DAYOFYEAR(d)",
+                            "field": "1",
+                            "dataType": {
+                                "type": 1,
+                                "flags": [
+                                    "UNSIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 3,
+                                "parameterFormatType": "OneOrZero",
+                                "synonyms": [
+                                    "BOOL",
+                                    "BOOLEAN",
+                                    "INT1"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 5 records retrieved in 15.367ms"
+                    },
+                    "totalRowCount": 5,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT d, DAYOFYEAR(d) FROM date_val",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 124,
+                "end": 124,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "31d11c2d-0ec1-4f9f-acba-5f0053e258d3"
+                    ]
+                },
+                "currentHeight": 36,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 57
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
+                    "resultId": "31d11c2d-0ec1-4f9f-acba-5f0053e258d3",
+                    "rows": [
+                        {
+                            "0": "1864-02-28",
+                            "1": "Sunday",
+                            "2": "Sun"
+                        },
+                        {
+                            "0": "1900-01-15",
+                            "1": "Monday",
+                            "2": "Mon"
+                        },
+                        {
+                            "0": "1999-12-31",
+                            "1": "Friday",
+                            "2": "Fri"
+                        },
+                        {
+                            "0": "2000-06-04",
+                            "1": "Sunday",
+                            "2": "Sun"
+                        },
+                        {
+                            "0": "2017-03-16",
+                            "1": "Thursday",
+                            "2": "Thu"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "d",
+                            "field": "0",
+                            "dataType": {
+                                "type": 27,
+                                "needsQuotes": true
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "DAYNAME(d)",
+                            "field": "1",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "DATE_FORMAT(d, '%a')",
+                            "field": "2",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 5 records retrieved in 0s"
+                    },
+                    "totalRowCount": 5,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT d, DAYNAME(d), DATE_FORMAT(d, '%a') FROM date_val",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 125,
+                "end": 125,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "beb20558-34bc-48ab-f837-1980cd9f50fb"
+                    ]
+                },
+                "currentHeight": 36,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 61
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
+                    "resultId": "beb20558-34bc-48ab-f837-1980cd9f50fb",
+                    "rows": [
+                        {
+                            "0": "1864-02-28",
+                            "1": "Sunday",
+                            "2": 1,
+                            "3": 6
+                        },
+                        {
+                            "0": "1900-01-15",
+                            "1": "Monday",
+                            "2": 2,
+                            "3": 0
+                        },
+                        {
+                            "0": "1999-12-31",
+                            "1": "Friday",
+                            "2": 6,
+                            "3": 4
+                        },
+                        {
+                            "0": "2000-06-04",
+                            "1": "Sunday",
+                            "2": 1,
+                            "3": 6
+                        },
+                        {
+                            "0": "2017-03-16",
+                            "1": "Thursday",
+                            "2": 5,
+                            "3": 3
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "d",
+                            "field": "0",
+                            "dataType": {
+                                "type": 27,
+                                "needsQuotes": true
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "DAYNAME(d)",
+                            "field": "1",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "DAYOFWEEK(d)",
+                            "field": "2",
+                            "dataType": {
+                                "type": 4,
+                                "flags": [
+                                    "SIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 10,
+                                "parameterFormatType": "OneOrZero",
+                                "synonyms": [
+                                    "INTEGER",
+                                    "INT4"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "WEEKDAY(d)",
+                            "field": "3",
+                            "dataType": {
+                                "type": 4,
+                                "flags": [
+                                    "SIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 10,
+                                "parameterFormatType": "OneOrZero",
+                                "synonyms": [
+                                    "INTEGER",
+                                    "INT4"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 5 records retrieved in 0s"
+                    },
+                    "totalRowCount": 5,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT d, DAYNAME(d), DAYOFWEEK(d), WEEKDAY(d) FROM date_val",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 126,
+                "end": 127,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "0cd4bd32-a9e2-4fc7-9d40-a98fc96ccb1f"
+                    ]
+                },
+                "currentHeight": 36,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 151
+                        },
+                        "contentStart": 78,
+                        "state": 3
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
+                    "resultId": "0cd4bd32-a9e2-4fc7-9d40-a98fc96ccb1f",
+                    "rows": [
+                        {
+                            "0": "1970-01-01 00:00:00",
+                            "1": 1,
+                            "2": 0
+                        },
+                        {
+                            "0": "1999-12-31 09:00:00",
+                            "1": 31,
+                            "2": 9
+                        },
+                        {
+                            "0": "2000-06-04 15:45:30",
+                            "1": 4,
+                            "2": 15
+                        },
+                        {
+                            "0": "2017-03-16 12:30:15",
+                            "1": 16,
+                            "2": 12
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "dt",
+                            "field": "0",
+                            "dataType": {
+                                "type": 26,
+                                "dateTimePrecision": 8,
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "EXTRACT(DAY FROM dt)",
+                            "field": "1",
+                            "dataType": {
+                                "type": 1,
+                                "flags": [
+                                    "UNSIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 3,
+                                "parameterFormatType": "OneOrZero",
+                                "synonyms": [
+                                    "BOOL",
+                                    "BOOLEAN",
+                                    "INT1"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "EXTRACT(HOUR FROM dt)",
+                            "field": "2",
+                            "dataType": {
+                                "type": 1,
+                                "flags": [
+                                    "UNSIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 3,
+                                "parameterFormatType": "OneOrZero",
+                                "synonyms": [
+                                    "BOOL",
+                                    "BOOLEAN",
+                                    "INT1"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 4 records retrieved in 2.933ms"
+                    },
+                    "totalRowCount": 4,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "-- EXTRACT() Is another function that extract componenet from temporal value.\nSELECT dt, EXTRACT(DAY FROM dt), EXTRACT(HOUR FROM dt) FROM datetime_val;",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 128,
+                "end": 129,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "6d8ac9a6-6b1e-4a9d-c6d1-046a571e3a50"
+                    ]
+                },
+                "currentHeight": 36,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 158
+                        },
+                        "contentStart": 0,
+                        "state": 3
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
+                    "resultId": "6d8ac9a6-6b1e-4a9d-c6d1-046a571e3a50",
+                    "rows": [
+                        {
+                            "0": "2024-07-10",
+                            "1": 2024,
+                            "2": 7,
+                            "3": "July",
+                            "4": 10,
+                            "5": "Wednesday"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "CURDATE()",
+                            "field": "0",
+                            "dataType": {
+                                "type": 27,
+                                "needsQuotes": true
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "year",
+                            "field": "1",
+                            "dataType": {
+                                "type": 2,
+                                "flags": [
+                                    "UNSIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 5,
+                                "parameterFormatType": "OneOrZero",
+                                "synonyms": [
+                                    "INT2"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "month",
+                            "field": "2",
+                            "dataType": {
+                                "type": 1,
+                                "flags": [
+                                    "UNSIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 3,
+                                "parameterFormatType": "OneOrZero",
+                                "synonyms": [
+                                    "BOOL",
+                                    "BOOLEAN",
+                                    "INT1"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "monthname",
+                            "field": "3",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "day",
+                            "field": "4",
+                            "dataType": {
+                                "type": 1,
+                                "flags": [
+                                    "UNSIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 3,
+                                "parameterFormatType": "OneOrZero",
+                                "synonyms": [
+                                    "BOOL",
+                                    "BOOLEAN",
+                                    "INT1"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "dayname",
+                            "field": "5",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 8.223ms"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT CURDATE(), YEAR(CURDATE()) AS year, MONTH(CURDATE()) AS month,\nMONTHNAME(CURDATE()) AS monthname, DAY(CURDATE()) AS day, DAYNAME(CURDATE()) AS dayname;",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 130,
+                "end": 130,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "fddeb8ca-919c-4ab2-a33d-72b9d561024d"
+                    ]
+                },
+                "currentHeight": 36,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 84
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
+                    "resultId": "fddeb8ca-919c-4ab2-a33d-72b9d561024d",
+                    "rows": [
+                        {
+                            "0": "2024-07-10 13:13:06",
+                            "1": 13,
+                            "2": 13,
+                            "3": 6
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "NOW()",
+                            "field": "0",
+                            "dataType": {
+                                "type": 26,
+                                "dateTimePrecision": 8,
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "hour",
+                            "field": "1",
+                            "dataType": {
+                                "type": 1,
+                                "flags": [
+                                    "UNSIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 3,
+                                "parameterFormatType": "OneOrZero",
+                                "synonyms": [
+                                    "BOOL",
+                                    "BOOLEAN",
+                                    "INT1"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "minute",
+                            "field": "2",
+                            "dataType": {
+                                "type": 1,
+                                "flags": [
+                                    "UNSIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 3,
+                                "parameterFormatType": "OneOrZero",
+                                "synonyms": [
+                                    "BOOL",
+                                    "BOOLEAN",
+                                    "INT1"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "second",
+                            "field": "3",
+                            "dataType": {
+                                "type": 1,
+                                "flags": [
+                                    "UNSIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 3,
+                                "parameterFormatType": "OneOrZero",
+                                "synonyms": [
+                                    "BOOL",
+                                    "BOOLEAN",
+                                    "INT1"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 0s"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT NOW(), HOUR(NOW()) as hour, MINUTE(NOW()) as minute, SECOND(NOW()) AS second",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 131,
+                "end": 134,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "0261829e-3633-450b-bb9e-33fbb6107164"
+                    ]
+                },
+                "currentHeight": 36,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 355
+                        },
+                        "contentStart": 164,
+                        "state": 3
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
+                    "resultId": "0261829e-3633-450b-bb9e-33fbb6107164",
+                    "rows": [
+                        {
+                            "0": "1970-01-01 00:00:00",
+                            "1": "1970",
+                            "2": "01",
+                            "3": "00",
+                            "4": "00",
+                            "5": "000000"
+                        },
+                        {
+                            "0": "1999-12-31 09:00:00",
+                            "1": "1999",
+                            "2": "31",
+                            "3": "09",
+                            "4": "00",
+                            "5": "000000"
+                        },
+                        {
+                            "0": "2000-06-04 15:45:30",
+                            "1": "2000",
+                            "2": "04",
+                            "3": "15",
+                            "4": "30",
+                            "5": "000000"
+                        },
+                        {
+                            "0": "2017-03-16 12:30:15",
+                            "1": "2017",
+                            "2": "16",
+                            "3": "12",
+                            "4": "15",
+                            "5": "000000"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "dt",
+                            "field": "0",
+                            "dataType": {
+                                "type": 26,
+                                "dateTimePrecision": 8,
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "year",
+                            "field": "1",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "day",
+                            "field": "2",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "hour",
+                            "field": "3",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "second",
+                            "field": "4",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "microsecond",
+                            "field": "5",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 4 records retrieved in 0s"
+                    },
+                    "totalRowCount": 4,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "# Decomposing Dates or Times using formatting functions.\n-- With DATE_FORMAT() and TIME_FORMAT() function we can extract components by specifying the format string\nSELECT dt, DATE_FORMAT(dt, '%Y') AS year, DATE_FORMAT(dt, '%d') AS day, TIME_FORMAT(dt, '%H') as hour,\nTIME_FORMAT(dt, '%s') AS second, TIME_FORMAT(dt, '%f') AS microsecond FROM datetime_val;",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 135,
+                "end": 135,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "24dddb5b-1ce3-47b9-dc1e-a98b2546159b"
+                    ]
+                },
+                "currentHeight": 206.5625,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 110
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
+                    "resultId": "24dddb5b-1ce3-47b9-dc1e-a98b2546159b",
+                    "rows": [
+                        {
+                            "0": "1970-01-01 00:00:00",
+                            "1": "1970-01-01",
+                            "2": "00:00:00"
+                        },
+                        {
+                            "0": "1999-12-31 09:00:00",
+                            "1": "1999-12-31",
+                            "2": "09:00:00"
+                        },
+                        {
+                            "0": "2000-06-04 15:45:30",
+                            "1": "2000-06-04",
+                            "2": "15:45:30"
+                        },
+                        {
+                            "0": "2017-03-16 12:30:15",
+                            "1": "2017-03-16",
+                            "2": "12:30:15"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "dt",
+                            "field": "0",
+                            "dataType": {
+                                "type": 26,
+                                "dateTimePrecision": 8,
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "date part",
+                            "field": "1",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "time part",
+                            "field": "2",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 4 records retrieved in 0s"
+                    },
+                    "totalRowCount": 4,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT dt, DATE_FORMAT(dt, '%Y-%m-%d') AS `date part`, TIME_FORMAT(dt, '%T') as `time part` FROM datetime_val",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 136,
+                "end": 136,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "ed86e923-256c-43b1-ec77-7173dd2d925d"
+                    ]
+                },
+                "currentHeight": 206.5625,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 123
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
+                    "resultId": "ed86e923-256c-43b1-ec77-7173dd2d925d",
+                    "rows": [
+                        {
+                            "0": "1970-01-01 00:00:00",
+                            "1": "January 1, 1970",
+                            "2": "00:00"
+                        },
+                        {
+                            "0": "1999-12-31 09:00:00",
+                            "1": "December 31, 1999",
+                            "2": "09:00"
+                        },
+                        {
+                            "0": "2000-06-04 15:45:30",
+                            "1": "June 4, 2000",
+                            "2": "15:45"
+                        },
+                        {
+                            "0": "2017-03-16 12:30:15",
+                            "1": "March 16, 2017",
+                            "2": "12:30"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "dt",
+                            "field": "0",
+                            "dataType": {
+                                "type": 26,
+                                "dateTimePrecision": 8,
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "descriptive date",
+                            "field": "1",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "hour/minute",
+                            "field": "2",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 4 records retrieved in 0s"
+                    },
+                    "totalRowCount": 4,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT dt, DATE_FORMAT(dt, '%M %e, %Y') as `descriptive date`, TIME_FORMAT(dt, '%H:%i') as `hour/minute` FROM datetime_val",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 137,
+                "end": 142,
+                "language": "mysql",
+                "result": {
+                    "type": "text",
+                    "text": [
+                        {
+                            "type": 0,
+                            "index": 0,
+                            "content": "ClassicResult.fetch_one: Invalid date value '-05:00:11'\n",
+                            "language": "ansi"
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": ""
+                    }
+                },
+                "currentHeight": 34,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 452
+                        },
+                        "contentStart": 405,
+                        "state": 0
+                    },
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 452,
+                            "length": 5
+                        },
+                        "contentStart": 453,
+                        "state": 0
+                    },
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 457,
+                            "length": 22
+                        },
+                        "contentStart": 457,
+                        "state": 1
+                    }
+                ]
+            },
+            "data": []
+        },
+        {
+            "state": {
+                "start": 143,
+                "end": 143,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "ba3a491e-f98a-4937-a6bb-c7ba14efea70"
+                    ]
+                },
+                "currentHeight": 107.140625,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 46
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "90527e3b-78b4-404d-e178-c5e8102dc549",
+                    "resultId": "ba3a491e-f98a-4937-a6bb-c7ba14efea70",
+                    "rows": [
+                        {
+                            "0": "10:30:58",
+                            "1": "05:00:11"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "MAKETIME(10,30,58)",
+                            "field": "0",
+                            "dataType": {
+                                "type": 28,
+                                "dateTimePrecision": 3,
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "MAKETIME(5, 0, 11)",
+                            "field": "1",
+                            "dataType": {
+                                "type": 28,
+                                "dateTimePrecision": 3,
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 1.001ms"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT MAKETIME(10,30,58), MAKETIME(5, 0, 11)",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 144,
+                "end": 144,
                 "language": "mysql",
                 "currentSet": 1,
                 "statements": [
