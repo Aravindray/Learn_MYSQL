@@ -2,18 +2,18 @@
     "type": "MySQLNotebook",
     "version": "1.0",
     "caption": "Untitled",
-    "content": "USE cookbook;\r\n# Intodruction\r\n-- Mysql has several data type for representing temporal data\r\n# Choosing a Temporal Data type\r\n-- There are DATE, TIME, TIMESTAMP and DATETIME data type for representing temporal data type.\r\n-- Choose an appropirate data type based on characteristics and secification.\r\nSELECT * from time_val;\r\nSELECT * FROM date_val;\r\nSELECT * FROM datetime_val;\r\nSELECT CURTIME(), CURTIME(2), CURTIME(6);\r\n-- Result not displayed as expected\r\n# Using Fractional Seconds support\r\nSELECT POSITION AS POS, no, driver, car, laps, DATE_FORMAT(time, '%H:%i:%s:%f') AS time, points as pts FROM formula1 ORDER BY time;\r\nSELECT * FROM formula1;\r\nSELECT MIN(time) from formula1 into @fastest;\r\nWITH time_gap AS (\r\n SELECT\r\n position,\r\n car,\r\n driver,\r\n time,\r\n TIMESTAMPDIFF(SECOND, time , @fastest) AS seconds\r\n FROM formula1\r\n),\r\nDIFFERENCES AS (\r\n SELECT\r\n position as pos,\r\n driver,\r\n car,\r\n time,\r\n seconds,\r\n MOD(seconds, 60) AS seconds_part,\r\n MOD(seconds, 3600) AS minutes_part\r\n FROM time_gap\r\n)\r\nSELECT\r\n pos,\r\n driver,\r\n time,\r\n CONCAT(\r\n FLOOR(minutes_part / 60), ' min ',\r\n SUBSTRING_INDEX(SUBSTRING_INDEX(seconds_part,'-',2),'-',-1),' secs'\r\n ) AS difference\r\nFROM differences;\r\n-- we will learn more about CTE in recipe 10.18\r\n# Changing MySQL Date Format\r\n-- MySQL support only ISO format for storing dates. But if our date is different format or close to ISO format we can convert it first to ISO format and store it in mysql db.\r\n-- With the help of STR_TO_DATE() function we can convert non-ISO format to ISO format date format.\r\nCREATE TABLE tmp_tbl_5 \r\n(\r\n    date DATE\r\n);\r\nINSERT INTO tmp_tbl_5 VALUES (STR_TO_DATE('May 13, 2007', '%M %d, %Y'));\r\nSELECT * FROM tmp_tbl_5;\r\n-- Mysql display the date and time in ISO format, But we can tell Mysql to display required format using DATE_FORMAT() and TIME_FORMAT() functions.\r\n-- Syntax: DATE_FORMAT(DATE|DATETIME|TIMESTAMP, string specifiers)\r\n-- String specifiers is same as the STR_TO_DATE() supported specifier.\r\nSELECT d, DATE_FORMAT(d, '%M %d, %Y') AS date FROM date_val;\r\nSELECT dt, DATE_FORMAT(dt, '%c/%e/%y %r') AS `Format 1`, DATE_FORMAT(dt, '%M %e, %Y %T') AS `Format 2` FROM datetime_val;\r\nSELECT dt, TIME_FORMAT(dt, '%r'), TIME_FORMAT(dt, '%T') FROM datetime_val;\r\n-- I have created the function from root user login\r\nSELECT t1, time_ampm(t1) FROM time_val;\r\nCREATE TABLE tmp_tbl_6 (ts TIMESTAMP);\r\nINSERT INTO tmp_tbl_6 VALUES('2021-06-21 12:30:00');\r\nSELECT ts FROM tmp_tbl_6;\r\nSELECT @@global.time_zone, @@session.time_zone;\r\n-- To see the system time zone check the global variable\r\nSHOW GLOBAL VARIABLES LIKE 'system_time_zone';\r\n# Setting Server Time Zone\r\nSHOW GLOBAL VARIABLES LIKE 'time_zone';\r\n-- You may choose to set the global time zone variable \r\n-- SET GLOBAL time_zone = '+03:00';\r\n-- once time_zone changed you may verify it SELECT @@global.time_zone, @@session.time_zone;\r\n-- Not understood properly - Recipe 8.5\r\n# Shifting Temporal Value Between Time Zones\r\n-- You have date-and-time value and want to know what it will be in different time zone. User CONVERT_TZ() function\r\n-- Syntax: CONVERT_TZ(date-time, from_time_zone, to_time_zone);\r\nSET @dt = '2021-11-28 08:00:00';\r\nSELECT @dt AS Chicago,\r\nCONVERT_TZ(@dt, 'US/Central', 'Europe/Istanbul') AS Istanbul,\r\nCONVERT_TZ(@dt, 'US/Central', 'Europe/London') AS London,\r\nCONVERT_TZ(@dt, 'US/Central', 'America/Edmonton') AS Edmonton,\r\nCONVERT_TZ(@dt, 'US/Central', 'Australia/Brisbane') AS Brisbane;\r\n-- Preceding statement only work if you store the named timezone in mysql server, so use the UTC offset\r\nSELECT @dt AS Chicago,\r\nCONVERT_TZ(@dt, '-06:00', '+03:00') AS Istanbul,\r\nCONVERT_TZ(@dt, '-06:00', '+00:00') AS London,\r\nCONVERT_TZ(@dt, '-06:00', '-07:00') AS Edmonton,\r\nCONVERT_TZ(@dt, '-06:00', '+10:00') AS Brisbane;\r\n# Determining current date or time\r\n-- You want to know what current date and time, use CURDATE(), CURTIME(), and NOW() functions.\r\n-- If you want to know what UTC date and tiem, Use UTC_DATE(), UTC_TIME(), and UTC_TIMESTAMP() functions.\r\nSELECT CURDATE(), CURTIME(), NOW();\r\nSELECT UTC_DATE(), UTC_TIME(), UTC_TIMESTAMP();\r\n# Using TIMESTAMP, DATETIME to track row modification time\r\n-- TIMESTAMP and DATETIME have DEFAULT CURRENT_TIMESTAMP for new record addition,\r\n-- and ON UPDATE CURRENT_TIMESTAMP for row modification column attirbutes is helpful.\r\nDROP TABLE IF EXISTS tsdemo;\r\nCREATE TABLE tsdemo (\r\nval INT NOT NULL AUTO_INCREMENT PRIMARY KEY,\r\nts_both TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\r\nts_create TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\r\nts_update TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP\r\n) ENGINE=InnoDB;\r\nINSERT INTO tsdemo (val) VALUES (1);\r\nINSERT INTO tsdemo (val) VALUES (5);\r\nINSERT INTO tsdemo (val) VALUES (10);\r\nSELECT * FROM tsdemo;\r\nUPDATE tsdemo SET val = 11 WHERE val = 10;\r\nSELECT * FROM tsdemo;\r\nUPDATE tsdemo SET val = val + 1;\r\nSELECT * FROM tsdemo;\r\nUPDATE tsdemo SET val = val;\r\nSELECT * FROM tsdemo;\r\nSHOW CREATE TABLE tsdemo;\r\n# Extracting parts of Dates or Time\r\n# Decomposing dates or times using component-extractions functions\r\n-- DATE() and TIME() extract the date and time component from the temporal value.\r\nSELECT dt, DATE(dt), TIME(dt) FROM datetime_val;\r\nSELECT dt, YEAR(dt), DAYOFMONTH(dt), HOUR(dt), SECOND(dt) from datetime_val;\r\nSET @date_time = '2021-11-24 22:11:12.000201';\r\nSELECT HOUR(@date_time) AS hour, MINUTE(@date_time) AS minute, SECOND(@date_time) AS second, MICROSECOND(@date_time) AS microsecond;\r\nSELECT d, DAYOFYEAR(d) FROM date_val;\r\nSELECT d, DAYNAME(d), DATE_FORMAT(d, '%a') FROM date_val;\r\nSELECT d, DAYNAME(d), DAYOFWEEK(d), WEEKDAY(d) FROM date_val;\r\n-- EXTRACT() Is another function that extract componenet from temporal value.\r\nSELECT dt, EXTRACT(DAY FROM dt), EXTRACT(HOUR FROM dt) FROM datetime_val;\r\nSELECT CURDATE(), YEAR(CURDATE()) AS year, MONTH(CURDATE()) AS month,\r\nMONTHNAME(CURDATE()) AS monthname, DAY(CURDATE()) AS day, DAYNAME(CURDATE()) AS dayname;\r\nSELECT NOW(), HOUR(NOW()) as hour, MINUTE(NOW()) as minute, SECOND(NOW()) AS second;\r\n# Decomposing Dates or Times using formatting functions.\r\n-- With DATE_FORMAT() and TIME_FORMAT() function we can extract components by specifying the format string\r\nSELECT dt, DATE_FORMAT(dt, '%Y') AS year, DATE_FORMAT(dt, '%d') AS day, TIME_FORMAT(dt, '%H') as hour,\r\nTIME_FORMAT(dt, '%s') AS second, TIME_FORMAT(dt, '%f') AS microsecond FROM datetime_val;\r\nSELECT dt, DATE_FORMAT(dt, '%Y-%m-%d') AS `date part`, TIME_FORMAT(dt, '%T') as `time part` FROM datetime_val;\r\nSELECT dt, DATE_FORMAT(dt, '%M %e, %Y') as `descriptive date`, TIME_FORMAT(dt, '%H:%i') as `hour/minute` FROM datetime_val;\r\n# Synthesizing dates or times from components values\r\n-- Composition Function - MAKETIME() function construct time value from hour, minute and seconds\r\n-- Formatting Function - DATE_FORMAT() and TIME_FORMAT() replace the desire values\r\n-- String Concat - Or pull out part from the date or time component and CONCAT() them.\r\n-- Syntax: MAKETIME(hour, mintue, second) take 3 arguments and return date function.\r\nSELECT MAKETIME(10,30,58), MAKETIME(-5, 0, 11); -- Not working as expected\r\nSELECT MAKETIME(10,30,58), MAKETIME(5, 0, 11);\r\nSELECT d, CONCAT(YEAR(d),'-',MONTH(d),'-01') FROM date_val;\r\nSELECT d, CONCAT(YEAR(d),'-', LPAD(MONTH(d),2,'0'), '-01') FROM date_val;\r\nSELECT t1, CONCAT(LPAD(HOUR(t1), 2, '0'), ':', LPAD(MINUTE(t1),2,'0'),':00') AS combined FROM time_val;\r\nSET @d = '2009-06-03', @t = '16:05:08';\r\nSELECT @d, @t, CONCAT(@d, ' ' , @t);\r\n# Converting between temporal value and basic units\r\n-- To convert between time values and seconds use TIME_TO_SEC() and SEC_TO_TIME() functions.\r\n-- To convert between date values and dates use TO_DAYS() and FROM_DAYS() functions.\r\n-- To convert between date-and-time values and seconds UNIX_TIMESTAMP() and FROM_UNIXTIME() functions.\r\n# Converting times to seconds\r\nSELECT t1, TIME_TO_SEC(t1), SEC_TO_TIME(TIME_TO_SEC(t1)) FROM time_val;\r\nSELECT t1, TIME_TO_SEC(t1) AS `seconds`, TIME_TO_SEC(t1) / 60 AS `minutes`, TIME_TO_SEC(t1) / (60*60) AS `hours`, TIME_TO_SEC(t1) / (24*60*60) AS `days` FROM time_val;\r\n-- Use FLOOR() function if you prefer integer value\r\nSELECT dt,\r\nTIME_TO_SEC(dt) as `time part in seconds`,\r\nSEC_TO_TIME(TIME_TO_SEC(dt)) as `time part as TIME`\r\nFROM datetime_val;\r\n# converting between dates and days\r\nSELECT d,\r\nTO_DAYS(d) AS `Date to Days`,\r\nFROM_DAYS(TO_DAYS(d)) AS `Date to days to Date`\r\nFROM date_val;\r\nSELECT dt,\r\nTO_DAYS(dt) AS `date part in days`,\r\nFROM_DAYS(TO_DAYS(dt)) AS `date part as DATE`\r\nFROM datetime_val;\r\n# Converting between date-and-time values to seconds\r\nSELECT dt,\r\nUNIX_TIMESTAMP(dt) as `seconds`,\r\nFROM_UNIXTIME(UNIX_TIMESTAMP(dt)) as `timestamp`\r\nFROM datetime_val;\r\nSET time_zone = '+00:00';\r\nSELECT dt,\r\nUNIX_TIMESTAMP(dt) as `seconds`,\r\nFROM_UNIXTIME(UNIX_TIMESTAMP(dt)) as `timestamp`\r\nFROM datetime_val;\r\nSELECT CURDATE(), UNIX_TIMESTAMP(CURDATE()), FROM_UNIXTIME(UNIX_TIMESTAMP(CURDATE()));\r\n# Calculating interval between dates or time\r\n# Calculating intervals with temporal difference function\r\n-- Use DATEDIFF() function to calculate days between 2 dates\r\nSET @d1 = '2010-01-01', @d2 = '2009-12-01';\r\nSELECT DATEDIFF(@d1,@d2) AS `d1 - d2`, DATEDIFF(@d2, @d1) AS `d2 - d1`;\r\n-- To calculate interval between time value use TIMEDIFF() function\r\nSET @t1 = '12:00:00', @t2 = '16:30:00';\r\nSELECT TIMEDIFF(@t1, @t2) as `t1 - t2`, TIMEDIFF(@t2, @t1) as `t2 - t1`; -- Check in cmd prmpt\r\nSELECT t1, t2,\r\nTIMEDIFF(t2, t1) AS `t2 - t1 as Time`,\r\nIF(TIMEDIFF(t2, t1) >= 0, '+', '-') AS `sign`,\r\nHOUR(TIMEDIFF(t2, t1)) AS `hours`,\r\nMINUTE(TIMEDIFF(t2, t1)) AS `minute`,\r\nSECOND(TIMEDIFF(t2, t1)) AS `second`\r\nFROM time_val; -- Check in cmd prmpt\r\n-- If you want to work with date-and-time value use TIMESTAMPDIFF() function, It enables you to\r\n-- specify the unit in which interval should be expressed\r\n-- Syntax: TIMESTAMPDIFF(unit, val1, val2)\r\nSET @dt1 = '1900-01-01 00:00:00', @dt2 = '1910-01-01 00:00:00';\r\nSELECT\r\nTIMESTAMPDIFF(MINUTE, @dt1, @dt2) as 'minutes',\r\nTIMESTAMPDIFF(HOUR, @dt1, @dt2) as 'hours',\r\nTIMESTAMPDIFF(DAY, @dt1, @dt2) as 'days',\r\nTIMESTAMPDIFF(WEEK, @dt1, @dt2) as 'weeks',\r\nTIMESTAMPDIFF(YEAR, @dt1, @dt2) as 'years';\r\n",
+    "content": "USE cookbook;\r\n# Intodruction\r\n-- Mysql has several data type for representing temporal data\r\n# Choosing a Temporal Data type\r\n-- There are DATE, TIME, TIMESTAMP and DATETIME data type for representing temporal data type.\r\n-- Choose an appropirate data type based on characteristics and secification.\r\nSELECT * from time_val;\r\nSELECT * FROM date_val;\r\nSELECT * FROM datetime_val;\r\nSELECT CURTIME(), CURTIME(2), CURTIME(6);\r\n-- Result not displayed as expected\r\n# Using Fractional Seconds support\r\nSELECT POSITION AS POS, no, driver, car, laps, DATE_FORMAT(time, '%H:%i:%s:%f') AS time, points as pts FROM formula1 ORDER BY time;\r\nSELECT * FROM formula1;\r\nSELECT MIN(time) from formula1 into @fastest;\r\nWITH time_gap AS (\r\n SELECT\r\n position,\r\n car,\r\n driver,\r\n time,\r\n TIMESTAMPDIFF(SECOND, time , @fastest) AS seconds\r\n FROM formula1\r\n),\r\nDIFFERENCES AS (\r\n SELECT\r\n position as pos,\r\n driver,\r\n car,\r\n time,\r\n seconds,\r\n MOD(seconds, 60) AS seconds_part,\r\n MOD(seconds, 3600) AS minutes_part\r\n FROM time_gap\r\n)\r\nSELECT\r\n pos,\r\n driver,\r\n time,\r\n CONCAT(\r\n FLOOR(minutes_part / 60), ' min ',\r\n SUBSTRING_INDEX(SUBSTRING_INDEX(seconds_part,'-',2),'-',-1),' secs'\r\n ) AS difference\r\nFROM differences;\r\n-- we will learn more about CTE in recipe 10.18\r\n# Changing MySQL Date Format\r\n-- MySQL support only ISO format for storing dates. But if our date is different format or close to ISO format we can convert it first to ISO format and store it in mysql db.\r\n-- With the help of STR_TO_DATE() function we can convert non-ISO format to ISO format date format.\r\nCREATE TABLE tmp_tbl_5 \r\n(\r\n    date DATE\r\n);\r\nINSERT INTO tmp_tbl_5 VALUES (STR_TO_DATE('May 13, 2007', '%M %d, %Y'));\r\nSELECT * FROM tmp_tbl_5;\r\n-- Mysql display the date and time in ISO format, But we can tell Mysql to display required format using DATE_FORMAT() and TIME_FORMAT() functions.\r\n-- Syntax: DATE_FORMAT(DATE|DATETIME|TIMESTAMP, string specifiers)\r\n-- String specifiers is same as the STR_TO_DATE() supported specifier.\r\nSELECT d, DATE_FORMAT(d, '%M %d, %Y') AS date FROM date_val;\r\nSELECT dt, DATE_FORMAT(dt, '%c/%e/%y %r') AS `Format 1`, DATE_FORMAT(dt, '%M %e, %Y %T') AS `Format 2` FROM datetime_val;\r\nSELECT dt, TIME_FORMAT(dt, '%r'), TIME_FORMAT(dt, '%T') FROM datetime_val;\r\n-- I have created the function from root user login\r\nSELECT t1, time_ampm(t1) FROM time_val;\r\nCREATE TABLE tmp_tbl_6 (ts TIMESTAMP);\r\nINSERT INTO tmp_tbl_6 VALUES('2021-06-21 12:30:00');\r\nSELECT ts FROM tmp_tbl_6;\r\nSELECT @@global.time_zone, @@session.time_zone;\r\n-- To see the system time zone check the global variable\r\nSHOW GLOBAL VARIABLES LIKE 'system_time_zone';\r\n# Setting Server Time Zone\r\nSHOW GLOBAL VARIABLES LIKE 'time_zone';\r\n-- You may choose to set the global time zone variable \r\n-- SET GLOBAL time_zone = '+03:00';\r\n-- once time_zone changed you may verify it SELECT @@global.time_zone, @@session.time_zone;\r\n-- Not understood properly - Recipe 8.5\r\n# Shifting Temporal Value Between Time Zones\r\n-- You have date-and-time value and want to know what it will be in different time zone. User CONVERT_TZ() function\r\n-- Syntax: CONVERT_TZ(date-time, from_time_zone, to_time_zone);\r\nSET @dt = '2021-11-28 08:00:00';\r\nSELECT @dt AS Chicago,\r\nCONVERT_TZ(@dt, 'US/Central', 'Europe/Istanbul') AS Istanbul,\r\nCONVERT_TZ(@dt, 'US/Central', 'Europe/London') AS London,\r\nCONVERT_TZ(@dt, 'US/Central', 'America/Edmonton') AS Edmonton,\r\nCONVERT_TZ(@dt, 'US/Central', 'Australia/Brisbane') AS Brisbane;\r\n-- Preceding statement only work if you store the named timezone in mysql server, so use the UTC offset\r\nSELECT @dt AS Chicago,\r\nCONVERT_TZ(@dt, '-06:00', '+03:00') AS Istanbul,\r\nCONVERT_TZ(@dt, '-06:00', '+00:00') AS London,\r\nCONVERT_TZ(@dt, '-06:00', '-07:00') AS Edmonton,\r\nCONVERT_TZ(@dt, '-06:00', '+10:00') AS Brisbane;\r\n# Determining current date or time\r\n-- You want to know what current date and time, use CURDATE(), CURTIME(), and NOW() functions.\r\n-- If you want to know what UTC date and tiem, Use UTC_DATE(), UTC_TIME(), and UTC_TIMESTAMP() functions.\r\nSELECT CURDATE(), CURTIME(), NOW();\r\nSELECT UTC_DATE(), UTC_TIME(), UTC_TIMESTAMP();\r\n# Using TIMESTAMP, DATETIME to track row modification time\r\n-- TIMESTAMP and DATETIME have DEFAULT CURRENT_TIMESTAMP for new record addition,\r\n-- and ON UPDATE CURRENT_TIMESTAMP for row modification column attirbutes is helpful.\r\nDROP TABLE IF EXISTS tsdemo;\r\nCREATE TABLE tsdemo (\r\nval INT NOT NULL AUTO_INCREMENT PRIMARY KEY,\r\nts_both TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\r\nts_create TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\r\nts_update TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP\r\n) ENGINE=InnoDB;\r\nINSERT INTO tsdemo (val) VALUES (1);\r\nINSERT INTO tsdemo (val) VALUES (5);\r\nINSERT INTO tsdemo (val) VALUES (10);\r\nSELECT * FROM tsdemo;\r\nUPDATE tsdemo SET val = 11 WHERE val = 10;\r\nSELECT * FROM tsdemo;\r\nUPDATE tsdemo SET val = val + 1;\r\nSELECT * FROM tsdemo;\r\nUPDATE tsdemo SET val = val;\r\nSELECT * FROM tsdemo;\r\nSHOW CREATE TABLE tsdemo;\r\n# Extracting parts of Dates or Time\r\n# Decomposing dates or times using component-extractions functions\r\n-- DATE() and TIME() extract the date and time component from the temporal value.\r\nSELECT dt, DATE(dt), TIME(dt) FROM datetime_val;\r\nSELECT dt, YEAR(dt), DAYOFMONTH(dt), HOUR(dt), SECOND(dt) from datetime_val;\r\nSET @date_time = '2021-11-24 22:11:12.000201';\r\nSELECT HOUR(@date_time) AS hour, MINUTE(@date_time) AS minute, SECOND(@date_time) AS second, MICROSECOND(@date_time) AS microsecond;\r\nSELECT d, DAYOFYEAR(d) FROM date_val;\r\nSELECT d, DAYNAME(d), DATE_FORMAT(d, '%a') FROM date_val;\r\nSELECT d, DAYNAME(d), DAYOFWEEK(d), WEEKDAY(d) FROM date_val;\r\n-- EXTRACT() Is another function that extract componenet from temporal value.\r\nSELECT dt, EXTRACT(DAY FROM dt), EXTRACT(HOUR FROM dt) FROM datetime_val;\r\nSELECT CURDATE(), YEAR(CURDATE()) AS year, MONTH(CURDATE()) AS month,\r\nMONTHNAME(CURDATE()) AS monthname, DAY(CURDATE()) AS day, DAYNAME(CURDATE()) AS dayname;\r\nSELECT NOW(), HOUR(NOW()) as hour, MINUTE(NOW()) as minute, SECOND(NOW()) AS second;\r\n# Decomposing Dates or Times using formatting functions.\r\n-- With DATE_FORMAT() and TIME_FORMAT() function we can extract components by specifying the format string\r\nSELECT dt, DATE_FORMAT(dt, '%Y') AS year, DATE_FORMAT(dt, '%d') AS day, TIME_FORMAT(dt, '%H') as hour,\r\nTIME_FORMAT(dt, '%s') AS second, TIME_FORMAT(dt, '%f') AS microsecond FROM datetime_val;\r\nSELECT dt, DATE_FORMAT(dt, '%Y-%m-%d') AS `date part`, TIME_FORMAT(dt, '%T') as `time part` FROM datetime_val;\r\nSELECT dt, DATE_FORMAT(dt, '%M %e, %Y') as `descriptive date`, TIME_FORMAT(dt, '%H:%i') as `hour/minute` FROM datetime_val;\r\n# Synthesizing dates or times from components values\r\n-- Composition Function - MAKETIME() function construct time value from hour, minute and seconds\r\n-- Formatting Function - DATE_FORMAT() and TIME_FORMAT() replace the desire values\r\n-- String Concat - Or pull out part from the date or time component and CONCAT() them.\r\n-- Syntax: MAKETIME(hour, mintue, second) take 3 arguments and return date function.\r\nSELECT MAKETIME(10,30,58), MAKETIME(-5, 0, 11); -- Not working as expected\r\nSELECT MAKETIME(10,30,58), MAKETIME(5, 0, 11);\r\nSELECT d, CONCAT(YEAR(d),'-',MONTH(d),'-01') FROM date_val;\r\nSELECT d, CONCAT(YEAR(d),'-', LPAD(MONTH(d),2,'0'), '-01') FROM date_val;\r\nSELECT t1, CONCAT(LPAD(HOUR(t1), 2, '0'), ':', LPAD(MINUTE(t1),2,'0'),':00') AS combined FROM time_val;\r\nSET @d = '2009-06-03', @t = '16:05:08';\r\nSELECT @d, @t, CONCAT(@d, ' ' , @t);\r\n# Converting between temporal value and basic units\r\n-- To convert between time values and seconds use TIME_TO_SEC() and SEC_TO_TIME() functions.\r\n-- To convert between date values and dates use TO_DAYS() and FROM_DAYS() functions.\r\n-- To convert between date-and-time values and seconds UNIX_TIMESTAMP() and FROM_UNIXTIME() functions.\r\n# Converting times to seconds\r\nSELECT t1, TIME_TO_SEC(t1), SEC_TO_TIME(TIME_TO_SEC(t1)) FROM time_val;\r\nSELECT t1, TIME_TO_SEC(t1) AS `seconds`, TIME_TO_SEC(t1) / 60 AS `minutes`, TIME_TO_SEC(t1) / (60*60) AS `hours`, TIME_TO_SEC(t1) / (24*60*60) AS `days` FROM time_val;\r\n-- Use FLOOR() function if you prefer integer value\r\nSELECT dt,\r\nTIME_TO_SEC(dt) as `time part in seconds`,\r\nSEC_TO_TIME(TIME_TO_SEC(dt)) as `time part as TIME`\r\nFROM datetime_val;\r\n# converting between dates and days\r\nSELECT d,\r\nTO_DAYS(d) AS `Date to Days`,\r\nFROM_DAYS(TO_DAYS(d)) AS `Date to days to Date`\r\nFROM date_val;\r\nSELECT dt,\r\nTO_DAYS(dt) AS `date part in days`,\r\nFROM_DAYS(TO_DAYS(dt)) AS `date part as DATE`\r\nFROM datetime_val;\r\n# Converting between date-and-time values to seconds\r\nSELECT dt,\r\nUNIX_TIMESTAMP(dt) as `seconds`,\r\nFROM_UNIXTIME(UNIX_TIMESTAMP(dt)) as `timestamp`\r\nFROM datetime_val;\r\nSET time_zone = '+00:00';\r\nSELECT dt,\r\nUNIX_TIMESTAMP(dt) as `seconds`,\r\nFROM_UNIXTIME(UNIX_TIMESTAMP(dt)) as `timestamp`\r\nFROM datetime_val;\r\nSELECT CURDATE(), UNIX_TIMESTAMP(CURDATE()), FROM_UNIXTIME(UNIX_TIMESTAMP(CURDATE()));\r\n# Calculating interval between dates or time\r\n# Calculating intervals with temporal difference function\r\n-- Use DATEDIFF() function to calculate days between 2 dates\r\nSET @d1 = '2010-01-01', @d2 = '2009-12-01';\r\nSELECT DATEDIFF(@d1,@d2) AS `d1 - d2`, DATEDIFF(@d2, @d1) AS `d2 - d1`;\r\n-- To calculate interval between time value use TIMEDIFF() function\r\nSET @t1 = '12:00:00', @t2 = '16:30:00';\r\nSELECT TIMEDIFF(@t1, @t2) as `t1 - t2`, TIMEDIFF(@t2, @t1) as `t2 - t1`; -- Check in cmd prmpt\r\nSELECT t1, t2,\r\nTIMEDIFF(t2, t1) AS `t2 - t1 as Time`,\r\nIF(TIMEDIFF(t2, t1) >= 0, '+', '-') AS `sign`,\r\nHOUR(TIMEDIFF(t2, t1)) AS `hours`,\r\nMINUTE(TIMEDIFF(t2, t1)) AS `minute`,\r\nSECOND(TIMEDIFF(t2, t1)) AS `second`\r\nFROM time_val; -- Check in cmd prmpt\r\n-- If you want to work with date-and-time value use TIMESTAMPDIFF() function, It enables you to\r\n-- specify the unit in which interval should be expressed\r\n-- Syntax: TIMESTAMPDIFF(unit, val1, val2)\r\nSET @dt1 = '1900-01-01 00:00:00', @dt2 = '1910-01-01 00:00:00';\r\nSELECT\r\nTIMESTAMPDIFF(MINUTE, @dt1, @dt2) as 'minutes',\r\nTIMESTAMPDIFF(HOUR, @dt1, @dt2) as 'hours',\r\nTIMESTAMPDIFF(DAY, @dt1, @dt2) as 'days',\r\nTIMESTAMPDIFF(WEEK, @dt1, @dt2) as 'weeks',\r\nTIMESTAMPDIFF(YEAR, @dt1, @dt2) as 'years';\r\n# Time interval calculation using basic unit\r\nSELECT t1, t2, TIME_TO_SEC(t2) - TIME_TO_SEC(t1) as `t2 - t1`, \r\nSEC_TO_TIME(TIME_TO_SEC(t2) - TIME_TO_SEC(t1)) as `t2 - t1 (as time)`\r\n/*, TIMESTAMPDIFF(SECOND, t2, t1)*/\r\nFROM time_val; -- check it in cmd prompt\r\n# Date or date-and-time interval calculation using basic unit\r\nSET @days = TO_DAYS('1884-01-01') - TO_DAYS('1883-06-05');\r\nSELECT @days AS days, @days/7 AS Weeks;\r\nSET @dt1 = '1984-01-01 09:00:00';\r\nSET @dt2 = @dt1 + INTERVAL 14 DAY;\r\nSET @interval = UNIX_TIMESTAMP(@dt2) - UNIX_TIMESTAMP(@dt1);\r\nSELECT @interval as seconds, FLOOR(@interval / 60) as minutes, FLOOR(@interval / (60 * 60)) as hours,\r\nFLOOR(@interval / (24 * 60 * 60)) as days, FLOOR(@interval / (7 * 24 * 60 * 60)) as weeks;\r\n",
     "options": {},
     "viewState": {
         "cursorState": [
             {
                 "inSelectionMode": false,
                 "selectionStart": {
-                    "lineNumber": 206,
+                    "lineNumber": 219,
                     "column": 1
                 },
                 "position": {
-                    "lineNumber": 206,
+                    "lineNumber": 219,
                     "column": 1
                 }
             }
@@ -21,10 +21,10 @@
         "viewState": {
             "scrollLeft": 0,
             "firstPosition": {
-                "lineNumber": 189,
+                "lineNumber": 210,
                 "column": 1
             },
-            "firstPositionDeltaTop": -17
+            "firstPositionDeltaTop": -8
         },
         "contributionsState": {
             "editor.contrib.folding": {},
@@ -43,8 +43,8 @@
                         {
                             "type": 4,
                             "index": 0,
-                            "resultId": "ac59964b-7590-486e-eb17-20db170057a4",
-                            "content": "OK, 0 records retrieved in 14.772ms"
+                            "resultId": "4c4b2ce5-5acc-4943-dcac-42449c1c5c9a",
+                            "content": "OK, 0 records retrieved in 1.003ms"
                         }
                     ]
                 },
@@ -72,7 +72,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "59893879-00a9-4f3c-a657-1bf76b175ea1"
+                        "6ccaf688-319f-4e71-fd1c-cb90aee190f6"
                     ]
                 },
                 "currentHeight": 36,
@@ -91,8 +91,8 @@
             },
             "data": [
                 {
-                    "tabId": "0c2c7cb4-86cd-4f53-f933-98754f9c3175",
-                    "resultId": "59893879-00a9-4f3c-a657-1bf76b175ea1",
+                    "tabId": "cf9a7fc9-4489-4c4d-c284-13a0edbbe456",
+                    "resultId": "6ccaf688-319f-4e71-fd1c-cb90aee190f6",
                     "rows": [
                         {
                             "0": 1,
@@ -181,7 +181,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "92496db7-a03f-4dfd-dd76-247fc697683a"
+                        "90031adf-90a0-4d42-ebd3-5542f82eaf41"
                     ]
                 },
                 "currentHeight": 36,
@@ -200,8 +200,8 @@
             },
             "data": [
                 {
-                    "tabId": "0c2c7cb4-86cd-4f53-f933-98754f9c3175",
-                    "resultId": "92496db7-a03f-4dfd-dd76-247fc697683a",
+                    "tabId": "cf9a7fc9-4489-4c4d-c284-13a0edbbe456",
+                    "resultId": "90031adf-90a0-4d42-ebd3-5542f82eaf41",
                     "rows": [
                         {
                             "0": "1864-02-28"
@@ -253,7 +253,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "44b202e0-c4e6-4bae-89b1-1bdf7612fb43"
+                        "e6c26f61-6fa3-42e1-8681-5a998a6032a2"
                     ]
                 },
                 "currentHeight": 36,
@@ -272,8 +272,8 @@
             },
             "data": [
                 {
-                    "tabId": "0c2c7cb4-86cd-4f53-f933-98754f9c3175",
-                    "resultId": "44b202e0-c4e6-4bae-89b1-1bdf7612fb43",
+                    "tabId": "cf9a7fc9-4489-4c4d-c284-13a0edbbe456",
+                    "resultId": "e6c26f61-6fa3-42e1-8681-5a998a6032a2",
                     "rows": [
                         {
                             "0": "1970-01-01 00:00:00"
@@ -324,7 +324,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "265161ba-3bc8-4bff-e272-491712a40668"
+                        "38c574dd-2df7-446b-f48f-ad238384f774"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -343,8 +343,8 @@
             },
             "data": [
                 {
-                    "tabId": "0c2c7cb4-86cd-4f53-f933-98754f9c3175",
-                    "resultId": "265161ba-3bc8-4bff-e272-491712a40668",
+                    "tabId": "cf9a7fc9-4489-4c4d-c284-13a0edbbe456",
+                    "resultId": "38c574dd-2df7-446b-f48f-ad238384f774",
                     "rows": [
                         {
                             "0": "12:23:41",
@@ -414,7 +414,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "f36e30a3-0bdf-4b9c-d916-5e54b5fb0eaa"
+                        "1299c470-5470-45f0-d9ae-b4b49190282f"
                     ]
                 },
                 "currentHeight": 36,
@@ -433,8 +433,8 @@
             },
             "data": [
                 {
-                    "tabId": "0c2c7cb4-86cd-4f53-f933-98754f9c3175",
-                    "resultId": "f36e30a3-0bdf-4b9c-d916-5e54b5fb0eaa",
+                    "tabId": "cf9a7fc9-4489-4c4d-c284-13a0edbbe456",
+                    "resultId": "1299c470-5470-45f0-d9ae-b4b49190282f",
                     "rows": [
                         {
                             "0": 1,
@@ -619,7 +619,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "796bcb85-8a2e-48f0-fbc4-e6cb871848fd"
+                        "5e0ce41d-bd12-4694-f9f3-1a44274cf324"
                     ]
                 },
                 "currentHeight": 36,
@@ -638,8 +638,8 @@
             },
             "data": [
                 {
-                    "tabId": "0c2c7cb4-86cd-4f53-f933-98754f9c3175",
-                    "resultId": "796bcb85-8a2e-48f0-fbc4-e6cb871848fd",
+                    "tabId": "cf9a7fc9-4489-4c4d-c284-13a0edbbe456",
+                    "resultId": "5e0ce41d-bd12-4694-f9f3-1a44274cf324",
                     "rows": [
                         {
                             "0": 1,
@@ -881,7 +881,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "64fc5447-0898-45fa-e484-5e6d73a8a18a"
+                        "460cc143-7002-42ef-aada-32be702b295c"
                     ]
                 },
                 "currentHeight": 173.421875,
@@ -900,8 +900,8 @@
             },
             "data": [
                 {
-                    "tabId": "0c2c7cb4-86cd-4f53-f933-98754f9c3175",
-                    "resultId": "64fc5447-0898-45fa-e484-5e6d73a8a18a",
+                    "tabId": "cf9a7fc9-4489-4c4d-c284-13a0edbbe456",
+                    "resultId": "460cc143-7002-42ef-aada-32be702b295c",
                     "rows": [
                         {
                             "0": 1,
@@ -1077,7 +1077,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "38a6cb66-95a6-41a9-d65e-0c8e97ee254f"
+                        "f5becf46-afb7-49ce-b59a-1b414881cd5f"
                     ]
                 },
                 "currentHeight": 36,
@@ -1096,8 +1096,8 @@
             },
             "data": [
                 {
-                    "tabId": "0c2c7cb4-86cd-4f53-f933-98754f9c3175",
-                    "resultId": "38a6cb66-95a6-41a9-d65e-0c8e97ee254f",
+                    "tabId": "cf9a7fc9-4489-4c4d-c284-13a0edbbe456",
+                    "resultId": "f5becf46-afb7-49ce-b59a-1b414881cd5f",
                     "rows": [
                         {
                             "0": "2007-05-13"
@@ -1137,7 +1137,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "f73c99e8-8915-40ff-91f0-ab06ccd5868e"
+                        "d1c5b25c-389d-4d5f-db22-816812fb2375"
                     ]
                 },
                 "currentHeight": 239.703125,
@@ -1156,8 +1156,8 @@
             },
             "data": [
                 {
-                    "tabId": "0c2c7cb4-86cd-4f53-f933-98754f9c3175",
-                    "resultId": "f73c99e8-8915-40ff-91f0-ab06ccd5868e",
+                    "tabId": "cf9a7fc9-4489-4c4d-c284-13a0edbbe456",
+                    "resultId": "d1c5b25c-389d-4d5f-db22-816812fb2375",
                     "rows": [
                         {
                             "0": "1864-02-28",
@@ -1232,7 +1232,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "a279f3b7-7ccb-4acf-d90c-e520ca92d020"
+                        "325d656d-e451-4fbe-d320-66ddbf886dcf"
                     ]
                 },
                 "currentHeight": 206.5625,
@@ -1251,8 +1251,8 @@
             },
             "data": [
                 {
-                    "tabId": "0c2c7cb4-86cd-4f53-f933-98754f9c3175",
-                    "resultId": "a279f3b7-7ccb-4acf-d90c-e520ca92d020",
+                    "tabId": "cf9a7fc9-4489-4c4d-c284-13a0edbbe456",
+                    "resultId": "325d656d-e451-4fbe-d320-66ddbf886dcf",
                     "rows": [
                         {
                             "0": "1970-01-01 00:00:00",
@@ -1347,7 +1347,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "cda84b9c-bb41-4954-b88f-cc04a9702bb0"
+                        "592b8e13-7e78-40d7-8cc9-81b395159917"
                     ]
                 },
                 "currentHeight": 206.5625,
@@ -1366,8 +1366,8 @@
             },
             "data": [
                 {
-                    "tabId": "0c2c7cb4-86cd-4f53-f933-98754f9c3175",
-                    "resultId": "cda84b9c-bb41-4954-b88f-cc04a9702bb0",
+                    "tabId": "cf9a7fc9-4489-4c4d-c284-13a0edbbe456",
+                    "resultId": "592b8e13-7e78-40d7-8cc9-81b395159917",
                     "rows": [
                         {
                             "0": "1970-01-01 00:00:00",
@@ -1462,7 +1462,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "d8e9ccfb-3561-48e4-a94f-58d00afcb01d"
+                        "1543e007-5383-4135-ce24-669add40d8be"
                     ]
                 },
                 "currentHeight": 173.421875,
@@ -1481,8 +1481,8 @@
             },
             "data": [
                 {
-                    "tabId": "0c2c7cb4-86cd-4f53-f933-98754f9c3175",
-                    "resultId": "d8e9ccfb-3561-48e4-a94f-58d00afcb01d",
+                    "tabId": "cf9a7fc9-4489-4c4d-c284-13a0edbbe456",
+                    "resultId": "1543e007-5383-4135-ce24-669add40d8be",
                     "rows": [
                         {
                             "0": "15:00:00",
@@ -1615,7 +1615,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "90c1bcbf-0fad-496b-9824-806434101181"
+                        "aec4f946-38eb-493c-c104-6427500672f6"
                     ]
                 },
                 "currentHeight": 36,
@@ -1634,8 +1634,8 @@
             },
             "data": [
                 {
-                    "tabId": "0c2c7cb4-86cd-4f53-f933-98754f9c3175",
-                    "resultId": "90c1bcbf-0fad-496b-9824-806434101181",
+                    "tabId": "cf9a7fc9-4489-4c4d-c284-13a0edbbe456",
+                    "resultId": "aec4f946-38eb-493c-c104-6427500672f6",
                     "rows": [
                         {
                             "0": "2021-06-21 12:30:00"
@@ -1677,7 +1677,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "d790e751-ff70-4e48-d5b5-16c72b90f12a"
+                        "9c8f77b3-1c56-42c3-fe69-6ab22822df9e"
                     ]
                 },
                 "currentHeight": 36,
@@ -1696,8 +1696,8 @@
             },
             "data": [
                 {
-                    "tabId": "0c2c7cb4-86cd-4f53-f933-98754f9c3175",
-                    "resultId": "d790e751-ff70-4e48-d5b5-16c72b90f12a",
+                    "tabId": "cf9a7fc9-4489-4c4d-c284-13a0edbbe456",
+                    "resultId": "9c8f77b3-1c56-42c3-fe69-6ab22822df9e",
                     "rows": [
                         {
                             "0": "SYSTEM",
@@ -1763,7 +1763,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "8e0c24ea-fd8e-445a-c879-f144bdd175af"
+                        "77076ee4-0092-464c-f523-bfb112ecc674"
                     ]
                 },
                 "currentHeight": 36,
@@ -1782,8 +1782,8 @@
             },
             "data": [
                 {
-                    "tabId": "0c2c7cb4-86cd-4f53-f933-98754f9c3175",
-                    "resultId": "8e0c24ea-fd8e-445a-c879-f144bdd175af",
+                    "tabId": "cf9a7fc9-4489-4c4d-c284-13a0edbbe456",
+                    "resultId": "77076ee4-0092-464c-f523-bfb112ecc674",
                     "rows": [
                         {
                             "0": "system_time_zone",
@@ -1848,7 +1848,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "aebc5f7f-dfc0-4c54-9754-c4463fee58d7"
+                        "aed22286-0cb5-4b82-8f7f-0e99c3ab83a3"
                     ]
                 },
                 "currentHeight": 36,
@@ -1867,8 +1867,8 @@
             },
             "data": [
                 {
-                    "tabId": "0c2c7cb4-86cd-4f53-f933-98754f9c3175",
-                    "resultId": "aebc5f7f-dfc0-4c54-9754-c4463fee58d7",
+                    "tabId": "cf9a7fc9-4489-4c4d-c284-13a0edbbe456",
+                    "resultId": "aed22286-0cb5-4b82-8f7f-0e99c3ab83a3",
                     "rows": [
                         {
                             "0": "time_zone",
@@ -1965,7 +1965,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "3a0378d5-cb34-4ae2-ee36-2c6407eac307"
+                        "42b0f04b-6537-47cb-bb79-64bb417c801c"
                     ]
                 },
                 "currentHeight": 36,
@@ -1984,8 +1984,8 @@
             },
             "data": [
                 {
-                    "tabId": "0c2c7cb4-86cd-4f53-f933-98754f9c3175",
-                    "resultId": "3a0378d5-cb34-4ae2-ee36-2c6407eac307",
+                    "tabId": "cf9a7fc9-4489-4c4d-c284-13a0edbbe456",
+                    "resultId": "42b0f04b-6537-47cb-bb79-64bb417c801c",
                     "rows": [
                         {
                             "0": "2021-11-28 08:00:00",
@@ -2088,7 +2088,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "20559a8e-7914-4c38-e14f-2e30467b8e28"
+                        "b18eee9b-c7a0-4ee2-a89b-a4de02b275a0"
                     ]
                 },
                 "currentHeight": 36,
@@ -2107,8 +2107,8 @@
             },
             "data": [
                 {
-                    "tabId": "0c2c7cb4-86cd-4f53-f933-98754f9c3175",
-                    "resultId": "20559a8e-7914-4c38-e14f-2e30467b8e28",
+                    "tabId": "cf9a7fc9-4489-4c4d-c284-13a0edbbe456",
+                    "resultId": "b18eee9b-c7a0-4ee2-a89b-a4de02b275a0",
                     "rows": [
                         {
                             "0": "2021-11-28 08:00:00",
@@ -2211,7 +2211,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "faa0cbc1-50ea-4088-c250-e3f872161b64"
+                        "3fd3551c-8af6-43a9-928c-67713a5902b0"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -2230,8 +2230,8 @@
             },
             "data": [
                 {
-                    "tabId": "0c2c7cb4-86cd-4f53-f933-98754f9c3175",
-                    "resultId": "faa0cbc1-50ea-4088-c250-e3f872161b64",
+                    "tabId": "cf9a7fc9-4489-4c4d-c284-13a0edbbe456",
+                    "resultId": "3fd3551c-8af6-43a9-928c-67713a5902b0",
                     "rows": [
                         {
                             "0": "2024-07-09",
@@ -2299,7 +2299,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "2105e64c-fb92-4997-cfcf-394f7d0c51b0"
+                        "93734a6e-9cd5-46ee-b152-840dea8a2a4e"
                     ]
                 },
                 "currentHeight": 36,
@@ -2318,8 +2318,8 @@
             },
             "data": [
                 {
-                    "tabId": "0c2c7cb4-86cd-4f53-f933-98754f9c3175",
-                    "resultId": "2105e64c-fb92-4997-cfcf-394f7d0c51b0",
+                    "tabId": "cf9a7fc9-4489-4c4d-c284-13a0edbbe456",
+                    "resultId": "93734a6e-9cd5-46ee-b152-840dea8a2a4e",
                     "rows": [
                         {
                             "0": "2024-07-09",
@@ -2549,7 +2549,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "65ee6254-4c5c-42ef-c3a5-9958722b40f9"
+                        "28e979a8-40d3-4c16-80e4-6d85bfc7ca35"
                     ]
                 },
                 "currentHeight": 173.421875,
@@ -2568,8 +2568,8 @@
             },
             "data": [
                 {
-                    "tabId": "0c2c7cb4-86cd-4f53-f933-98754f9c3175",
-                    "resultId": "65ee6254-4c5c-42ef-c3a5-9958722b40f9",
+                    "tabId": "cf9a7fc9-4489-4c4d-c284-13a0edbbe456",
+                    "resultId": "28e979a8-40d3-4c16-80e4-6d85bfc7ca35",
                     "rows": [
                         {
                             "0": 1,
@@ -2707,7 +2707,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "606ad11a-d62b-419b-c9f8-65cea986bc3b"
+                        "91ab9273-4745-46a9-8c53-0404f4abdb81"
                     ]
                 },
                 "currentHeight": 173.421875,
@@ -2726,8 +2726,8 @@
             },
             "data": [
                 {
-                    "tabId": "0c2c7cb4-86cd-4f53-f933-98754f9c3175",
-                    "resultId": "606ad11a-d62b-419b-c9f8-65cea986bc3b",
+                    "tabId": "cf9a7fc9-4489-4c4d-c284-13a0edbbe456",
+                    "resultId": "91ab9273-4745-46a9-8c53-0404f4abdb81",
                     "rows": [
                         {
                             "0": 1,
@@ -2865,7 +2865,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "4cedb8ac-b1ce-450d-f9d2-b510fd9fe9da"
+                        "2e2e36d3-ac41-482d-ee4e-7151f81095d5"
                     ]
                 },
                 "currentHeight": 36,
@@ -2884,8 +2884,8 @@
             },
             "data": [
                 {
-                    "tabId": "0c2c7cb4-86cd-4f53-f933-98754f9c3175",
-                    "resultId": "4cedb8ac-b1ce-450d-f9d2-b510fd9fe9da",
+                    "tabId": "cf9a7fc9-4489-4c4d-c284-13a0edbbe456",
+                    "resultId": "2e2e36d3-ac41-482d-ee4e-7151f81095d5",
                     "rows": [
                         {
                             "0": 3,
@@ -3023,7 +3023,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "6293e739-0427-4b40-de26-37bb36e99e53"
+                        "5fd22dd0-8650-4eb6-ebb9-85f821c93b55"
                     ]
                 },
                 "currentHeight": 173.421875,
@@ -3042,8 +3042,8 @@
             },
             "data": [
                 {
-                    "tabId": "0c2c7cb4-86cd-4f53-f933-98754f9c3175",
-                    "resultId": "6293e739-0427-4b40-de26-37bb36e99e53",
+                    "tabId": "cf9a7fc9-4489-4c4d-c284-13a0edbbe456",
+                    "resultId": "5fd22dd0-8650-4eb6-ebb9-85f821c93b55",
                     "rows": [
                         {
                             "0": 3,
@@ -3149,7 +3149,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "de8f37da-8f09-4748-fc16-a26cfececd60"
+                        "83295cec-09ac-4d83-a3cf-35087509c409"
                     ]
                 },
                 "currentHeight": 36,
@@ -3168,8 +3168,8 @@
             },
             "data": [
                 {
-                    "tabId": "0c2c7cb4-86cd-4f53-f933-98754f9c3175",
-                    "resultId": "de8f37da-8f09-4748-fc16-a26cfececd60",
+                    "tabId": "cf9a7fc9-4489-4c4d-c284-13a0edbbe456",
+                    "resultId": "83295cec-09ac-4d83-a3cf-35087509c409",
                     "rows": [
                         {
                             "0": "tsdemo",
@@ -3234,7 +3234,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "f7d70073-4ace-4839-aa81-7334f975078b"
+                        "17bbc069-2767-40ac-dd81-f5d0e9dc8107"
                     ]
                 },
                 "currentHeight": 36,
@@ -3253,8 +3253,8 @@
             },
             "data": [
                 {
-                    "tabId": "0c2c7cb4-86cd-4f53-f933-98754f9c3175",
-                    "resultId": "f7d70073-4ace-4839-aa81-7334f975078b",
+                    "tabId": "cf9a7fc9-4489-4c4d-c284-13a0edbbe456",
+                    "resultId": "17bbc069-2767-40ac-dd81-f5d0e9dc8107",
                     "rows": [
                         {
                             "0": "1970-01-01 00:00:00",
@@ -3337,7 +3337,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "ec9f5082-bca3-4994-b618-4148e7c12b39"
+                        "e9812f62-4624-4e91-d135-8aa06eec42a8"
                     ]
                 },
                 "currentHeight": 36,
@@ -3356,8 +3356,8 @@
             },
             "data": [
                 {
-                    "tabId": "0c2c7cb4-86cd-4f53-f933-98754f9c3175",
-                    "resultId": "ec9f5082-bca3-4994-b618-4148e7c12b39",
+                    "tabId": "cf9a7fc9-4489-4c4d-c284-13a0edbbe456",
+                    "resultId": "e9812f62-4624-4e91-d135-8aa06eec42a8",
                     "rows": [
                         {
                             "0": "1970-01-01 00:00:00",
@@ -3538,7 +3538,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "f6ba79d9-d9b6-49e5-9c4c-d32b7930163f"
+                        "86f9e327-17ab-4548-e830-c0a73535e5d5"
                     ]
                 },
                 "currentHeight": 36,
@@ -3557,8 +3557,8 @@
             },
             "data": [
                 {
-                    "tabId": "0c2c7cb4-86cd-4f53-f933-98754f9c3175",
-                    "resultId": "f6ba79d9-d9b6-49e5-9c4c-d32b7930163f",
+                    "tabId": "cf9a7fc9-4489-4c4d-c284-13a0edbbe456",
+                    "resultId": "86f9e327-17ab-4548-e830-c0a73535e5d5",
                     "rows": [
                         {
                             "0": 22,
@@ -3673,7 +3673,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "7f0ea0ed-b2d7-43ec-9c8b-148da15bc354"
+                        "3b09491b-5b61-4df3-d7fa-4f920ade1f5c"
                     ]
                 },
                 "currentHeight": 36,
@@ -3692,8 +3692,8 @@
             },
             "data": [
                 {
-                    "tabId": "0c2c7cb4-86cd-4f53-f933-98754f9c3175",
-                    "resultId": "7f0ea0ed-b2d7-43ec-9c8b-148da15bc354",
+                    "tabId": "cf9a7fc9-4489-4c4d-c284-13a0edbbe456",
+                    "resultId": "3b09491b-5b61-4df3-d7fa-4f920ade1f5c",
                     "rows": [
                         {
                             "0": "1864-02-28",
@@ -3771,7 +3771,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "c6743376-c97b-4906-d7a3-9be961d6cc65"
+                        "d23e7516-fd34-448f-a888-d753feb19c02"
                     ]
                 },
                 "currentHeight": 36,
@@ -3790,8 +3790,8 @@
             },
             "data": [
                 {
-                    "tabId": "0c2c7cb4-86cd-4f53-f933-98754f9c3175",
-                    "resultId": "c6743376-c97b-4906-d7a3-9be961d6cc65",
+                    "tabId": "cf9a7fc9-4489-4c4d-c284-13a0edbbe456",
+                    "resultId": "d23e7516-fd34-448f-a888-d753feb19c02",
                     "rows": [
                         {
                             "0": "1864-02-28",
@@ -3889,7 +3889,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "245cc9f2-5b75-44ab-f87e-a72b1e0b558c"
+                        "c7198b36-fe4e-45ad-fa72-4f9336a51112"
                     ]
                 },
                 "currentHeight": 36,
@@ -3908,8 +3908,8 @@
             },
             "data": [
                 {
-                    "tabId": "0c2c7cb4-86cd-4f53-f933-98754f9c3175",
-                    "resultId": "245cc9f2-5b75-44ab-f87e-a72b1e0b558c",
+                    "tabId": "cf9a7fc9-4489-4c4d-c284-13a0edbbe456",
+                    "resultId": "c7198b36-fe4e-45ad-fa72-4f9336a51112",
                     "rows": [
                         {
                             "0": "1864-02-28",
@@ -4034,7 +4034,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "87c0a788-5da3-4de8-e9f9-16bf13f9fb24"
+                        "f9fc6ca5-435c-4e5a-8845-b7b06ece7e34"
                     ]
                 },
                 "currentHeight": 36,
@@ -4053,8 +4053,8 @@
             },
             "data": [
                 {
-                    "tabId": "0c2c7cb4-86cd-4f53-f933-98754f9c3175",
-                    "resultId": "87c0a788-5da3-4de8-e9f9-16bf13f9fb24",
+                    "tabId": "cf9a7fc9-4489-4c4d-c284-13a0edbbe456",
+                    "resultId": "f9fc6ca5-435c-4e5a-8845-b7b06ece7e34",
                     "rows": [
                         {
                             "0": "1970-01-01 00:00:00",
@@ -4155,7 +4155,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "4ca692fa-ca7d-4738-959c-ec1960af6e88"
+                        "85b49501-5198-4f48-f855-2c7c2ea26719"
                     ]
                 },
                 "currentHeight": 36,
@@ -4174,8 +4174,8 @@
             },
             "data": [
                 {
-                    "tabId": "0c2c7cb4-86cd-4f53-f933-98754f9c3175",
-                    "resultId": "4ca692fa-ca7d-4738-959c-ec1960af6e88",
+                    "tabId": "cf9a7fc9-4489-4c4d-c284-13a0edbbe456",
+                    "resultId": "85b49501-5198-4f48-f855-2c7c2ea26719",
                     "rows": [
                         {
                             "0": "2024-07-10",
@@ -4317,7 +4317,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "fdbc3a2e-0d2e-49a7-99c8-3903892aa6c1"
+                        "9b60b8be-c86b-470d-8b9b-27dccf5ae4dd"
                     ]
                 },
                 "currentHeight": 36,
@@ -4336,8 +4336,8 @@
             },
             "data": [
                 {
-                    "tabId": "0c2c7cb4-86cd-4f53-f933-98754f9c3175",
-                    "resultId": "fdbc3a2e-0d2e-49a7-99c8-3903892aa6c1",
+                    "tabId": "cf9a7fc9-4489-4c4d-c284-13a0edbbe456",
+                    "resultId": "9b60b8be-c86b-470d-8b9b-27dccf5ae4dd",
                     "rows": [
                         {
                             "0": "2024-07-10 13:13:06",
@@ -4445,7 +4445,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "2e4e6ca1-7d45-4289-aa75-9392bedc61b7"
+                        "14018d69-0bd4-4a1e-c62c-47cc6774a14e"
                     ]
                 },
                 "currentHeight": 36,
@@ -4464,8 +4464,8 @@
             },
             "data": [
                 {
-                    "tabId": "0c2c7cb4-86cd-4f53-f933-98754f9c3175",
-                    "resultId": "2e4e6ca1-7d45-4289-aa75-9392bedc61b7",
+                    "tabId": "cf9a7fc9-4489-4c4d-c284-13a0edbbe456",
+                    "resultId": "14018d69-0bd4-4a1e-c62c-47cc6774a14e",
                     "rows": [
                         {
                             "0": "1970-01-01 00:00:00",
@@ -4626,7 +4626,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "5c5bcc1c-b6ea-41f9-f795-01ec40113edd"
+                        "1eeee367-19f9-4c7c-a5ed-0df56871f642"
                     ]
                 },
                 "currentHeight": 206.5625,
@@ -4645,8 +4645,8 @@
             },
             "data": [
                 {
-                    "tabId": "0c2c7cb4-86cd-4f53-f933-98754f9c3175",
-                    "resultId": "5c5bcc1c-b6ea-41f9-f795-01ec40113edd",
+                    "tabId": "cf9a7fc9-4489-4c4d-c284-13a0edbbe456",
+                    "resultId": "1eeee367-19f9-4c7c-a5ed-0df56871f642",
                     "rows": [
                         {
                             "0": "1970-01-01 00:00:00",
@@ -4741,7 +4741,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "7dd6dded-e836-4e59-f66a-b0094ef059d4"
+                        "10701b10-c6e6-4daf-e563-67f6371f678c"
                     ]
                 },
                 "currentHeight": 206.5625,
@@ -4760,8 +4760,8 @@
             },
             "data": [
                 {
-                    "tabId": "0c2c7cb4-86cd-4f53-f933-98754f9c3175",
-                    "resultId": "7dd6dded-e836-4e59-f66a-b0094ef059d4",
+                    "tabId": "cf9a7fc9-4489-4c4d-c284-13a0edbbe456",
+                    "resultId": "10701b10-c6e6-4daf-e563-67f6371f678c",
                     "rows": [
                         {
                             "0": "1970-01-01 00:00:00",
@@ -4909,7 +4909,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "2feeb7ef-cee4-432c-fef7-e6840ca8a86e"
+                        "23fd3829-69c7-4468-aa82-7a9bc2910b27"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -4928,8 +4928,8 @@
             },
             "data": [
                 {
-                    "tabId": "0c2c7cb4-86cd-4f53-f933-98754f9c3175",
-                    "resultId": "2feeb7ef-cee4-432c-fef7-e6840ca8a86e",
+                    "tabId": "cf9a7fc9-4489-4c4d-c284-13a0edbbe456",
+                    "resultId": "23fd3829-69c7-4468-aa82-7a9bc2910b27",
                     "rows": [
                         {
                             "0": "10:30:58",
@@ -4985,7 +4985,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "dfd51c31-a164-4847-b110-9f01c5e52291"
+                        "da783984-b913-431e-e5b8-76eed8678368"
                     ]
                 },
                 "currentHeight": 36,
@@ -5004,8 +5004,8 @@
             },
             "data": [
                 {
-                    "tabId": "0c2c7cb4-86cd-4f53-f933-98754f9c3175",
-                    "resultId": "dfd51c31-a164-4847-b110-9f01c5e52291",
+                    "tabId": "cf9a7fc9-4489-4c4d-c284-13a0edbbe456",
+                    "resultId": "da783984-b913-431e-e5b8-76eed8678368",
                     "rows": [
                         {
                             "0": "1864-02-28",
@@ -5080,7 +5080,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "f1231c61-80ac-4039-fe69-4dfb88a39e47"
+                        "a080653f-6b3a-46a7-df54-73c4de10526e"
                     ]
                 },
                 "currentHeight": 239.703125,
@@ -5099,8 +5099,8 @@
             },
             "data": [
                 {
-                    "tabId": "0c2c7cb4-86cd-4f53-f933-98754f9c3175",
-                    "resultId": "f1231c61-80ac-4039-fe69-4dfb88a39e47",
+                    "tabId": "cf9a7fc9-4489-4c4d-c284-13a0edbbe456",
+                    "resultId": "a080653f-6b3a-46a7-df54-73c4de10526e",
                     "rows": [
                         {
                             "0": "1864-02-28",
@@ -5175,7 +5175,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "a1e56002-c82d-4fa2-c048-398a7ffc10f4"
+                        "531887c9-1e41-478a-eec1-a059ebab47dd"
                     ]
                 },
                 "currentHeight": 173.421875,
@@ -5194,8 +5194,8 @@
             },
             "data": [
                 {
-                    "tabId": "0c2c7cb4-86cd-4f53-f933-98754f9c3175",
-                    "resultId": "a1e56002-c82d-4fa2-c048-398a7ffc10f4",
+                    "tabId": "cf9a7fc9-4489-4c4d-c284-13a0edbbe456",
+                    "resultId": "531887c9-1e41-478a-eec1-a059ebab47dd",
                     "rows": [
                         {
                             "0": "15:00:00",
@@ -5296,7 +5296,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "b8505b75-3d5d-46b6-cca6-f4f7ccb16ad4"
+                        "7d2c7a2b-5f59-4d9f-864e-2aad93290f8d"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -5315,8 +5315,8 @@
             },
             "data": [
                 {
-                    "tabId": "0c2c7cb4-86cd-4f53-f933-98754f9c3175",
-                    "resultId": "b8505b75-3d5d-46b6-cca6-f4f7ccb16ad4",
+                    "tabId": "cf9a7fc9-4489-4c4d-c284-13a0edbbe456",
+                    "resultId": "7d2c7a2b-5f59-4d9f-864e-2aad93290f8d",
                     "rows": [
                         {
                             "0": "2009-06-03",
@@ -5401,7 +5401,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "1bad9d10-da35-44f2-9940-6cc50ec3acbd"
+                        "b702bd4f-a009-4676-989f-9a632912816e"
                     ]
                 },
                 "currentHeight": 36,
@@ -5420,8 +5420,8 @@
             },
             "data": [
                 {
-                    "tabId": "0c2c7cb4-86cd-4f53-f933-98754f9c3175",
-                    "resultId": "1bad9d10-da35-44f2-9940-6cc50ec3acbd",
+                    "tabId": "cf9a7fc9-4489-4c4d-c284-13a0edbbe456",
+                    "resultId": "b702bd4f-a009-4676-989f-9a632912816e",
                     "rows": [
                         {
                             "0": "15:00:00",
@@ -5508,7 +5508,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "ca3a4598-31e9-42ac-d759-54fcd9cef1df"
+                        "3d8d8494-37ed-4bf2-d1f2-7c760d2746e8"
                     ]
                 },
                 "currentHeight": 36,
@@ -5527,8 +5527,8 @@
             },
             "data": [
                 {
-                    "tabId": "0c2c7cb4-86cd-4f53-f933-98754f9c3175",
-                    "resultId": "ca3a4598-31e9-42ac-d759-54fcd9cef1df",
+                    "tabId": "cf9a7fc9-4489-4c4d-c284-13a0edbbe456",
+                    "resultId": "3d8d8494-37ed-4bf2-d1f2-7c760d2746e8",
                     "rows": [
                         {
                             "0": "15:00:00",
@@ -5674,7 +5674,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "dac056e3-c20b-4982-d7f4-ba0ae64d6996"
+                        "5a0d3b83-5ebf-4d2e-dc8a-2546454deafb"
                     ]
                 },
                 "currentHeight": 36,
@@ -5693,8 +5693,8 @@
             },
             "data": [
                 {
-                    "tabId": "0c2c7cb4-86cd-4f53-f933-98754f9c3175",
-                    "resultId": "dac056e3-c20b-4982-d7f4-ba0ae64d6996",
+                    "tabId": "cf9a7fc9-4489-4c4d-c284-13a0edbbe456",
+                    "resultId": "5a0d3b83-5ebf-4d2e-dc8a-2546454deafb",
                     "rows": [
                         {
                             "0": "1970-01-01 00:00:00",
@@ -5786,7 +5786,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "b94255f9-5100-46f0-f5fe-65ac587a29a6"
+                        "7197329c-cdba-400d-d1bc-a41c98f338e7"
                     ]
                 },
                 "currentHeight": 36,
@@ -5805,8 +5805,8 @@
             },
             "data": [
                 {
-                    "tabId": "0c2c7cb4-86cd-4f53-f933-98754f9c3175",
-                    "resultId": "b94255f9-5100-46f0-f5fe-65ac587a29a6",
+                    "tabId": "cf9a7fc9-4489-4c4d-c284-13a0edbbe456",
+                    "resultId": "7197329c-cdba-400d-d1bc-a41c98f338e7",
                     "rows": [
                         {
                             "0": "1864-02-28",
@@ -5899,7 +5899,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "265f53cc-6364-442f-fc7d-f42f04bc5c63"
+                        "730f7b30-c523-4121-953b-c393c65093aa"
                     ]
                 },
                 "currentHeight": 206.5625,
@@ -5918,8 +5918,8 @@
             },
             "data": [
                 {
-                    "tabId": "0c2c7cb4-86cd-4f53-f933-98754f9c3175",
-                    "resultId": "265f53cc-6364-442f-fc7d-f42f04bc5c63",
+                    "tabId": "cf9a7fc9-4489-4c4d-c284-13a0edbbe456",
+                    "resultId": "730f7b30-c523-4121-953b-c393c65093aa",
                     "rows": [
                         {
                             "0": "1970-01-01 00:00:00",
@@ -6009,7 +6009,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "81b9eb5b-c3cc-4376-b757-1b924e54db38"
+                        "e1d206b3-ca4c-4c42-fd05-4a9f06e30aba"
                     ]
                 },
                 "currentHeight": 206.5625,
@@ -6028,8 +6028,8 @@
             },
             "data": [
                 {
-                    "tabId": "0c2c7cb4-86cd-4f53-f933-98754f9c3175",
-                    "resultId": "81b9eb5b-c3cc-4376-b757-1b924e54db38",
+                    "tabId": "cf9a7fc9-4489-4c4d-c284-13a0edbbe456",
+                    "resultId": "e1d206b3-ca4c-4c42-fd05-4a9f06e30aba",
                     "rows": [
                         {
                             "0": "1970-01-01 00:00:00",
@@ -6153,7 +6153,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "8770f1f6-3c07-45ba-89af-d9a2367ed580"
+                        "850f4f38-e8ad-44c5-92b9-c89f237bcbe8"
                     ]
                 },
                 "currentHeight": 36,
@@ -6172,8 +6172,8 @@
             },
             "data": [
                 {
-                    "tabId": "0c2c7cb4-86cd-4f53-f933-98754f9c3175",
-                    "resultId": "8770f1f6-3c07-45ba-89af-d9a2367ed580",
+                    "tabId": "cf9a7fc9-4489-4c4d-c284-13a0edbbe456",
+                    "resultId": "850f4f38-e8ad-44c5-92b9-c89f237bcbe8",
                     "rows": [
                         {
                             "0": "1970-01-01 00:00:00",
@@ -6265,7 +6265,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "3e6a249a-aa79-498b-f0b7-b637ffbb5968"
+                        "f5510ccf-be4f-462a-af25-1dd2f87d9148"
                     ]
                 },
                 "currentHeight": 36,
@@ -6284,8 +6284,8 @@
             },
             "data": [
                 {
-                    "tabId": "0c2c7cb4-86cd-4f53-f933-98754f9c3175",
-                    "resultId": "3e6a249a-aa79-498b-f0b7-b637ffbb5968",
+                    "tabId": "cf9a7fc9-4489-4c4d-c284-13a0edbbe456",
+                    "resultId": "f5510ccf-be4f-462a-af25-1dd2f87d9148",
                     "rows": [
                         {
                             "0": "2024-07-11",
@@ -6392,7 +6392,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "9de0a2fb-c73d-482b-d151-8ae62bb96ed5"
+                        "33b30cc2-2eaa-4f73-d942-a1562d1a2ae5"
                     ]
                 },
                 "currentHeight": 36,
@@ -6411,8 +6411,8 @@
             },
             "data": [
                 {
-                    "tabId": "0c2c7cb4-86cd-4f53-f933-98754f9c3175",
-                    "resultId": "9de0a2fb-c73d-482b-d151-8ae62bb96ed5",
+                    "tabId": "cf9a7fc9-4489-4c4d-c284-13a0edbbe456",
+                    "resultId": "33b30cc2-2eaa-4f73-d942-a1562d1a2ae5",
                     "rows": [
                         {
                             "0": 31,
@@ -6490,7 +6490,7 @@
                         }
                     ]
                 },
-                "currentHeight": 34,
+                "currentHeight": 28,
                 "currentSet": 1,
                 "statements": [
                     {
@@ -6575,7 +6575,7 @@
                         "text": ""
                     }
                 },
-                "currentHeight": 60,
+                "currentHeight": 28,
                 "currentSet": 1,
                 "statements": [
                     {
@@ -6607,7 +6607,7 @@
                         }
                     ]
                 },
-                "currentHeight": 34,
+                "currentHeight": 28,
                 "currentSet": 1,
                 "statements": [
                     {
@@ -6631,7 +6631,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "22a6b64f-f4bf-43bd-da8d-8517973d2434"
+                        "8eeb9c1b-aecd-4d3d-d24b-8a3e3437f426"
                     ]
                 },
                 "currentHeight": 107.140625,
@@ -6650,8 +6650,8 @@
             },
             "data": [
                 {
-                    "tabId": "0c2c7cb4-86cd-4f53-f933-98754f9c3175",
-                    "resultId": "22a6b64f-f4bf-43bd-da8d-8517973d2434",
+                    "tabId": "cf9a7fc9-4489-4c4d-c284-13a0edbbe456",
+                    "resultId": "8eeb9c1b-aecd-4d3d-d24b-8a3e3437f426",
                     "rows": [
                         {
                             "0": 5258880,
@@ -6779,7 +6779,425 @@
         {
             "state": {
                 "start": 206,
-                "end": 206,
+                "end": 210,
+                "language": "mysql",
+                "result": {
+                    "type": "text",
+                    "text": [
+                        {
+                            "type": 0,
+                            "index": 0,
+                            "content": "ClassicResult.fetch_one: Invalid date value '-02:31:10'\n",
+                            "language": "ansi"
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": ""
+                    }
+                },
+                "currentHeight": 34,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 232
+                        },
+                        "contentStart": 45,
+                        "state": 3
+                    }
+                ]
+            },
+            "data": []
+        },
+        {
+            "state": {
+                "start": 211,
+                "end": 212,
+                "language": "mysql",
+                "result": {
+                    "type": "text",
+                    "text": [
+                        {
+                            "type": 4,
+                            "index": 0,
+                            "resultId": "608fc749-596a-45c6-ee9f-bc6b705c2b23",
+                            "content": "OK, 0 records retrieved in 0s"
+                        }
+                    ]
+                },
+                "currentHeight": 34,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 120
+                        },
+                        "contentStart": 62,
+                        "state": 3
+                    }
+                ]
+            },
+            "data": []
+        },
+        {
+            "state": {
+                "start": 213,
+                "end": 213,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "f7039c87-eb00-46c5-a039-0040a2775321"
+                    ]
+                },
+                "currentHeight": 107.140625,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 39
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "cf9a7fc9-4489-4c4d-c284-13a0edbbe456",
+                    "resultId": "f7039c87-eb00-46c5-a039-0040a2775321",
+                    "rows": [
+                        {
+                            "0": 210,
+                            "1": "30.0000"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "days",
+                            "field": "0",
+                            "dataType": {
+                                "type": 4,
+                                "flags": [
+                                    "SIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 10,
+                                "parameterFormatType": "OneOrZero",
+                                "synonyms": [
+                                    "INTEGER",
+                                    "INT4"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "Weeks",
+                            "field": "1",
+                            "dataType": {
+                                "type": 10,
+                                "flags": [
+                                    "UNSIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 65,
+                                "numericScale": 30,
+                                "parameterFormatType": "TwoOrOneOrZero",
+                                "synonyms": [
+                                    "FIXED",
+                                    "NUMERIC",
+                                    "DEC"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 0s"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT @days AS days, @days/7 AS Weeks",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 214,
+                "end": 214,
+                "language": "mysql",
+                "result": {
+                    "type": "text",
+                    "text": [
+                        {
+                            "type": 4,
+                            "index": 0,
+                            "resultId": "bade2998-043e-4e2d-f04d-68f82a8b16b1",
+                            "content": "OK, 0 records retrieved in 0s"
+                        }
+                    ]
+                },
+                "currentHeight": 34,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 33
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": []
+        },
+        {
+            "state": {
+                "start": 215,
+                "end": 215,
+                "language": "mysql",
+                "result": {
+                    "type": "text",
+                    "text": [
+                        {
+                            "type": 4,
+                            "index": 0,
+                            "resultId": "1396f945-1492-48ad-ef97-8afaf6091dbc",
+                            "content": "OK, 0 records retrieved in 0s"
+                        }
+                    ]
+                },
+                "currentHeight": 34,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 34
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": []
+        },
+        {
+            "state": {
+                "start": 216,
+                "end": 216,
+                "language": "mysql",
+                "result": {
+                    "type": "text",
+                    "text": [
+                        {
+                            "type": 4,
+                            "index": 0,
+                            "resultId": "f0f15c03-6be1-4b9e-ff65-08ccaeab2bf2",
+                            "content": "OK, 0 records retrieved in 0s"
+                        }
+                    ]
+                },
+                "currentHeight": 34,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 60
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": []
+        },
+        {
+            "state": {
+                "start": 217,
+                "end": 218,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "ee023d52-d02e-4732-822f-80feab13bfcd"
+                    ]
+                },
+                "currentHeight": 107.140625,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 192
+                        },
+                        "contentStart": 0,
+                        "state": 3
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "cf9a7fc9-4489-4c4d-c284-13a0edbbe456",
+                    "resultId": "ee023d52-d02e-4732-822f-80feab13bfcd",
+                    "rows": [
+                        {
+                            "0": "1209600",
+                            "1": "20160",
+                            "2": "336",
+                            "3": "14",
+                            "4": "2"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "seconds",
+                            "field": "0",
+                            "dataType": {
+                                "type": 10,
+                                "flags": [
+                                    "UNSIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 65,
+                                "numericScale": 30,
+                                "parameterFormatType": "TwoOrOneOrZero",
+                                "synonyms": [
+                                    "FIXED",
+                                    "NUMERIC",
+                                    "DEC"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "minutes",
+                            "field": "1",
+                            "dataType": {
+                                "type": 10,
+                                "flags": [
+                                    "UNSIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 65,
+                                "numericScale": 30,
+                                "parameterFormatType": "TwoOrOneOrZero",
+                                "synonyms": [
+                                    "FIXED",
+                                    "NUMERIC",
+                                    "DEC"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "hours",
+                            "field": "2",
+                            "dataType": {
+                                "type": 10,
+                                "flags": [
+                                    "UNSIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 65,
+                                "numericScale": 30,
+                                "parameterFormatType": "TwoOrOneOrZero",
+                                "synonyms": [
+                                    "FIXED",
+                                    "NUMERIC",
+                                    "DEC"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "days",
+                            "field": "3",
+                            "dataType": {
+                                "type": 10,
+                                "flags": [
+                                    "UNSIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 65,
+                                "numericScale": 30,
+                                "parameterFormatType": "TwoOrOneOrZero",
+                                "synonyms": [
+                                    "FIXED",
+                                    "NUMERIC",
+                                    "DEC"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        },
+                        {
+                            "title": "weeks",
+                            "field": "4",
+                            "dataType": {
+                                "type": 10,
+                                "flags": [
+                                    "UNSIGNED",
+                                    "ZEROFILL"
+                                ],
+                                "numericPrecision": 65,
+                                "numericScale": 30,
+                                "parameterFormatType": "TwoOrOneOrZero",
+                                "synonyms": [
+                                    "FIXED",
+                                    "NUMERIC",
+                                    "DEC"
+                                ]
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 1 record retrieved in 0s"
+                    },
+                    "totalRowCount": 1,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "SELECT @interval as seconds, FLOOR(@interval / 60) as minutes, FLOOR(@interval / (60 * 60)) as hours,\nFLOOR(@interval / (24 * 60 * 60)) as days, FLOOR(@interval / (7 * 24 * 60 * 60)) as weeks;",
+                    "updatable": false,
+                    "fullTableName": ""
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 219,
+                "end": 219,
                 "language": "mysql",
                 "currentSet": 1,
                 "statements": [
